@@ -4,7 +4,7 @@ An automatic indexer for Postgres
 
 ## Installation
 
-First, install [HypoPG](https://github.com/dalibo/hypopg) on your database server. Thankfully, this doesn't require a restart.
+First, install [HypoPG](https://github.com/dalibo/hypopg) on your database server. This doesn’t require a restart.
 
 ```sh
 wget https://github.com/dalibo/hypopg/archive/1.0.0.tar.gz

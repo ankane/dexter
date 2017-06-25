@@ -113,18 +113,7 @@ module Dexter
 
       log "Processing #{queries.size} new query fingerprints"
       if queries.any?
-        new_indexes = @indexer.process_queries(queries)
-
-        new_indexes.each do |index|
-          log "Index found: #{index[:table]} (#{index[:columns].join(", ")})"
-          # log "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")});"
-          # index[:queries].sort_by { |q| fingerprints[q[:query]] }.each do |query|
-          #   log "Query #{fingerprints[query[:query]]} (Cost: #{query[:starting_cost]} -> #{query[:final_cost]})"
-          #   puts
-          #   puts query[:query]
-          #   puts
-          # end
-        end
+        @indexer.process_queries(queries)
       end
     end
 

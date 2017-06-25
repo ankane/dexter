@@ -76,12 +76,28 @@ module Dexter
 
       # create indexes
       if new_indexes.any?
-        # puts "Indexes to be created:"
+        new_indexes.each do |index|
+          index[:queries] = queries_by_index[index]
+
+          log "Index found: #{index[:table]} (#{index[:columns].join(", ")})"
+          # log "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")});"
+          # index[:queries].sort_by { |q| fingerprints[q[:query]] }.each do |query|
+          #   log "Query #{fingerprints[query[:query]]} (Cost: #{query[:starting_cost]} -> #{query[:final_cost]})"
+          #   puts
+          #   puts query[:query]
+          #   puts
+          # end
+        end
+
         new_indexes.each do |index|
           statement = "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")})"
           # puts "#{statement};"
-          select_all(statement) if client.options[:create]
-          index[:queries] = queries_by_index[index]
+          if client.options[:create]
+            log "Creating index: #{statement}"
+            started_at = Time.now
+            select_all(statement)
+            log "Index created: #{((Time.now - started_at) * 1000).to_i} ms"
+          end
         end
       end
 

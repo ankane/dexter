@@ -33,28 +33,28 @@ gem install pgdexter
 Dexter needs a connection to your database and a log file to process.
 
 ```sh
-dexter <database-url> <log-file>
+tail -F -n +1 <log-file> | dexter <database-url>
 ```
 
 This finds slow queries and generates output like:
 
-```
-SELECT * FROM ratings ORDER BY user_id LIMIT 10
-Starting cost: 3797.99
-Final cost: 0.5
-CREATE INDEX CONCURRENTLY ON ratings (user_id);
+```log
+2017-06-25T17:52:19+00:00 Started
+2017-06-25T17:52:22+00:00 Processing 189 new query fingerprints
+2017-06-25T17:52:22+00:00 Index found: genres_movies (genre_id)
+2017-06-25T17:52:22+00:00 Index found: genres_movies (movie_id)
+2017-06-25T17:52:22+00:00 Index found: movies (title)
+2017-06-25T17:52:22+00:00 Index found: ratings (movie_id)
+2017-06-25T17:52:22+00:00 Index found: ratings (rating)
+2017-06-25T17:52:22+00:00 Index found: ratings (user_id)
+2017-06-25T17:53:22+00:00 Processing 12 new query fingerprints
 ```
 
-To be safe, Dexter does not create indexes unless you pass the `--create` flag.
-
-You can also pass a single statement with:
-
-```sh
-dexter <database-url> -s "SELECT * FROM ..."
-```
+To be safe, Dexter will not create indexes unless you pass the `--create` flag.
 
 ## Options
 
+- `--interval` - time to wait between processing queries
 - `--min-time` - only consider queries that have consumed a certain amount of DB time (in minutes)
 
 ## Contributing

@@ -1,5 +1,7 @@
 module Dexter
   class Indexer
+    include Logging
+
     def initialize(database_url, options)
       @database_url = database_url
       @create = options[:create]
@@ -311,10 +313,6 @@ module Dexter
     # activerecord
     def quote_string(s)
       s.gsub(/\\/, '\&\&').gsub(/'/, "''")
-    end
-
-    def log(message)
-      puts "#{Time.now.iso8601} #{message}"
     end
   end
 end

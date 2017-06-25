@@ -1,5 +1,7 @@
 module Dexter
   class Processor
+    include Logging
+
     def initialize(database_url, logfile, options)
       @logfile = logfile
 
@@ -54,10 +56,6 @@ module Dexter
 
       log "Processing #{queries.size} new query fingerprints"
       @indexer.process_queries(queries) if queries.any?
-    end
-
-    def log(message)
-      puts "#{Time.now.iso8601} #{message}"
     end
   end
 end

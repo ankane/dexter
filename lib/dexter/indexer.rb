@@ -197,7 +197,7 @@ module Dexter
           elsif query_tables[query].empty?
             log "No tables"
           else
-            log "Some tables missing in current database"
+            log "Tables missing in current database"
           end
           puts
           puts query

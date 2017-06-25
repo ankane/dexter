@@ -186,36 +186,6 @@ module Dexter
       Set.new(queries.flat_map(&:tables).uniq & database_tables)
     end
 
-    #   query_tables = {}
-    #   queries.each do |query|
-    #     query_tables[query] = PgQuery.parse(query).tables rescue nil
-    #   end
-
-    #   new_queries = queries.select { |q| query_tables[q] }
-
-    #   tables = new_queries.flat_map { |q| query_tables[q] }.uniq.select { |t| possible_tables.include?(t) }
-
-    #   new_queries = new_queries.select { |q| query_tables[q].any? && query_tables[q].all? { |t| possible_tables.include?(t) } }
-
-    #   if @log_level == "debug2"
-    #     (queries - new_queries).each do |query|
-    #       log "Processed #{PgQuery.fingerprint(query) rescue "unknown"}"
-    #       if !query_tables[query]
-    #         log "Query parse error"
-    #       elsif query_tables[query].empty?
-    #         log "No tables"
-    #       else
-    #         log "Tables not present in current database"
-    #       end
-    #       puts
-    #       puts query
-    #       puts
-    #     end
-    #   end
-
-    #   [tables, new_queries]
-    # end
-
     def columns(tables)
       columns = select_all <<-SQL
         SELECT

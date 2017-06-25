@@ -29,11 +29,11 @@ module Dexter
         candidates = {}
       end
 
-      new_indexes = determine_indexes(queries, tables, candidates)
+      new_indexes = determine_indexes(queries, candidates)
       show_and_create_indexes(new_indexes)
     end
 
-    def determine_indexes(queries, tables, candidates)
+    def determine_indexes(queries, candidates)
       new_indexes = {}
 
       queries.each do |query|

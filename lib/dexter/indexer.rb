@@ -141,6 +141,8 @@ module Dexter
             else
               log "Indexes: None"
             end
+          elsif query.fingerprint == "unknown"
+            log "Could not parse query"
           elsif query.tables.empty?
             log "No tables"
           elsif query.missing_tables

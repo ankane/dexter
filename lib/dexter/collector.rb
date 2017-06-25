@@ -1,0 +1,47 @@
+module Dexter
+  class Collector
+    def initialize(options = {})
+      @top_queries = {}
+      @new_queries = Set.new
+      @mutex = Mutex.new
+      @min_time = options[:min_time] * 60000 # convert minutes to ms
+    end
+
+    def add(query, duration)
+      fingerprint =
+        begin
+          PgQuery.fingerprint(query)
+        rescue PgQuery::ParseError
+          # do nothing
+        end
+
+      return unless fingerprint
+
+      @top_queries[fingerprint] ||= {calls: 0, total_time: 0}
+      @top_queries[fingerprint][:calls] += 1
+      @top_queries[fingerprint][:total_time] += duration
+      @top_queries[fingerprint][:query] = query
+      @mutex.synchronize do
+        @new_queries << fingerprint
+      end
+    end
+
+    def fetch_queries
+      new_queries = nil
+
+      @mutex.synchronize do
+        new_queries = @new_queries.dup
+        @new_queries.clear
+      end
+
+      queries = []
+      @top_queries.each do |k, v|
+        if new_queries.include?(k) && v[:total_time] > @min_time
+          queries << [k, v[:query]]
+        end
+      end
+
+      queries
+    end
+  end
+end

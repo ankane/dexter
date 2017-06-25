@@ -4,11 +4,9 @@ module Dexter
 
     def initialize(logfile, client)
       @logfile = logfile
-      @min_time = client.options[:min_time] * 60000 # convert minutes to ms
-      @top_queries = {}
+      @collector = Collector.new(min_time: client.options[:min_time])
+
       @indexer = Indexer.new(client)
-      @new_queries = Set.new
-      @new_queries_mutex = Mutex.new
       @process_queries_mutex = Mutex.new
       @last_checked_at = {}
 
@@ -71,41 +69,17 @@ module Dexter
     end
 
     def process_entry(query, duration)
-      return unless query =~ /SELECT/i
-      fingerprint =
-        begin
-          PgQuery.fingerprint(query)
-        rescue PgQuery::ParseError
-          # do nothing
-        end
-      return unless fingerprint
-
-      @top_queries[fingerprint] ||= {calls: 0, total_time: 0}
-      @top_queries[fingerprint][:calls] += 1
-      @top_queries[fingerprint][:total_time] += duration
-      @top_queries[fingerprint][:query] = query
-      @new_queries_mutex.synchronize do
-        @new_queries << fingerprint
-      end
+      @collector.add(query, duration) if query =~ /SELECT/i
     end
 
     def process_queries
-      new_queries = nil
-
-      @new_queries_mutex.synchronize do
-        new_queries = @new_queries.dup
-        @new_queries.clear
-      end
-
       now = Time.now
       min_checked_at = now - 3600 # don't recheck for an hour
       queries = []
-      fingerprints = {}
-      @top_queries.each do |k, v|
-        if new_queries.include?(k) && v[:total_time] > @min_time && (!@last_checked_at[k] || @last_checked_at[k] < min_checked_at)
-          fingerprints[v[:query]] = k
-          queries << v[:query]
-          @last_checked_at[k] = now
+      @collector.fetch_queries.each do |fingerprint, query|
+        if !@last_checked_at[fingerprint] || @last_checked_at[fingerprint] < min_checked_at
+          queries << query
+          @last_checked_at[fingerprint] = now
         end
       end
 

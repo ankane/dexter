@@ -38,8 +38,12 @@ module Dexter
           yield line
         end
       else
-        File.foreach(@logfile) do |line|
-          yield line
+        begin
+          File.foreach(@logfile) do |line|
+            yield line
+          end
+        rescue Errno::ENOENT
+          abort "Log file not found"
         end
       end
     end

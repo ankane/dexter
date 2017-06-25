@@ -1,9 +1,9 @@
 module Dexter
   class Indexer
-    attr_reader :client
-
-    def initialize(client)
-      @client = client
+    def initialize(database_url, options)
+      @database_url = database_url
+      @create = options[:create]
+      @log_level = options[:log_level]
 
       select_all("SET client_min_messages = warning")
       select_all("CREATE EXTENSION IF NOT EXISTS hypopg")
@@ -47,7 +47,7 @@ module Dexter
 
       queries_by_index = {}
 
-      if client.options[:log_level].start_with?("debug")
+      if @log_level.start_with?("debug")
         # TODO don't generate fingerprints again
         fingerprints = {}
         queries.each do |query|
@@ -85,7 +85,7 @@ module Dexter
           new_indexes.concat(best_indexes)
         end
 
-        if client.options[:log_level] == "debug2"
+        if @log_level == "debug2"
           log "Processed #{fingerprints[query]}"
           if initial_plans[query]
             log "Cost: #{starting_cost} -> #{cost2}"
@@ -115,7 +115,7 @@ module Dexter
 
           log "Index found: #{index[:table]} (#{index[:columns].join(", ")})"
 
-          if client.options[:log_level].start_with?("debug")
+          if @log_level.start_with?("debug")
             index[:queries].sort_by { |q| fingerprints[q[:query]] }.each do |query|
               log "Query #{fingerprints[query[:query]]} (Cost: #{query[:starting_cost]} -> #{query[:final_cost]})"
               puts
@@ -127,7 +127,7 @@ module Dexter
 
         new_indexes.each do |index|
           statement = "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")})"
-          if client.options[:create]
+          if @create
             log "Creating index: #{statement}"
             started_at = Time.now
             select_all(statement)
@@ -143,7 +143,7 @@ module Dexter
 
     def conn
       @conn ||= begin
-        uri = URI.parse(client.arguments[0])
+        uri = URI.parse(@database_url)
         config = {
           host: uri.host,
           port: uri.port,
@@ -189,7 +189,7 @@ module Dexter
 
       new_queries = new_queries.select { |q| query_tables[q].any? && query_tables[q].all? { |t| possible_tables.include?(t) } }
 
-      if client.options[:log_level] == "debug2"
+      if @log_level == "debug2"
         (queries - new_queries).each do |query|
           log "Processed #{PgQuery.fingerprint(query) rescue "unknown"}"
           if !query_tables[query]

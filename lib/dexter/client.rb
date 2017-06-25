@@ -8,15 +8,11 @@ module Dexter
 
     def perform
       if options[:statement]
-        Indexer.new(self).process_queries([options[:statement]])
+        Indexer.new(arguments[0], options).process_queries([options[:statement]])
       elsif arguments[1]
-        begin
-          Processor.new(arguments[1], self).perform
-        rescue Errno::ENOENT
-          abort "Log file not found"
-        end
+        Processor.new(arguments[0], arguments[1], options).perform
       else
-        Processor.new(STDIN, self).perform
+        Processor.new(arguments[0], STDIN, options).perform
       end
     end
 

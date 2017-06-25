@@ -1,14 +1,14 @@
 module Dexter
   class Processor
-    def initialize(logfile, client)
+    def initialize(database_url, logfile, options)
       @logfile = logfile
 
-      @collector = Collector.new(min_time: client.options[:min_time])
+      @collector = Collector.new(min_time: options[:min_time])
       @log_parser = LogParser.new(logfile, @collector)
-      @indexer = Indexer.new(client)
+      @indexer = Indexer.new(database_url, options)
 
       @starting_interval = 3
-      @interval = client.options[:interval]
+      @interval = options[:interval]
 
       @mutex = Mutex.new
       @last_checked_at = {}

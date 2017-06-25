@@ -48,28 +48,57 @@ module Dexter
 
       queries_by_index = {}
 
+      if client.options[:log_level].start_with?("debug")
+        # TODO don't generate fingerprints again
+        fingerprints = {}
+        queries.each do |query|
+          fingerprints[query] = PgQuery.fingerprint(query)
+        end
+      end
+
       new_indexes = []
       queries.each do |query|
         starting_cost = initial_plans[query]["Total Cost"]
         plan2 = plan(query)
         cost2 = plan2["Total Cost"]
         best_indexes = []
+        found_indexes = []
 
         candidates.each do |col, index_name|
-          if plan2.inspect.include?(index_name) && cost2 < starting_cost * 0.5
-            best_indexes << {
+          if plan2.inspect.include?(index_name)
+            best_index = {
               table: col[:table],
               columns: [col[:column]]
             }
-            (queries_by_index[best_indexes.last] ||= []) << {
-              starting_cost: starting_cost,
-              final_cost: cost2,
-              query: query
-            }
+            found_indexes << best_index
+            if cost2 < starting_cost * 0.5
+              best_indexes << best_index
+              (queries_by_index[best_index] ||= []) << {
+                starting_cost: starting_cost,
+                final_cost: cost2,
+                query: query
+              }
+            end
           end
         end
 
         new_indexes.concat(best_indexes)
+
+        if client.options[:log_level] == "debug2"
+          log "Processed #{fingerprints[query]}"
+          log "Cost: #{starting_cost} -> #{cost2}"
+
+          index_str = found_indexes.any? ? found_indexes.map { |i| "#{i[:table]} (#{i[:columns].join(", ")})" }.join(", ") : "None"
+          log "Indexes: #{index_str}"
+
+          if found_indexes != best_indexes
+            log "Need 50% cost savings to suggest index"
+          end
+
+          puts
+          puts query
+          puts
+        end
       end
 
       new_indexes = new_indexes.uniq.sort_by(&:to_a)
@@ -81,13 +110,7 @@ module Dexter
 
           log "Index found: #{index[:table]} (#{index[:columns].join(", ")})"
 
-          if client.options[:log_level] == "debug"
-            # TODO don't generate fingerprints again
-            fingerprints = {}
-            queries.each do |query|
-              fingerprints[query] = PgQuery.fingerprint(query)
-            end
-
+          if client.options[:log_level].start_with?("debug")
             index[:queries].sort_by { |q| fingerprints[q[:query]] }.each do |query|
               log "Query #{fingerprints[query[:query]]} (Cost: #{query[:starting_cost]} -> #{query[:final_cost]})"
               puts

@@ -55,7 +55,7 @@ Options:}
 
       abort "Too many arguments" if arguments.size > 2
 
-      abort "Unknown log level" unless ["info", "debug"].include?(opts.to_hash[:log_level].to_s.downcase)
+      abort "Unknown log level" unless ["info", "debug", "debug2"].include?(opts.to_hash[:log_level].to_s.downcase)
 
       [arguments, opts.to_hash]
     rescue Slop::Error => e

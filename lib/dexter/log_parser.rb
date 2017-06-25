@@ -2,14 +2,14 @@ module Dexter
   class LogParser
     REGEX = /duration: (\d+\.\d+) ms  (statement|execute <unnamed>): (.+)/
 
-    def initialize(logfile, options = {})
+    def initialize(logfile, client)
       @logfile = logfile
-      @min_time = options[:min_time] * 60000 # convert minutes to ms
+      @min_time = client.options[:min_time] * 60000 # convert minutes to ms
+      @top_queries = {}
+      @indexer = Indexer.new(client)
     end
 
-    def queries
-      @top_queries = {}
-
+    def perform
       active_line = nil
       duration = nil
 
@@ -33,7 +33,7 @@ module Dexter
       end
       process_entry(active_line, duration) if active_line
 
-      @top_queries.select { |_, v| v[:total_time] > @min_time }.map { |_, v| v[:query] }
+      @indexer.process_queries(queries)
     end
 
     private
@@ -42,7 +42,6 @@ module Dexter
       if @logfile == STDIN
         STDIN.each_line do |line|
           yield line
-          putc "."
         end
       else
         File.foreach(@logfile) do |line|
@@ -57,6 +56,10 @@ module Dexter
       @top_queries[fingerprint] ||= {calls: 0, total_time: 0, query: query}
       @top_queries[fingerprint][:calls] += 1
       @top_queries[fingerprint][:total_time] += duration
+    end
+
+    def queries
+      @top_queries.select { |_, v| v[:total_time] > @min_time }.map { |_, v| v[:query] }
     end
   end
 end

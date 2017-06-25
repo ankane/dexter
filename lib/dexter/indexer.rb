@@ -7,13 +7,12 @@ module Dexter
       @create = options[:create]
       @log_level = options[:log_level]
 
-      select_all("SET client_min_messages = warning")
-      select_all("CREATE EXTENSION IF NOT EXISTS hypopg")
+      create_hypopg_extension
     end
 
     def process_queries(queries)
       # reset hypothetical indexes
-      select_all("SELECT hypopg_reset()")
+      reset_hypothetical_indexes
 
       # filter queries from other databases and system tables
       tables = possible_tables(queries)
@@ -35,6 +34,74 @@ module Dexter
 
       # display and create new indexes
       show_and_create_indexes(new_indexes)
+    end
+
+    private
+
+    def create_hypopg_extension
+      select_all("SET client_min_messages = warning")
+      select_all("CREATE EXTENSION IF NOT EXISTS hypopg")
+    end
+
+    def reset_hypothetical_indexes
+      select_all("SELECT hypopg_reset()")
+    end
+
+    def analyze_tables(tables)
+      tables = tables.to_a.sort
+
+      analyze_stats = select_all <<-SQL
+        SELECT
+          schemaname AS schema,
+          relname AS table,
+          last_analyze,
+          last_autoanalyze
+        FROM
+          pg_stat_user_tables
+        WHERE
+          relname IN (#{tables.map { |t| quote(t) }.join(", ")})
+      SQL
+
+      last_analyzed = {}
+      analyze_stats.each do |stats|
+        last_analyzed[stats["table"]] = Time.parse(stats["last_analyze"]) if stats["last_analyze"]
+      end
+
+      tables.each do |table|
+        if !last_analyzed[table] || last_analyzed[table] < Time.now - 3600
+          statement = "ANALYZE #{table}"
+          log "Running analyze: #{statement}"
+          select_all(statement)
+        end
+      end
+    end
+
+    def calculate_initial_cost(queries)
+      queries.each do |query|
+        begin
+          query.initial_cost = plan(query.statement)["Total Cost"]
+        rescue PG::Error
+          # do nothing
+        end
+      end
+    end
+
+    def create_hypothetical_indexes(tables)
+      # get existing indexes
+      index_set = Set.new
+      indexes(tables).each do |index|
+        # TODO make sure btree
+        index_set << [index["table"], index["columns"]]
+      end
+
+      # create hypothetical indexes
+      candidates = {}
+      columns(tables).each do |col|
+        unless index_set.include?([col[:table], [col[:column]]])
+          candidates[col] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{col[:table]} (#{[col[:column]].join(", ")})');").first["indexname"]
+        end
+      end
+      candidates
     end
 
     def determine_indexes(queries, candidates)
@@ -147,34 +214,6 @@ module Dexter
       JSON.parse(select_all("EXPLAIN (FORMAT JSON) #{query}").first["QUERY PLAN"]).first["Plan"]
     end
 
-    def create_hypothetical_indexes(tables)
-      # get existing indexes
-      index_set = Set.new
-      indexes(tables).each do |index|
-        # TODO make sure btree
-        index_set << [index["table"], index["columns"]]
-      end
-
-      # create hypothetical indexes
-      candidates = {}
-      columns(tables).each do |col|
-        unless index_set.include?([col[:table], [col[:column]]])
-          candidates[col] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{col[:table]} (#{[col[:column]].join(", ")})');").first["indexname"]
-        end
-      end
-      candidates
-    end
-
-    def calculate_initial_cost(queries)
-      queries.each do |query|
-        begin
-          query.initial_cost = plan(query.statement)["Total Cost"]
-        rescue PG::Error
-          # do nothing
-        end
-      end
-    end
-
     def database_tables
       result = select_all <<-SQL
         SELECT
@@ -246,35 +285,6 @@ module Dexter
         part[1..-2]
       else
         part
-      end
-    end
-
-    def analyze_tables(tables)
-      tables = tables.to_a.sort
-
-      analyze_stats = select_all <<-SQL
-        SELECT
-          schemaname AS schema,
-          relname AS table,
-          last_analyze,
-          last_autoanalyze
-        FROM
-          pg_stat_user_tables
-        WHERE
-          relname IN (#{tables.map { |t| quote(t) }.join(", ")})
-      SQL
-
-      last_analyzed = {}
-      analyze_stats.each do |stats|
-        last_analyzed[stats["table"]] = Time.parse(stats["last_analyze"]) if stats["last_analyze"]
-      end
-
-      tables.each do |table|
-        if !last_analyzed[table] || last_analyzed[table] < Time.now - 3600
-          statement = "ANALYZE #{table}"
-          log "Running analyze: #{statement}"
-          select_all(statement)
-        end
       end
     end
 

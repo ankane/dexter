@@ -8,7 +8,8 @@ module Dexter
 
     def perform
       if options[:statement]
-        Indexer.new(arguments[0], options).process_queries([options[:statement]])
+        query = Query.new(options[:statement], PgQuery.fingerprint(options[:statement]))
+        Indexer.new(arguments[0], options).process_queries([query])
       elsif arguments[1]
         Processor.new(arguments[0], arguments[1], options).perform
       else

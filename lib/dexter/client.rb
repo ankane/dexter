@@ -11,12 +11,12 @@ module Dexter
         Indexer.new(self).process_queries([options[:statement]])
       elsif arguments[1]
         begin
-          LogParser.new(arguments[1], self).perform
+          Processor.new(arguments[1], self).perform
         rescue Errno::ENOENT
           abort "Log file not found"
         end
       else
-        LogParser.new(STDIN, self).perform
+        Processor.new(STDIN, self).perform
       end
     end
 

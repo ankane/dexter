@@ -29,6 +29,7 @@ module Dexter
           # do nothing
         end
       end
+      # TODO log skipping
       queries.select! { |q| initial_plans[q] }
 
       # get existing indexes
@@ -173,9 +174,30 @@ module Dexter
       SQL
       possible_tables = Set.new(result.map { |r| r["table_name"] })
 
-      tables = queries.flat_map { |q| PgQuery.parse(q).tables }.uniq.select { |t| possible_tables.include?(t) }
+      query_tables = {}
+      queries.each do |query|
+        query_tables[query] = PgQuery.parse(query).tables
+      end
 
-      [tables, queries.select { |q| PgQuery.parse(q).tables.all? { |t| possible_tables.include?(t) } }]
+      tables = queries.flat_map { |q| query_tables[q] }.uniq.select { |t| possible_tables.include?(t) }
+
+      new_queries = queries.select { |q| query_tables[q].all? { |t| possible_tables.include?(t) } }
+
+      if client.options[:log_level] == "debug2"
+        (queries - new_queries).each do |query|
+          log "Processed #{PgQuery.fingerprint(query)}"
+          if query_tables[query].empty?
+            log "No tables"
+          else
+            log "Some tables missing in current database"
+          end
+          puts
+          puts query
+          puts
+        end
+      end
+
+      [tables, new_queries]
     end
 
     def columns(tables)

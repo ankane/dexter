@@ -22,10 +22,10 @@ module Dexter
 
     def parse_args(args)
       opts = Slop.parse(args) do |o|
-        o.banner = %{Usage:
+        o.banner = %(Usage:
     dexter <database-url> [options]
 
-Options:}
+Options:)
         o.boolean "--create", "create indexes", default: false
         o.integer "--interval", "time to wait between processing queries, in seconds", default: 60
         o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
@@ -43,7 +43,7 @@ Options:}
 
       arguments = opts.arguments
 
-      if arguments.size == 0
+      if arguments.empty?
         log opts
         exit
       end

@@ -47,8 +47,6 @@ module Dexter
         if !active_line && m = REGEX.match(line.chomp)
           duration = m[1].to_f
           active_line = m[3]
-        else
-          # skip
         end
       end
       process_entry(active_line, duration) if active_line
@@ -112,9 +110,7 @@ module Dexter
       end
 
       log "Processing #{queries.size} new query fingerprints"
-      if queries.any?
-        @indexer.process_queries(queries)
-      end
+      @indexer.process_queries(queries) if queries.any?
     end
 
     def log(message)

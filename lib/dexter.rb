@@ -31,7 +31,15 @@ module Dexter
           abort "Log file not found"
         end
       end
+      if !options[:s] && !arguments[1]
+        parser = LogParser.new(STDIN, min_time: options[:min_time])
+        queries.concat(parser.queries)
+      end
 
+      process_queries(queries)
+    end
+
+    def process_queries(queries)
       # narrow down queries and tables
       tables, queries = narrow_queries(queries)
       return if tables.empty?

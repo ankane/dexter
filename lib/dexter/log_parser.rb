@@ -13,7 +13,7 @@ module Dexter
       active_line = nil
       duration = nil
 
-      File.foreach(@logfile) do |line|
+      each_line do |line|
         if active_line
           if line.include?(":  ")
             process_entry(active_line, duration)
@@ -37,6 +37,19 @@ module Dexter
     end
 
     private
+
+    def each_line
+      if @logfile == STDIN
+        STDIN.each_line do |line|
+          yield line
+          putc "."
+        end
+      else
+        File.foreach(@logfile) do |line|
+          yield line
+        end
+      end
+    end
 
     def process_entry(query, duration)
       return unless query =~ /SELECT/i

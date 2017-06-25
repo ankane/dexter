@@ -74,7 +74,14 @@ module Dexter
 
     def process_entry(query, duration)
       return unless query =~ /SELECT/i
-      fingerprint = PgQuery.fingerprint(query)
+      fingerprint =
+        begin
+          PgQuery.fingerprint(query)
+        rescue PgQuery::ParseError
+          # do nothing
+        end
+      return unless fingerprint
+
       @top_queries[fingerprint] ||= {calls: 0, total_time: 0}
       @top_queries[fingerprint][:calls] += 1
       @top_queries[fingerprint][:total_time] += duration

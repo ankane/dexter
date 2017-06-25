@@ -43,6 +43,7 @@ module Dexter
         o.boolean "--create", default: false
         o.string "-s"
         o.float "--min-time", default: 0
+        o.integer "--interval", default: 60
       end
       [opts.arguments, opts.to_hash]
     rescue Slop::Error => e

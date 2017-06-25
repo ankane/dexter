@@ -12,12 +12,14 @@ module Dexter
       @process_queries_mutex = Mutex.new
       @last_checked_at = {}
 
+      log "Started"
+
       if @logfile == STDIN
         Thread.abort_on_exception = true
 
         @timer_thread = Thread.new do
           loop do
-            sleep(5)
+            sleep(client.options[:interval])
             @process_queries_mutex.synchronize do
               process_queries
             end
@@ -61,7 +63,7 @@ module Dexter
       if @logfile == STDIN
         STDIN.each_line do |line|
           yield line
-          putc "."
+          # putc "."
         end
       else
         File.foreach(@logfile) do |line|
@@ -100,11 +102,18 @@ module Dexter
         end
       end
 
+      log "Processing #{queries.size} queries"
       if queries.any?
-        @indexer.process_queries(queries)
-      else
-        puts "No new queries"
+        new_indexes = @indexer.process_queries(queries)
+
+        new_indexes.each do |index|
+          log "Index found: #{index[:table]} (#{index[:columns].join(", ")})"
+        end
       end
+    end
+
+    def log(message)
+      puts "#{Time.now.iso8601}  #{message}"
     end
   end
 end

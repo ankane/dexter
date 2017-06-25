@@ -62,31 +62,35 @@ module Dexter
           end
         end
 
-        puts query
-        puts "Starting cost: #{starting_cost}"
-        puts "Final cost: #{cost2}"
+        # puts query
+        # puts "Starting cost: #{starting_cost}"
+        # puts "Final cost: #{cost2}"
 
         # must make it 20% faster
         if cost2 < starting_cost * 0.8
           new_indexes.concat(best_indexes)
           best_indexes.each do |index|
-            puts "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")});"
+            # puts "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")});"
           end
         else
-          puts "Nope!"
+          # puts "Nope!"
         end
-        puts
+        # puts
       end
+
+      new_indexes = new_indexes.uniq.sort_by(&:to_a)
 
       # create indexes
       if new_indexes.any?
-        puts "Indexes to be created:"
-        new_indexes.uniq.sort_by(&:to_a).each do |index|
+        # puts "Indexes to be created:"
+        new_indexes.each do |index|
           statement = "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")})"
-          puts "#{statement};"
+          # puts "#{statement};"
           select_all(statement) if client.options[:create]
         end
       end
+
+      new_indexes
     end
 
     def conn

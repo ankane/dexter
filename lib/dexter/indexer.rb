@@ -16,18 +16,14 @@ module Dexter
 
       tables = possible_tables(queries)
 
-      if tables.any?
-        # mark queries as missing tables
-        queries.each do |query|
-          query.missing_tables = !query.tables.all? { |t| tables.include?(t) }
-        end
-
-        analyze_tables(tables)
-        calculate_initial_cost(queries.reject(&:missing_tables))
-        candidates = create_hypothetical_indexes(tables)
-      else
-        candidates = {}
+      # filter queries from other databases, system tables, etc
+      queries.each do |query|
+        query.missing_tables = !query.tables.all? { |t| tables.include?(t) }
       end
+
+      analyze_tables(tables) if tables.any?
+      calculate_initial_cost(queries.reject(&:missing_tables))
+      candidates = tables.any? ? create_hypothetical_indexes(tables) : {}
 
       new_indexes = determine_indexes(queries, candidates)
       show_and_create_indexes(new_indexes)
@@ -70,6 +66,8 @@ module Dexter
             else
               log "Indexes: None"
             end
+          elsif query.tables.empty?
+            log "No tables"
           elsif query.missing_tables
             log "Tables not present in current database"
           else

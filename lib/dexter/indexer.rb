@@ -285,8 +285,9 @@ module Dexter
 
       tables.each do |table|
         if !last_analyzed[table] || last_analyzed[table] < Time.now - 3600
-          log "Analyzing #{table}"
-          select_all("ANALYZE #{table}")
+          statement = "ANALYZE #{table}"
+          log "Running analyze: #{statement}"
+          select_all(statement)
         end
       end
     end

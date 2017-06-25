@@ -110,13 +110,13 @@ module Dexter
 
         new_indexes.each do |index|
           log "Index found: #{index[:table]} (#{index[:columns].join(", ")})"
-          log "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")});"
-          index[:queries].sort_by { |q| fingerprints[q[:query]] }.each do |query|
-            log "Query #{fingerprints[query[:query]]} (Cost: #{query[:starting_cost]} -> #{query[:final_cost]})"
-            # puts
-            # puts query[:query]
-            # puts
-          end
+          # log "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")});"
+          # index[:queries].sort_by { |q| fingerprints[q[:query]] }.each do |query|
+          #   log "Query #{fingerprints[query[:query]]} (Cost: #{query[:starting_cost]} -> #{query[:final_cost]})"
+          #   puts
+          #   puts query[:query]
+          #   puts
+          # end
         end
       end
     end

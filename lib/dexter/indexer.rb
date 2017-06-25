@@ -56,7 +56,7 @@ module Dexter
         best_indexes = []
 
         candidates.each do |col, index_name|
-          if plan2.inspect.include?(index_name)
+          if plan2.inspect.include?(index_name) && cost2 < starting_cost * 0.5
             best_indexes << {
               table: col[:table],
               columns: [col[:column]]
@@ -69,20 +69,7 @@ module Dexter
           end
         end
 
-        # puts query
-        # puts "Starting cost: #{starting_cost}"
-        # puts "Final cost: #{cost2}"
-
-        # must make it 20% faster
-        if cost2 < starting_cost * 0.8
-          new_indexes.concat(best_indexes)
-          best_indexes.each do |index|
-            # puts "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")});"
-          end
-        else
-          # puts "Nope!"
-        end
-        # puts
+        new_indexes.concat(best_indexes)
       end
 
       new_indexes = new_indexes.uniq.sort_by(&:to_a)
@@ -219,7 +206,7 @@ module Dexter
       end
 
       tables.each do |table|
-        if true # !last_analyzed[table] || last_analyzed[table] < Time.now - 3600
+        if !last_analyzed[table] || last_analyzed[table] < Time.now - 3600
           log "Analyzing #{table}"
           select_all("ANALYZE #{table}")
         end

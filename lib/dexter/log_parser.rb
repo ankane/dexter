@@ -7,6 +7,18 @@ module Dexter
       @min_time = client.options[:min_time] * 60000 # convert minutes to ms
       @top_queries = {}
       @indexer = Indexer.new(client)
+      @last_processed_at = Time.now
+      @new_queries = Set.new
+
+      if @logfile == STDIN
+        @timer_thread = Thread.new do
+          loop do
+            sleep(5)
+            # TODO mutex
+            process_queries
+          end
+        end
+      end
     end
 
     def perform
@@ -33,7 +45,7 @@ module Dexter
       end
       process_entry(active_line, duration) if active_line
 
-      @indexer.process_queries(queries)
+      process_queries
     end
 
     private
@@ -42,6 +54,7 @@ module Dexter
       if @logfile == STDIN
         STDIN.each_line do |line|
           yield line
+          putc "."
         end
       else
         File.foreach(@logfile) do |line|
@@ -56,10 +69,19 @@ module Dexter
       @top_queries[fingerprint] ||= {calls: 0, total_time: 0, query: query}
       @top_queries[fingerprint][:calls] += 1
       @top_queries[fingerprint][:total_time] += duration
+      @new_queries << fingerprint
     end
 
-    def queries
-      @top_queries.select { |_, v| v[:total_time] > @min_time }.map { |_, v| v[:query] }
+    def process_queries
+      @last_processed_at = Time.now
+      queries = @top_queries.select { |k, v| @new_queries.include?(k) && v[:total_time] > @min_time }.map { |_, v| v[:query] }
+      # TODO mutex
+      @new_queries.clear
+      if queries.any?
+        @indexer.process_queries(queries)
+      else
+        puts "No new queries"
+      end
     end
   end
 end

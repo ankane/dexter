@@ -100,8 +100,8 @@ module Dexter
           end
         end
 
-        new_indexes.each do |index|
-          if @create
+        if @create
+          new_indexes.each do |index|
             statement = "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")})"
             log "Creating index: #{statement}"
             started_at = Time.now

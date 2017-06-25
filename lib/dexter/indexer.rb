@@ -80,18 +80,25 @@ module Dexter
           index[:queries] = queries_by_index[index]
 
           log "Index found: #{index[:table]} (#{index[:columns].join(", ")})"
-          # log "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")});"
-          # index[:queries].sort_by { |q| fingerprints[q[:query]] }.each do |query|
-          #   log "Query #{fingerprints[query[:query]]} (Cost: #{query[:starting_cost]} -> #{query[:final_cost]})"
-          #   puts
-          #   puts query[:query]
-          #   puts
-          # end
+
+          if client.options[:log_level] == "debug"
+            # TODO don't generate fingerprints again
+            fingerprints = {}
+            queries.each do |query|
+              fingerprints[query] = PgQuery.fingerprint(query)
+            end
+
+            index[:queries].sort_by { |q| fingerprints[q[:query]] }.each do |query|
+              log "Query #{fingerprints[query[:query]]} (Cost: #{query[:starting_cost]} -> #{query[:final_cost]})"
+              puts
+              puts query[:query]
+              puts
+            end
+          end
         end
 
         new_indexes.each do |index|
           statement = "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")})"
-          # puts "#{statement};"
           if client.options[:create]
             log "Creating index: #{statement}"
             started_at = Time.now

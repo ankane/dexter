@@ -32,8 +32,9 @@ module Dexter
 
 Options:}
         o.boolean "--create", "create indexes", default: false
-        o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
         o.integer "--interval", "time to wait between processing queries, in seconds", default: 60
+        o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
+        o.string "--log-level", "log level", default: "info"
         o.string "-s", help: false
         o.on "-v", "--version", "print the version" do
           log Dexter::VERSION
@@ -53,6 +54,8 @@ Options:}
       end
 
       abort "Too many arguments" if arguments.size > 2
+
+      abort "Unknown log level" unless ["info", "debug"].include?(opts.to_hash[:log_level].to_s.downcase)
 
       [arguments, opts.to_hash]
     rescue Slop::Error => e

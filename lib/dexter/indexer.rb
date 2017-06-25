@@ -180,17 +180,21 @@ module Dexter
 
       query_tables = {}
       queries.each do |query|
-        query_tables[query] = PgQuery.parse(query).tables
+        query_tables[query] = PgQuery.parse(query).tables rescue nil
       end
 
-      tables = queries.flat_map { |q| query_tables[q] }.uniq.select { |t| possible_tables.include?(t) }
+      new_queries = queries.select { |q| query_tables[q] }
 
-      new_queries = queries.select { |q| query_tables[q].any? && query_tables[q].all? { |t| possible_tables.include?(t) } }
+      tables = new_queries.flat_map { |q| query_tables[q] }.uniq.select { |t| possible_tables.include?(t) }
+
+      new_queries = new_queries.select { |q| query_tables[q].any? && query_tables[q].all? { |t| possible_tables.include?(t) } }
 
       if client.options[:log_level] == "debug2"
         (queries - new_queries).each do |query|
-          log "Processed #{PgQuery.fingerprint(query)}"
-          if query_tables[query].empty?
+          log "Processed #{PgQuery.fingerprint(query) rescue "unknown"}"
+          if !query_tables[query]
+            log "Query parse error"
+          elsif query_tables[query].empty?
             log "No tables"
           else
             log "Some tables missing in current database"

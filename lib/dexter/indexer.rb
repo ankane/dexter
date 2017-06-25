@@ -4,6 +4,9 @@ module Dexter
 
     def initialize(client)
       @client = client
+
+      select_all("SET client_min_messages = warning")
+      select_all("CREATE EXTENSION IF NOT EXISTS hypopg")
     end
 
     def process_queries(queries)
@@ -12,8 +15,6 @@ module Dexter
       return if tables.empty?
 
       # get ready for hypothetical indexes
-      select_all("SET client_min_messages = warning")
-      select_all("CREATE EXTENSION IF NOT EXISTS hypopg")
       select_all("SELECT hypopg_reset()")
 
       # ensure tables have recently been analyzed

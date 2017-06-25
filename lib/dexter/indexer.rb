@@ -12,7 +12,7 @@ module Dexter
     def process_queries(queries)
       # narrow down queries and tables
       tables, queries = narrow_queries(queries)
-      return if tables.empty?
+      return [] if tables.empty?
 
       # get ready for hypothetical indexes
       select_all("SELECT hypopg_reset()")

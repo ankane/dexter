@@ -11,9 +11,9 @@ module Dexter
       @new_queries_mutex = Mutex.new
       @process_queries_mutex = Mutex.new
 
-      Thread.abort_on_exception = true
-
       if @logfile == STDIN
+        Thread.abort_on_exception = true
+
         @timer_thread = Thread.new do
           loop do
             sleep(5)

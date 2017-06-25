@@ -7,15 +7,19 @@ module Dexter
       @min_time = client.options[:min_time] * 60000 # convert minutes to ms
       @top_queries = {}
       @indexer = Indexer.new(client)
-      @last_processed_at = Time.now
       @new_queries = Set.new
+      @new_queries_mutex = Mutex.new
+      @process_queries_mutex = Mutex.new
+
+      Thread.abort_on_exception = true
 
       if @logfile == STDIN
         @timer_thread = Thread.new do
           loop do
             sleep(5)
-            # TODO mutex
-            process_queries
+            @process_queries_mutex.synchronize do
+              process_queries
+            end
           end
         end
       end
@@ -45,7 +49,9 @@ module Dexter
       end
       process_entry(active_line, duration) if active_line
 
-      process_queries
+      @process_queries_mutex.synchronize do
+        process_queries
+      end
     end
 
     private
@@ -66,17 +72,25 @@ module Dexter
     def process_entry(query, duration)
       return unless query =~ /SELECT/i
       fingerprint = PgQuery.fingerprint(query)
-      @top_queries[fingerprint] ||= {calls: 0, total_time: 0, query: query}
+      @top_queries[fingerprint] ||= {calls: 0, total_time: 0}
       @top_queries[fingerprint][:calls] += 1
       @top_queries[fingerprint][:total_time] += duration
-      @new_queries << fingerprint
+      @top_queries[fingerprint][:query] = query
+      @new_queries_mutex.synchronize do
+        @new_queries << fingerprint
+      end
     end
 
     def process_queries
-      @last_processed_at = Time.now
-      queries = @top_queries.select { |k, v| @new_queries.include?(k) && v[:total_time] > @min_time }.map { |_, v| v[:query] }
-      # TODO mutex
-      @new_queries.clear
+      new_queries = nil
+
+      @new_queries_mutex.synchronize do
+        new_queries = @new_queries.dup
+        @new_queries.clear
+      end
+
+      queries = @top_queries.select { |k, v| new_queries.include?(k) && v[:total_time] > @min_time }.map { |_, v| v[:query] }
+
       if queries.any?
         @indexer.process_queries(queries)
       else

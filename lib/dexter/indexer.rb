@@ -87,7 +87,11 @@ module Dexter
 
       new_indexes = new_indexes.uniq.sort_by(&:to_a)
 
-      # create indexes
+      show_and_create_indexes(new_indexes, queries_by_index)
+    end
+
+
+    def show_and_create_indexes(new_indexes, queries_by_index)
       if new_indexes.any?
         new_indexes.each do |index|
           index[:queries] = queries_by_index[index]
@@ -105,8 +109,8 @@ module Dexter
         end
 
         new_indexes.each do |index|
-          statement = "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")})"
           if @create
+            statement = "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")})"
             log "Creating index: #{statement}"
             started_at = Time.now
             select_all(statement)

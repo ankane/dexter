@@ -18,11 +18,12 @@ module Dexter
         Thread.abort_on_exception = true
 
         @timer_thread = Thread.new do
+          sleep(3) # starting sleep
           loop do
-            sleep(client.options[:interval])
             @process_queries_mutex.synchronize do
               process_queries
             end
+            sleep(client.options[:interval])
           end
         end
       end
@@ -63,7 +64,6 @@ module Dexter
       if @logfile == STDIN
         STDIN.each_line do |line|
           yield line
-          # putc "."
         end
       else
         File.foreach(@logfile) do |line|

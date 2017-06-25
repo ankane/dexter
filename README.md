@@ -50,7 +50,13 @@ This finds slow queries and generates output like:
 2017-06-25T17:53:22+00:00 Processing 12 new query fingerprints
 ```
 
-To be safe, Dexter will not create indexes unless you pass the `--create` flag.
+To be safe, Dexter will not create indexes unless you pass the `--create` flag. In this case, you’ll see:
+
+```log
+2017-06-25T17:52:22+00:00 Index found: ratings (user_id)
+2017-06-25T17:52:22+00:00 Creating index: CREATE INDEX CONCURRENTLY ON ratings (user_id)
+2017-06-25T17:52:37+00:00 Index created: 15243 ms
+```
 
 ## Options
 

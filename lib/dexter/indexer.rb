@@ -46,6 +46,8 @@ module Dexter
         end
       end
 
+      queries_by_index = {}
+
       new_indexes = []
       queries.each do |query|
         starting_cost = initial_plans[query]["Total Cost"]
@@ -58,6 +60,11 @@ module Dexter
             best_indexes << {
               table: col[:table],
               columns: [col[:column]]
+            }
+            (queries_by_index[best_indexes.last] ||= []) << {
+              starting_cost: starting_cost,
+              final_cost: cost2,
+              query: query
             }
           end
         end
@@ -87,6 +94,7 @@ module Dexter
           statement = "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")})"
           # puts "#{statement};"
           select_all(statement) if client.options[:create]
+          index[:queries] = queries_by_index[index]
         end
       end
 
@@ -211,8 +219,8 @@ module Dexter
       end
 
       tables.each do |table|
-        if !last_analyzed[table] || last_analyzed[table] < Time.now - 3600
-          puts "Analyzing #{table}"
+        if true # !last_analyzed[table] || last_analyzed[table] < Time.now - 3600
+          log "Analyzing #{table}"
           select_all("ANALYZE #{table}")
         end
       end
@@ -229,6 +237,10 @@ module Dexter
     # activerecord
     def quote_string(s)
       s.gsub(/\\/, '\&\&').gsub(/'/, "''")
+    end
+
+    def log(message)
+      puts "#{Time.now.iso8601} #{message}"
     end
   end
 end

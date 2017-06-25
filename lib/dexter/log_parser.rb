@@ -95,8 +95,10 @@ module Dexter
       now = Time.now
       min_checked_at = now - 3600 # don't recheck for an hour
       queries = []
+      fingerprints = {}
       @top_queries.each do |k, v|
         if new_queries.include?(k) && v[:total_time] > @min_time && (!@last_checked_at[k] || @last_checked_at[k] < min_checked_at)
+          fingerprints[v[:query]] = k
           queries << v[:query]
           @last_checked_at[k] = now
         end
@@ -108,12 +110,19 @@ module Dexter
 
         new_indexes.each do |index|
           log "Index found: #{index[:table]} (#{index[:columns].join(", ")})"
+          log "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")});"
+          index[:queries].sort_by { |q| fingerprints[q[:query]] }.each do |query|
+            log "Query #{fingerprints[query[:query]]} (Cost: #{query[:starting_cost]} -> #{query[:final_cost]})"
+            # puts
+            # puts query[:query]
+            # puts
+          end
         end
       end
     end
 
     def log(message)
-      puts "#{Time.now.iso8601}  #{message}"
+      puts "#{Time.now.iso8601} #{message}"
     end
   end
 end

@@ -102,7 +102,7 @@ module Dexter
         end
       end
 
-      log "Processing #{queries.size} queries"
+      log "Processing #{queries.size} queries (#{new_queries.size - queries.size} duplicates)"
       if queries.any?
         new_indexes = @indexer.process_queries(queries)
 

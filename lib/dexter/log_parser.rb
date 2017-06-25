@@ -10,6 +10,7 @@ module Dexter
       @new_queries = Set.new
       @new_queries_mutex = Mutex.new
       @process_queries_mutex = Mutex.new
+      @last_checked_at = {}
 
       if @logfile == STDIN
         Thread.abort_on_exception = true
@@ -89,7 +90,15 @@ module Dexter
         @new_queries.clear
       end
 
-      queries = @top_queries.select { |k, v| new_queries.include?(k) && v[:total_time] > @min_time }.map { |_, v| v[:query] }
+      now = Time.now
+      min_checked_at = now - 3600 # don't recheck for an hour
+      queries = []
+      @top_queries.each do |k, v|
+        if new_queries.include?(k) && v[:total_time] > @min_time && (!@last_checked_at[k] || @last_checked_at[k] < min_checked_at)
+          queries << v[:query]
+          @last_checked_at[k] = now
+        end
+      end
 
       if queries.any?
         @indexer.process_queries(queries)

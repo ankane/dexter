@@ -29,8 +29,6 @@ module Dexter
           # do nothing
         end
       end
-      # TODO log skipping
-      queries.select! { |q| initial_plans[q] }
 
       # get existing indexes
       index_set = Set.new
@@ -59,41 +57,47 @@ module Dexter
 
       new_indexes = []
       queries.each do |query|
-        starting_cost = initial_plans[query]["Total Cost"]
-        plan2 = plan(query)
-        cost2 = plan2["Total Cost"]
-        best_indexes = []
-        found_indexes = []
+        if initial_plans[query]
+          starting_cost = initial_plans[query]["Total Cost"]
+          plan2 = plan(query)
+          cost2 = plan2["Total Cost"]
+          best_indexes = []
+          found_indexes = []
 
-        candidates.each do |col, index_name|
-          if plan2.inspect.include?(index_name)
-            best_index = {
-              table: col[:table],
-              columns: [col[:column]]
-            }
-            found_indexes << best_index
-            if cost2 < starting_cost * 0.5
-              best_indexes << best_index
-              (queries_by_index[best_index] ||= []) << {
-                starting_cost: starting_cost,
-                final_cost: cost2,
-                query: query
+          candidates.each do |col, index_name|
+            if plan2.inspect.include?(index_name)
+              best_index = {
+                table: col[:table],
+                columns: [col[:column]]
               }
+              found_indexes << best_index
+              if cost2 < starting_cost * 0.5
+                best_indexes << best_index
+                (queries_by_index[best_index] ||= []) << {
+                  starting_cost: starting_cost,
+                  final_cost: cost2,
+                  query: query
+                }
+              end
             end
           end
-        end
 
-        new_indexes.concat(best_indexes)
+          new_indexes.concat(best_indexes)
+        end
 
         if client.options[:log_level] == "debug2"
           log "Processed #{fingerprints[query]}"
-          log "Cost: #{starting_cost} -> #{cost2}"
+          if initial_plans[query]
+            log "Cost: #{starting_cost} -> #{cost2}"
 
-          index_str = found_indexes.any? ? found_indexes.map { |i| "#{i[:table]} (#{i[:columns].join(", ")})" }.join(", ") : "None"
-          log "Indexes: #{index_str}"
+            index_str = found_indexes.any? ? found_indexes.map { |i| "#{i[:table]} (#{i[:columns].join(", ")})" }.join(", ") : "None"
+            log "Indexes: #{index_str}"
 
-          if found_indexes != best_indexes
-            log "Need 50% cost savings to suggest index"
+            if found_indexes != best_indexes
+              log "Need 50% cost savings to suggest index"
+            end
+          else
+            log "Could not run explain"
           end
 
           puts
@@ -181,7 +185,7 @@ module Dexter
 
       tables = queries.flat_map { |q| query_tables[q] }.uniq.select { |t| possible_tables.include?(t) }
 
-      new_queries = queries.select { |q| query_tables[q].all? { |t| possible_tables.include?(t) } }
+      new_queries = queries.select { |q| query_tables[q].any? && query_tables[q].all? { |t| possible_tables.include?(t) } }
 
       if client.options[:log_level] == "debug2"
         (queries - new_queries).each do |query|

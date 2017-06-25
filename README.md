@@ -54,8 +54,8 @@ To be safe, Dexter will not create indexes unless you pass the `--create` flag.
 
 ## Options
 
-- `--interval` - time to wait between processing queries
-- `--min-time` - only consider queries that have consumed a certain amount of DB time (in minutes)
+- `--interval` - time to wait between processing queries, in seconds (default: 60)
+- `--min-time` - only consider queries that have consumed a certain amount of DB time, in minutes (default: 0)
 
 ## Contributing
 

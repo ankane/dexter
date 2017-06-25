@@ -47,9 +47,5 @@ module Dexter
     def process_entry(query, duration)
       @collector.add(query, duration) if query =~ /SELECT/i
     end
-
-    def log(message)
-      puts "#{Time.now.iso8601} #{message}"
-    end
   end
 end

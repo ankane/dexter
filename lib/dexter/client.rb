@@ -7,11 +7,8 @@ module Dexter
     end
 
     def perform
-      # get queries
-      queries = []
-      if options[:s]
-        queries << options[:s]
-        Indexer.new(self).process_queries(queries)
+      if options[:statement]
+        Indexer.new(self).process_queries([options[:statement]])
       elsif arguments[1]
         begin
           LogParser.new(arguments[1], self).perform

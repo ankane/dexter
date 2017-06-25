@@ -10,99 +10,89 @@ module Dexter
     end
 
     def process_queries(queries)
-      # narrow down queries and tables
-      tables, queries = filter_queries(queries)
-      return [] if tables.empty?
-
-      # get ready for hypothetical indexes
       select_all("SELECT hypopg_reset()")
 
-      # ensure tables have recently been analyzed
-      analyze_tables(tables)
+      tables = possible_tables(queries)
 
-      initial_plans = calculate_initial_plans(queries)
-
-      candidates = create_hypothetical_indexes(tables)
-
-      queries_by_index = {}
-
-      if @log_level.start_with?("debug")
-        # TODO don't generate fingerprints again
-        fingerprints = {}
+      if tables.any?
+        # mark queries as missing tables
         queries.each do |query|
-          fingerprints[query] = PgQuery.fingerprint(query)
+          query.missing_tables = !query.tables.all? { |t| tables.include?(t) }
         end
+
+        analyze_tables(tables)
+        calculate_initial_cost(queries.reject(&:missing_tables))
+        candidates = create_hypothetical_indexes(tables)
+      else
+        candidates = {}
       end
 
-      new_indexes = []
-      queries.each do |query|
-        if initial_plans[query]
-          starting_cost = initial_plans[query]["Total Cost"]
-          plan2 = plan(query)
-          cost2 = plan2["Total Cost"]
-          best_indexes = []
-          found_indexes = []
+      new_indexes = determine_indexes(queries, tables, candidates)
+      show_and_create_indexes(new_indexes)
+    end
 
+    def determine_indexes(queries, tables, candidates)
+      new_indexes = {}
+
+      queries.each do |query|
+        if query.initial_cost
+          new_plan = plan(query.statement)
+          query.new_cost = new_plan["Total Cost"]
+          cost_savings = query.new_cost < query.initial_cost * 0.5
+
+          query_indexes = []
           candidates.each do |col, index_name|
-            if plan2.inspect.include?(index_name)
-              best_index = {
+            if new_plan.inspect.include?(index_name)
+              index = {
                 table: col[:table],
                 columns: [col[:column]]
               }
-              found_indexes << best_index
-              if cost2 < starting_cost * 0.5
-                best_indexes << best_index
-                (queries_by_index[best_index] ||= []) << {
-                  starting_cost: starting_cost,
-                  final_cost: cost2,
-                  query: query
-                }
+              query_indexes << index
+
+              if cost_savings
+                new_indexes[index] ||= index.dup
+                (new_indexes[index][:queries] ||= []) << query
               end
             end
           end
-
-          new_indexes.concat(best_indexes)
         end
 
         if @log_level == "debug2"
-          log "Processed #{fingerprints[query]}"
-          if initial_plans[query]
-            log "Cost: #{starting_cost} -> #{cost2}"
+          log "Processed #{query.fingerprint}"
+          if query.initial_cost
+            log "Cost: #{query.initial_cost} -> #{query.new_cost}"
 
-            index_str = found_indexes.any? ? found_indexes.map { |i| "#{i[:table]} (#{i[:columns].join(", ")})" }.join(", ") : "None"
-            log "Indexes: #{index_str}"
-
-            if found_indexes != best_indexes
-              log "Need 50% cost savings to suggest index"
+            if query_indexes.any?
+              log "Indexes: #{query_indexes.map { |i| "#{i[:table]} (#{i[:columns].join(", ")})" }.join(", ")}"
+              log "Need 50% cost savings to suggest index" unless cost_savings
+            else
+              log "Indexes: None"
             end
+          elsif query.missing_tables
+            log "Tables not present in current database"
           else
             log "Could not run explain"
           end
 
           puts
-          puts query
+          puts query.statement
           puts
         end
       end
 
-      new_indexes = new_indexes.uniq.sort_by(&:to_a)
-
-      show_and_create_indexes(new_indexes, queries_by_index, fingerprints)
+      new_indexes.values.sort_by(&:to_a)
     end
 
-
-    def show_and_create_indexes(new_indexes, queries_by_index, fingerprints)
+    def show_and_create_indexes(new_indexes)
       if new_indexes.any?
         new_indexes.each do |index|
-          index[:queries] = queries_by_index[index]
-
           log "Index found: #{index[:table]} (#{index[:columns].join(", ")})"
 
           if @log_level.start_with?("debug")
-            index[:queries].sort_by { |q| fingerprints[q[:query]] }.each do |query|
-              log "Query #{fingerprints[query[:query]]} (Cost: #{query[:starting_cost]} -> #{query[:final_cost]})"
+            index[:queries].sort_by(&:fingerprint).each do |query|
+              log "Query #{query.fingerprint} (Cost: #{query.initial_cost} -> #{query.new_cost})"
               puts
-              puts query[:query]
+              puts query.statement
               puts
             end
           end
@@ -167,19 +157,17 @@ module Dexter
       candidates
     end
 
-    def calculate_initial_plans(queries)
-      initial_plans = {}
+    def calculate_initial_cost(queries)
       queries.each do |query|
         begin
-          initial_plans[query] = plan(query)
+          query.initial_cost = plan(query.statement)["Total Cost"]
         rescue PG::Error
           # do nothing
         end
       end
-      initial_plans
     end
 
-    def filter_queries(queries)
+    def database_tables
       result = select_all <<-SQL
         SELECT
           table_name
@@ -189,37 +177,42 @@ module Dexter
           table_catalog = current_database() AND
           table_schema NOT IN ('pg_catalog', 'information_schema')
       SQL
-      possible_tables = Set.new(result.map { |r| r["table_name"] })
-
-      query_tables = {}
-      queries.each do |query|
-        query_tables[query] = PgQuery.parse(query).tables rescue nil
-      end
-
-      new_queries = queries.select { |q| query_tables[q] }
-
-      tables = new_queries.flat_map { |q| query_tables[q] }.uniq.select { |t| possible_tables.include?(t) }
-
-      new_queries = new_queries.select { |q| query_tables[q].any? && query_tables[q].all? { |t| possible_tables.include?(t) } }
-
-      if @log_level == "debug2"
-        (queries - new_queries).each do |query|
-          log "Processed #{PgQuery.fingerprint(query) rescue "unknown"}"
-          if !query_tables[query]
-            log "Query parse error"
-          elsif query_tables[query].empty?
-            log "No tables"
-          else
-            log "Tables not present in current database"
-          end
-          puts
-          puts query
-          puts
-        end
-      end
-
-      [tables, new_queries]
+      result.map { |r| r["table_name"] }
     end
+
+    def possible_tables(queries)
+      Set.new(queries.flat_map(&:tables).uniq & database_tables)
+    end
+
+    #   query_tables = {}
+    #   queries.each do |query|
+    #     query_tables[query] = PgQuery.parse(query).tables rescue nil
+    #   end
+
+    #   new_queries = queries.select { |q| query_tables[q] }
+
+    #   tables = new_queries.flat_map { |q| query_tables[q] }.uniq.select { |t| possible_tables.include?(t) }
+
+    #   new_queries = new_queries.select { |q| query_tables[q].any? && query_tables[q].all? { |t| possible_tables.include?(t) } }
+
+    #   if @log_level == "debug2"
+    #     (queries - new_queries).each do |query|
+    #       log "Processed #{PgQuery.fingerprint(query) rescue "unknown"}"
+    #       if !query_tables[query]
+    #         log "Query parse error"
+    #       elsif query_tables[query].empty?
+    #         log "No tables"
+    #       else
+    #         log "Tables not present in current database"
+    #       end
+    #       puts
+    #       puts query
+    #       puts
+    #     end
+    #   end
+
+    #   [tables, new_queries]
+    # end
 
     def columns(tables)
       columns = select_all <<-SQL
@@ -279,6 +272,8 @@ module Dexter
     end
 
     def analyze_tables(tables)
+      tables = tables.to_a.sort
+
       analyze_stats = select_all <<-SQL
         SELECT
           schemaname AS schema,

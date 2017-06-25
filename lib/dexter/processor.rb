@@ -45,10 +45,10 @@ module Dexter
       now = Time.now
       min_checked_at = now - 3600 # don't recheck for an hour
       queries = []
-      @collector.fetch_queries.each do |fingerprint, query|
-        if !@last_checked_at[fingerprint] || @last_checked_at[fingerprint] < min_checked_at
+      @collector.fetch_queries.each do |query|
+        if !@last_checked_at[query.fingerprint] || @last_checked_at[query.fingerprint] < min_checked_at
           queries << query
-          @last_checked_at[fingerprint] = now
+          @last_checked_at[query.fingerprint] = now
         end
       end
 

@@ -37,11 +37,11 @@ module Dexter
       queries = []
       @top_queries.each do |k, v|
         if new_queries.include?(k) && v[:total_time] > @min_time
-          queries << [k, v[:query]]
+          queries << Query.new(v[:query], k)
         end
       end
 
-      queries
+      queries.sort_by(&:fingerprint)
     end
   end
 end

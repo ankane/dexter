@@ -17,9 +17,6 @@ module Dexter
     end
 
     def perform
-      abort "Missing database url" if arguments.empty?
-      abort "Too many arguments" if arguments.size > 2
-
       # get queries
       queries = []
       if options[:s]
@@ -40,14 +37,40 @@ module Dexter
 
     def parse_args(args)
       opts = Slop.parse(args) do |o|
-        o.boolean "--create", default: false
-        o.string "-s"
-        o.float "--min-time", default: 0
-        o.integer "--interval", default: 60
+        o.banner = %{Usage:
+    dexter <database-url> [options]
+
+Options:}
+        o.boolean "--create", "create indexes", default: false
+        o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
+        o.integer "--interval", "time to wait between processing queries, in seconds", default: 60
+        o.string "-s", help: false
+        o.on "-v", "--version", "print the version" do
+          log Dexter::VERSION
+          exit
+        end
+        o.on "-h", "--help", "prints help" do
+          log o
+          exit
+        end
       end
-      [opts.arguments, opts.to_hash]
+
+      arguments = opts.arguments
+
+      if arguments.size == 0
+        log opts
+        exit
+      end
+
+      abort "Too many arguments" if arguments.size > 2
+
+      [arguments, opts.to_hash]
     rescue Slop::Error => e
       abort e.message
+    end
+
+    def log(message)
+      $stderr.puts message
     end
   end
 end

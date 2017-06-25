@@ -87,11 +87,11 @@ module Dexter
 
       new_indexes = new_indexes.uniq.sort_by(&:to_a)
 
-      show_and_create_indexes(new_indexes, queries_by_index)
+      show_and_create_indexes(new_indexes, queries_by_index, fingerprints)
     end
 
 
-    def show_and_create_indexes(new_indexes, queries_by_index)
+    def show_and_create_indexes(new_indexes, queries_by_index, fingerprints)
       if new_indexes.any?
         new_indexes.each do |index|
           index[:queries] = queries_by_index[index]

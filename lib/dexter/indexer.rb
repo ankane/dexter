@@ -12,20 +12,28 @@ module Dexter
     end
 
     def process_queries(queries)
+      # reset hypothetical indexes
       select_all("SELECT hypopg_reset()")
 
+      # filter queries from other databases and system tables
       tables = possible_tables(queries)
-
-      # filter queries from other databases, system tables, etc
       queries.each do |query|
         query.missing_tables = !query.tables.all? { |t| tables.include?(t) }
       end
 
+      # analyze tables if needed
       analyze_tables(tables) if tables.any?
+
+      # get initial costs for queries
       calculate_initial_cost(queries.reject(&:missing_tables))
+
+      # create hypothetical indexes
       candidates = tables.any? ? create_hypothetical_indexes(tables) : {}
 
+      # get new costs and see if new indexes were used
       new_indexes = determine_indexes(queries, candidates)
+
+      # display and create new indexes
       show_and_create_indexes(new_indexes)
     end
 

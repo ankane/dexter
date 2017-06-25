@@ -99,6 +99,8 @@ module Dexter
             log "Index created: #{((Time.now - started_at) * 1000).to_i} ms"
           end
         end
+      else
+        log "No indexes found"
       end
 
       new_indexes

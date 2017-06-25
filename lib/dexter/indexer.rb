@@ -11,7 +11,7 @@ module Dexter
 
     def process_queries(queries)
       # narrow down queries and tables
-      tables, queries = narrow_queries(queries)
+      tables, queries = filter_queries(queries)
       return [] if tables.empty?
 
       # get ready for hypothetical indexes
@@ -20,30 +20,9 @@ module Dexter
       # ensure tables have recently been analyzed
       analyze_tables(tables)
 
-      # get initial plans
-      initial_plans = {}
-      queries.each do |query|
-        begin
-          initial_plans[query] = plan(query)
-        rescue PG::Error
-          # do nothing
-        end
-      end
+      initial_plans = calculate_initial_plans(queries)
 
-      # get existing indexes
-      index_set = Set.new
-      indexes(tables).each do |index|
-        # TODO make sure btree
-        index_set << [index["table"], index["columns"]]
-      end
-
-      # create hypothetical indexes
-      candidates = {}
-      columns(tables).each do |col|
-        unless index_set.include?([col[:table], [col[:column]]])
-          candidates[col] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{col[:table]} (#{[col[:column]].join(", ")})');").first["indexname"]
-        end
-      end
+      candidates = create_hypothetical_indexes(tables)
 
       queries_by_index = {}
 
@@ -166,7 +145,37 @@ module Dexter
       JSON.parse(select_all("EXPLAIN (FORMAT JSON) #{query}").first["QUERY PLAN"]).first["Plan"]
     end
 
-    def narrow_queries(queries)
+    def create_hypothetical_indexes(tables)
+      # get existing indexes
+      index_set = Set.new
+      indexes(tables).each do |index|
+        # TODO make sure btree
+        index_set << [index["table"], index["columns"]]
+      end
+
+      # create hypothetical indexes
+      candidates = {}
+      columns(tables).each do |col|
+        unless index_set.include?([col[:table], [col[:column]]])
+          candidates[col] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{col[:table]} (#{[col[:column]].join(", ")})');").first["indexname"]
+        end
+      end
+      candidates
+    end
+
+    def calculate_initial_plans(queries)
+      initial_plans = {}
+      queries.each do |query|
+        begin
+          initial_plans[query] = plan(query)
+        rescue PG::Error
+          # do nothing
+        end
+      end
+      initial_plans
+    end
+
+    def filter_queries(queries)
       result = select_all <<-SQL
         SELECT
           table_name

@@ -8,7 +8,7 @@ module Dexter
       @log_level = options[:log_level]
       @exclude_tables = options[:exclude]
 
-      create_hypopg_extension
+      create_extension
     end
 
     def process_queries(queries)
@@ -45,7 +45,7 @@ module Dexter
 
     private
 
-    def create_hypopg_extension
+    def create_extension
       select_all("SET client_min_messages = warning")
       select_all("CREATE EXTENSION IF NOT EXISTS hypopg")
     end

@@ -67,6 +67,10 @@ interval | time to wait between processing queries, in seconds | 60
 log-level | `debug` gives additional info for suggested indexes<br />`debug2` gives additional info for all processed queries | info
 min-time | only process queries consuming a min amount of DB time, in minutes | 0
 
+## Thanks
+
+This software wouldn’t be possible without [HypoPG](https://github.com/dalibo/hypopg), which allows you to create hypothetical indexes, and [pg_query](https://github.com/lfittl/pg_query), which allows you to parse and fingerprint queries. A big thanks to Dalibo and Lukas Fittl respectively.
+
 ## Contributing
 
 Everyone is encouraged to help improve this project. Here are a few ways you can help:

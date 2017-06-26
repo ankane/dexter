@@ -7,6 +7,9 @@ module Dexter
     end
 
     def perform
+      STDOUT.sync = true
+      STDERR.sync = true
+
       if options[:statement]
         fingerprint = PgQuery.fingerprint(options[:statement]) rescue "unknown"
         query = Query.new(options[:statement], fingerprint)

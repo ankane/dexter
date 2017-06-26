@@ -183,6 +183,11 @@ module Dexter
         end
 
         if @create
+          # TODO use advisory locks
+          # 1. create lock
+          # 2. refresh existing index list
+          # 3. create indexes that still don't exist
+          # 4. release lock
           new_indexes.each do |index|
             statement = "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")})"
             log "Creating index: #{statement}"

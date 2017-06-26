@@ -76,7 +76,7 @@ module Dexter
 
       tables.each do |table|
         if !last_analyzed[table] || last_analyzed[table] < Time.now - 3600
-          statement = "ANALYZE #{table}"
+          statement = "ANALYZE #{quote_ident(table)}"
           log "Running analyze: #{statement}"
           select_all(statement)
         end
@@ -300,6 +300,10 @@ module Dexter
       else
         part
       end
+    end
+
+    def quote_ident(value)
+      conn.quote_ident(value)
     end
 
     def quote(value)

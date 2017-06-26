@@ -6,6 +6,7 @@ module Dexter
       @database_url = database_url
       @create = options[:create]
       @log_level = options[:log_level]
+      @exclude_tables = options[:exclude]
 
       create_hypopg_extension
     end
@@ -18,6 +19,12 @@ module Dexter
       tables = possible_tables(queries)
       queries.each do |query|
         query.missing_tables = !query.tables.all? { |t| tables.include?(t) }
+      end
+
+      # exclude user specified tables
+      # TODO exclude write-heavy tables
+      @exclude_tables.each do |table|
+        tables.delete(table)
       end
 
       # analyze tables if needed

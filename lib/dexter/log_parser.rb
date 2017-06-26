@@ -1,6 +1,7 @@
 module Dexter
   class LogParser
     REGEX = /duration: (\d+\.\d+) ms  (statement|execute <unnamed>): (.+)/
+    LINE_SEPERATOR = ":  ".freeze
 
     def initialize(logfile, collector)
       @logfile = logfile
@@ -13,10 +14,9 @@ module Dexter
 
       each_line do |line|
         if active_line
-          if line.include?(":  ")
+          if line.include?(LINE_SEPERATOR)
             process_entry(active_line, duration)
             active_line = nil
-            duration = nil
           else
             active_line << line
           end

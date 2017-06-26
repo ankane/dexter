@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Andrew Kane"]
   spec.email         = ["andrew@chartkick.com"]
 
-  spec.summary       = "An automatic indexer for Postgres"
+  spec.summary       = "The automatic indexer for Postgres"
   spec.homepage      = "https://github.com/ankane/dexter"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|

@@ -1,6 +1,6 @@
 # Dexter
 
-An automatic indexer for Postgres
+The automatic indexer for Postgres
 
 ## Installation
 

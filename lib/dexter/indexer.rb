@@ -221,7 +221,14 @@ module Dexter
     end
 
     def select_all(query)
-      conn.exec(query).to_a
+      # use exec_params instead of exec for securiy
+      #
+      # Unlike PQexec, PQexecParams allows at most one SQL command in the given string.
+      # (There can be semicolons in it, but not more than one nonempty command.)
+      # This is a limitation of the underlying protocol, but has some usefulness
+      # as an extra defense against SQL-injection attacks.
+      # https://www.postgresql.org/docs/current/static/libpq-exec.html
+      conn.exec_params(query, []).to_a
     end
 
     def plan(query)

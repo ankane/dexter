@@ -232,7 +232,8 @@ module Dexter
     end
 
     def plan(query)
-      JSON.parse(select_all("EXPLAIN (FORMAT JSON) #{query}").first["QUERY PLAN"]).first["Plan"]
+      # strip semi-colons as another measure of defense
+      JSON.parse(select_all("EXPLAIN (FORMAT JSON) #{query.gsub(";", "")}").first["QUERY PLAN"]).first["Plan"]
     end
 
     def database_tables

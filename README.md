@@ -70,7 +70,7 @@ min-time | only process queries consuming a min amount of DB time, in minutes | 
 
 ## Future Work
 
-[Here are some ideas](https://github.com/ankane/dexter/issues/1).
+[Here are some ideas](https://github.com/ankane/dexter/issues/1)
 
 ## Thanks
 

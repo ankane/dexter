@@ -1,3 +1,14 @@
-## 0.2.0 [unreleased]
+## 0.1.2 [unreleased]
+
+- Added `--exclude` option
+- Added `--log-sql` option
+
+## 0.1.1
+
+- Added `--interval` option
+- Added `--min-time` option
+- Added `--log-level` option
+
+## 0.1.0
 
 - Launched

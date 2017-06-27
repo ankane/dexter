@@ -7,6 +7,7 @@ module Dexter
       @create = options[:create]
       @log_level = options[:log_level]
       @exclude_tables = options[:exclude]
+      @log_sql = options[:log_sql]
 
       create_extension
     end
@@ -228,6 +229,8 @@ module Dexter
       # This is a limitation of the underlying protocol, but has some usefulness
       # as an extra defense against SQL-injection attacks.
       # https://www.postgresql.org/docs/current/static/libpq-exec.html
+      query = squish(query)
+      log "SQL: #{query}" if @log_sql
       conn.exec_params(query, []).to_a
     end
 
@@ -275,13 +278,7 @@ module Dexter
           t.relname AS table,
           ix.relname AS name,
           regexp_replace(pg_get_indexdef(i.indexrelid), '^[^\\(]*\\((.*)\\)$', '\\1') AS columns,
-          regexp_replace(pg_get_indexdef(i.indexrelid), '.* USING ([^ ]*) \\(.*', '\\1') AS using,
-          indisunique AS unique,
-          indisprimary AS primary,
-          indisvalid AS valid,
-          indexprs::text,
-          indpred::text,
-          pg_get_indexdef(i.indexrelid) AS definition
+          regexp_replace(pg_get_indexdef(i.indexrelid), '.* USING ([^ ]*) \\(.*', '\\1') AS using
         FROM
           pg_index i
         INNER JOIN
@@ -322,9 +319,14 @@ module Dexter
       end
     end
 
-    # activerecord
+    # from activerecord
     def quote_string(s)
       s.gsub(/\\/, '\&\&').gsub(/'/, "''")
+    end
+
+    # from activesupport
+    def squish(str)
+      str.to_s.gsub(/\A[[:space:]]+/, "").gsub(/[[:space:]]+\z/, "").gsub(/[[:space:]]+/, " ")
     end
   end
 end

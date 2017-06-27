@@ -3,6 +3,8 @@ module Dexter
     include Logging
 
     def initialize(database_url, logfile, options)
+      log "Started"
+
       @logfile = logfile
 
       @collector = Collector.new(min_time: options[:min_time])
@@ -17,8 +19,6 @@ module Dexter
     end
 
     def perform
-      log "Started"
-
       if @logfile == STDIN
         Thread.abort_on_exception = true
         Thread.new do

@@ -22,7 +22,7 @@ Enable logging for slow queries.
 log_min_duration_statement = 10 # ms
 ```
 
-And install with:
+And install the command line tool with:
 
 ```sh
 gem install pgdexter

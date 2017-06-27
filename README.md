@@ -2,6 +2,8 @@
 
 The automatic indexer for Postgres
 
+[Read about how it works](https://medium.com/@ankane/introducing-dexter-the-automatic-indexer-for-postgres-5f8fa8b28f27)
+
 ## Installation
 
 First, install [HypoPG](https://github.com/dalibo/hypopg) on your database server. This doesn’t require a restart.

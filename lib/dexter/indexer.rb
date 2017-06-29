@@ -222,7 +222,7 @@ module Dexter
     end
 
     def select_all(query)
-      # use exec_params instead of exec for securiy
+      # use exec_params instead of exec for security
       #
       # Unlike PQexec, PQexecParams allows at most one SQL command in the given string.
       # (There can be semicolons in it, but not more than one nonempty command.)

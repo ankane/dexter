@@ -106,7 +106,7 @@ module Dexter
       candidates = {}
       columns(tables).each do |col|
         unless index_set.include?([col[:table], [col[:column]]])
-          candidates[col] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{col[:table]} (#{[col[:column]].join(", ")})');").first["indexname"]
+          candidates[col] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{col[:table]} (#{[col[:column]].join(", ")})')").first["indexname"]
         end
       end
       candidates

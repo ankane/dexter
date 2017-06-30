@@ -1,3 +1,7 @@
+## 0.1.3 [unreleased]
+
+- Fixed error with non-lowercase columns
+
 ## 0.1.2
 
 - Added `--exclude` option

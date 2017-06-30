@@ -106,7 +106,7 @@ module Dexter
       candidates = {}
       columns(tables).each do |col|
         unless index_set.include?([col[:table], [col[:column]]])
-          candidates[col] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{col[:table]} (#{[col[:column]].join(", ")})')").first["indexname"]
+          candidates[col] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(col[:table])} (#{[col[:column]].map { |c| quote_ident(c) }.join(", ")})')").first["indexname"]
         end
       end
       candidates
@@ -190,7 +190,7 @@ module Dexter
           # 3. create indexes that still don't exist
           # 4. release lock
           new_indexes.each do |index|
-            statement = "CREATE INDEX CONCURRENTLY ON #{index[:table]} (#{index[:columns].join(", ")})"
+            statement = "CREATE INDEX CONCURRENTLY ON #{quote_ident(index[:table])} (#{index[:columns].map { |c| quote_ident(c) }.join(", ")})"
             log "Creating index: #{statement}"
             started_at = Time.now
             select_all(statement)

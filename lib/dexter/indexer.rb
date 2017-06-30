@@ -106,7 +106,9 @@ module Dexter
       candidates = {}
       columns(tables).each do |col|
         unless index_set.include?([col[:table], [col[:column]]])
-          candidates[col] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(col[:table])} (#{[col[:column]].map { |c| quote_ident(c) }.join(", ")})')").first["indexname"]
+          unless ["json", "jsonb"].include?(col[:type])
+            candidates[col] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(col[:table])} (#{[col[:column]].map { |c| quote_ident(c)  }.join(", ")})')").first["indexname"]
+          end
         end
       end
       candidates
@@ -260,7 +262,8 @@ module Dexter
       columns = select_all <<-SQL
         SELECT
           table_name,
-          column_name
+          column_name,
+          data_type
         FROM
           information_schema.columns
         WHERE
@@ -268,7 +271,7 @@ module Dexter
           table_name IN (#{tables.map { |t| quote(t) }.join(", ")})
       SQL
 
-      columns.map { |v| {table: v["table_name"], column: v["column_name"]} }
+      columns.map { |v| {table: v["table_name"], column: v["column_name"], type: v["data_type"]} }
     end
 
     def indexes(tables)

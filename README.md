@@ -30,6 +30,8 @@ And install the command line tool with:
 gem install pgdexter
 ```
 
+Dexter is also available as a [Linux package](guides/Linux.md).
+
 ## How to Use
 
 Dexter needs a connection to your database and a log file to process.

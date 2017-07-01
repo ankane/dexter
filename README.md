@@ -60,6 +60,12 @@ To be safe, Dexter will not create indexes unless you pass the `--create` flag. 
 2017-06-25T17:52:37+00:00 Index created: 15243 ms
 ```
 
+You can also pass a single statement with:
+
+```sh
+dexter <database-url> -s "SELECT * FROM ..."
+```
+
 ## Options
 
 Name | Description | Default

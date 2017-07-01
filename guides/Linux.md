@@ -5,7 +5,7 @@ Distributions
 - [Ubuntu 16.04 (Xenial)](#ubuntu-1604-xenial)
 - [Ubuntu 14.04 (Trusty)](#ubuntu-1404-trusty)
 - [Debian 8 (Jesse)](#debian-8-jesse)
-- [CentOS / RHEL 7](#centos-rhel-7)
+- [CentOS / RHEL 7](#centos--rhel-7)
 - [SUSE Linux Enterprise Server 12](#suse-linux-enterprise-server-12)
 
 ### Ubuntu 16.04 (Xenial)

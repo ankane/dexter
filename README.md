@@ -86,3 +86,12 @@ Everyone is encouraged to help improve this project. Here are a few ways you can
 - Fix bugs and [submit pull requests](https://github.com/ankane/dexter/pulls)
 - Write, clarify, or fix documentation
 - Suggest or add new features
+
+To get started, run:
+
+```sh
+git clone https://github.com/ankane/dexter.git
+cd dexter
+bundle
+rake install
+```

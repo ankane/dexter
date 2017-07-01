@@ -32,10 +32,10 @@ module Dexter
       # analyze tables if needed
       analyze_tables(tables) if tables.any?
 
-      # create hypothetical indexes
+      # create hypothetical indexes and explain queries
       candidates = tables.any? ? create_hypothetical_indexes(queries.reject(&:missing_tables), tables) : {}
 
-      # get new costs and see if new indexes were used
+      # see if new indexes were used and meet bar
       new_indexes = determine_indexes(queries, candidates)
 
       # display and create new indexes

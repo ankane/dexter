@@ -30,7 +30,7 @@ And install the command line tool with:
 gem install pgdexter
 ```
 
-Dexter is also available as a [Linux package](guides/Linux.md).
+The command line tool is also available as a [Linux package](guides/Linux.md).
 
 ## How to Use
 

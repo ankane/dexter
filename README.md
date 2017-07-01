@@ -72,7 +72,7 @@ Name | Description | Default
 --- | --- | ---
 exclude | prevent specific tables from being indexed | None
 interval | time to wait between processing queries, in seconds | 60
-log-level | `debug` gives additional info for suggested indexes<br />`debug2` gives additional info for all processed queries | info
+log-level | `debug` gives additional info for suggested indexes<br />`debug2` gives additional info for processed queries | info
 log-sql | log SQL statements executed | false
 min-time | only process queries consuming a min amount of DB time, in minutes | 0
 

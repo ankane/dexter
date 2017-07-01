@@ -90,7 +90,7 @@ module Dexter
             log "Explaining query"
             puts
             # Pass format to prevent ANALYZE
-            puts select_all("EXPLAIN (FORMAT TEXT) #{query.statement}").map { |r| r["QUERY PLAN"] }.join("\n")
+            puts select_all("EXPLAIN (FORMAT TEXT) #{safe_statement(query.statement)}").map { |r| r["QUERY PLAN"] }.join("\n")
             puts
           end
         rescue PG::Error
@@ -259,7 +259,7 @@ module Dexter
 
     def plan(query)
       # strip semi-colons as another measure of defense
-      JSON.parse(select_all("EXPLAIN (FORMAT JSON) #{query.gsub(";", "")}").first["QUERY PLAN"]).first["Plan"]
+      JSON.parse(select_all("EXPLAIN (FORMAT JSON) #{safe_statement(query)}").first["QUERY PLAN"]).first["Plan"]
     end
 
     # TODO for multicolumn indexes, use ordering
@@ -365,6 +365,10 @@ module Dexter
     # from activesupport
     def squish(str)
       str.to_s.gsub(/\A[[:space:]]+/, "").gsub(/[[:space:]]+\z/, "").gsub(/[[:space:]]+/, " ")
+    end
+
+    def safe_statement(statement)
+      statement.gsub(";", "")
     end
   end
 end

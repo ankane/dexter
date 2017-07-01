@@ -9,6 +9,10 @@ class DexterTest < Minitest::Test
     assert_no_index "SELECT * FROM posts"
   end
 
+  def test_multicolumn_order
+    assert_index "SELECT * FROM posts WHERE user_id = 1 ORDER BY blog_id LIMIT 1000", "posts (user_id, blog_id)"
+  end
+
   private
 
   def assert_index(statement, index)

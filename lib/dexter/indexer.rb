@@ -8,6 +8,7 @@ module Dexter
       @log_level = options[:log_level]
       @exclude_tables = options[:exclude]
       @log_sql = options[:log_sql]
+      @log_explain = options[:log_explain]
 
       create_extension
     end
@@ -31,11 +32,8 @@ module Dexter
       # analyze tables if needed
       analyze_tables(tables) if tables.any?
 
-      # get initial costs for queries
-      calculate_initial_cost(queries.reject(&:missing_tables))
-
       # create hypothetical indexes
-      candidates = tables.any? ? create_hypothetical_indexes(tables) : {}
+      candidates = tables.any? ? create_hypothetical_indexes(queries.reject(&:missing_tables), tables) : {}
 
       # get new costs and see if new indexes were used
       new_indexes = determine_indexes(queries, candidates)
@@ -84,17 +82,26 @@ module Dexter
       end
     end
 
-    def calculate_initial_cost(queries)
+    def calculate_plan(key, queries)
       queries.each do |query|
         begin
-          query.initial_cost = plan(query.statement)["Total Cost"]
+          query.plans[key] = plan(query.statement)
+          if @log_explain
+            log "Explaining query"
+            puts
+            puts select_all("EXPLAIN (FORMAT TEXT) #{query.statement}").map { |r| r["QUERY PLAN"] }.join("\n")
+            puts
+          end
         rescue PG::Error
           # do nothing
         end
       end
     end
 
-    def create_hypothetical_indexes(tables)
+    def create_hypothetical_indexes(queries, tables)
+      # get initial costs for queries
+      calculate_plan(:initial, queries)
+
       # get existing indexes
       index_set = Set.new
       indexes(tables).each do |index|
@@ -104,13 +111,20 @@ module Dexter
 
       # create hypothetical indexes
       candidates = {}
-      columns(tables).each do |col|
-        unless index_set.include?([col[:table], [col[:column]]])
-          unless ["json", "jsonb"].include?(col[:type])
-            candidates[col] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(col[:table])} (#{[col[:column]].map { |c| quote_ident(c)  }.join(", ")})')").first["indexname"]
-          end
-        end
-      end
+      columns_by_table = columns(tables).reject { |c| ["json", "jsonb"].include?(c[:type]) }.group_by { |c| c[:table] }
+
+      # create single column indexes
+      create_hypothetical_indexes_helper(columns_by_table, 1, index_set, candidates)
+
+      # get next round of costs
+      calculate_plan(:single, queries.select(&:explainable?))
+
+      # create multicolumn indexes
+      create_hypothetical_indexes_helper(columns_by_table, 2, index_set, candidates)
+
+      # get next round of costs
+      calculate_plan(:multi, queries.select(&:explainable?))
+
       candidates
     end
 
@@ -118,17 +132,20 @@ module Dexter
       new_indexes = {}
 
       queries.each do |query|
-        if query.initial_cost
-          new_plan = plan(query.statement)
-          query.new_cost = new_plan["Total Cost"]
+        if query.explainable?
           cost_savings = query.new_cost < query.initial_cost * 0.5
+          # set high bar for multicolumn indexes
+          cost_savings2 = query.new_cost > 100 && query.final_cost < query.new_cost * 0.5
+          final_cost = cost_savings2 ? query.final_cost : query.new_cost
 
           query_indexes = []
-          candidates.each do |col, index_name|
-            if new_plan.inspect.include?(index_name)
+          candidates.each do |col_set, index_name|
+            key = cost_savings2 ? :multi : :single
+
+            if query.plans[key].inspect.include?(index_name)
               index = {
-                table: col[:table],
-                columns: [col[:column]]
+                table: col_set[0][:table],
+                columns: col_set.map { |c| c[:column] }
               }
               query_indexes << index
 
@@ -142,12 +159,12 @@ module Dexter
 
         if @log_level == "debug2"
           log "Processed #{query.fingerprint}"
-          if query.initial_cost
-            log "Cost: #{query.initial_cost} -> #{query.new_cost}"
+          if query.explainable?
+            log "Cost: #{query.initial_cost} -> #{final_cost}"
 
             if query_indexes.any?
               log "Indexes: #{query_indexes.map { |i| "#{i[:table]} (#{i[:columns].join(", ")})" }.join(", ")}"
-              log "Need 50% cost savings to suggest index" unless cost_savings
+              log "Need 50% cost savings to suggest index" unless cost_savings || cost_savings2
             else
               log "Indexes: None"
             end
@@ -241,6 +258,18 @@ module Dexter
       JSON.parse(select_all("EXPLAIN (FORMAT JSON) #{query.gsub(";", "")}").first["QUERY PLAN"]).first["Plan"]
     end
 
+    # TODO create indexes with different ordering
+    def create_hypothetical_indexes_helper(columns_by_table, n, index_set, candidates)
+      # create more hypothetical indexes
+      columns_by_table.each do |table, cols|
+        cols.permutation(n) do |col_set|
+          if !index_set.include?([table, col_set.map { |col| col[:column] }])
+            candidates[col_set] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{col_set.map { |c| quote_ident(c[:column])  }.join(", ")})')").first["indexname"]
+          end
+        end
+      end
+    end
+
     def database_tables
       result = select_all <<-SQL
         SELECT
@@ -269,6 +298,8 @@ module Dexter
         WHERE
           table_schema = 'public' AND
           table_name IN (#{tables.map { |t| quote(t) }.join(", ")})
+        ORDER BY
+          1, 2
       SQL
 
       columns.map { |v| {table: v["table_name"], column: v["column_name"], type: v["data_type"]} }

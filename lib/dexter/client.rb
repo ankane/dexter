@@ -31,6 +31,7 @@ Options:)
         o.array "--exclude", "prevent specific tables from being indexed"
         o.integer "--interval", "time to wait between processing queries, in seconds", default: 60
         o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
+        o.boolean "--log-explain", "log explain", default: false, help: false
         o.string "--log-level", "log level", default: "info"
         o.boolean "--log-sql", "log sql", default: false
         o.string "-s", "--statement", "process a single statement"

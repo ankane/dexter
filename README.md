@@ -95,3 +95,9 @@ cd dexter
 bundle
 rake install
 ```
+
+To run tests, use:
+
+```sh
+rake test
+```

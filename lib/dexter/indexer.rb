@@ -112,7 +112,7 @@ module Dexter
 
       # create hypothetical indexes
       candidates = {}
-      columns_by_table = columns(tables).reject { |c| ["json", "jsonb"].include?(c[:type]) }.group_by { |c| c[:table] }
+      columns_by_table = columns(tables).group_by { |c| c[:table] }
 
       # create single column indexes
       create_hypothetical_indexes_helper(columns_by_table, 1, index_set, candidates)
@@ -262,11 +262,11 @@ module Dexter
       JSON.parse(select_all("EXPLAIN (FORMAT JSON) #{query.gsub(";", "")}").first["QUERY PLAN"]).first["Plan"]
     end
 
-    # TODO create indexes with different ordering
+    # TODO for multicolumn indexes, use ordering
     def create_hypothetical_indexes_helper(columns_by_table, n, index_set, candidates)
-      # create more hypothetical indexes
       columns_by_table.each do |table, cols|
-        cols.permutation(n) do |col_set|
+        # no reason to use btree index for json columns
+        cols.reject { |c| ["json", "jsonb"].include?(c[:type]) }.permutation(n) do |col_set|
           if !index_set.include?([table, col_set.map { |col| col[:column] }])
             candidates[col_set] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{col_set.map { |c| quote_ident(c[:column])  }.join(", ")})')").first["indexname"]
           end

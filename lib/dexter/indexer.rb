@@ -200,7 +200,7 @@ module Dexter
           end
         end
       else
-        log "No indexes found"
+        log "No new indexes found"
       end
 
       new_indexes

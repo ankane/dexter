@@ -19,6 +19,6 @@ class DexterTest < Minitest::Test
   def assert_no_index(statement)
     # TODO DRY
     dexter = Dexter::Client.new(["dexter_test", "-s", statement])
-    assert_output(/No indexes found/) { dexter.perform }
+    assert_output(/No new indexes found/) { dexter.perform }
   end
 end

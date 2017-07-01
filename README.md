@@ -13,7 +13,7 @@ wget https://github.com/dalibo/hypopg/archive/1.0.0.tar.gz
 tar xf 1.0.0.tar.gz
 cd hypopg-1.0.0
 make
-make install
+make install # may need sudo
 ```
 
 > Note: If you have issues, make sure `postgresql-server-dev-*` is installed.

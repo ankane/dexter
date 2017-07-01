@@ -45,18 +45,18 @@ module Dexter
     private
 
     def create_extension
-      select_all("SET client_min_messages = warning")
-      select_all("CREATE EXTENSION IF NOT EXISTS hypopg")
+      execute("SET client_min_messages = warning")
+      execute("CREATE EXTENSION IF NOT EXISTS hypopg")
     end
 
     def reset_hypothetical_indexes
-      select_all("SELECT hypopg_reset()")
+      execute("SELECT hypopg_reset()")
     end
 
     def analyze_tables(tables)
       tables = tables.to_a.sort
 
-      analyze_stats = select_all <<-SQL
+      analyze_stats = execute <<-SQL
         SELECT
           schemaname AS schema,
           relname AS table,
@@ -77,7 +77,7 @@ module Dexter
         if !last_analyzed[table] || last_analyzed[table] < Time.now - 3600
           statement = "ANALYZE #{quote_ident(table)}"
           log "Running analyze: #{statement}"
-          select_all(statement)
+          execute(statement)
         end
       end
     end
@@ -90,7 +90,7 @@ module Dexter
             log "Explaining query"
             puts
             # Pass format to prevent ANALYZE
-            puts select_all("EXPLAIN (FORMAT TEXT) #{safe_statement(query.statement)}").map { |r| r["QUERY PLAN"] }.join("\n")
+            puts execute("EXPLAIN (FORMAT TEXT) #{safe_statement(query.statement)}").map { |r| r["QUERY PLAN"] }.join("\n")
             puts
           end
         rescue PG::Error
@@ -217,7 +217,7 @@ module Dexter
             statement = "CREATE INDEX CONCURRENTLY ON #{quote_ident(index[:table])} (#{index[:columns].map { |c| quote_ident(c) }.join(", ")})"
             log "Creating index: #{statement}"
             started_at = Time.now
-            select_all(statement)
+            execute(statement)
             log "Index created: #{((Time.now - started_at) * 1000).to_i} ms"
           end
         end
@@ -245,7 +245,7 @@ module Dexter
       abort "Bad database url"
     end
 
-    def select_all(query)
+    def execute(query)
       # use exec_params instead of exec for security
       #
       # Unlike PQexec, PQexecParams allows at most one SQL command in the given string.
@@ -260,7 +260,7 @@ module Dexter
 
     def plan(query)
       # strip semi-colons as another measure of defense
-      JSON.parse(select_all("EXPLAIN (FORMAT JSON) #{safe_statement(query)}").first["QUERY PLAN"]).first["Plan"]
+      JSON.parse(execute("EXPLAIN (FORMAT JSON) #{safe_statement(query)}").first["QUERY PLAN"]).first["Plan"]
     end
 
     # TODO for multicolumn indexes, use ordering
@@ -269,14 +269,14 @@ module Dexter
         # no reason to use btree index for json columns
         cols.reject { |c| ["json", "jsonb"].include?(c[:type]) }.permutation(n) do |col_set|
           if !index_set.include?([table, col_set.map { |col| col[:column] }])
-            candidates[col_set] = select_all("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{col_set.map { |c| quote_ident(c[:column])  }.join(", ")})')").first["indexname"]
+            candidates[col_set] = execute("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{col_set.map { |c| quote_ident(c[:column])  }.join(", ")})')").first["indexname"]
           end
         end
       end
     end
 
     def database_tables
-      result = select_all <<-SQL
+      result = execute <<-SQL
         SELECT
           table_name
         FROM
@@ -293,7 +293,7 @@ module Dexter
     end
 
     def columns(tables)
-      columns = select_all <<-SQL
+      columns = execute <<-SQL
         SELECT
           table_name,
           column_name,
@@ -311,7 +311,7 @@ module Dexter
     end
 
     def indexes(tables)
-      select_all(<<-SQL
+      execute(<<-SQL
         SELECT
           schemaname AS schema,
           t.relname AS table,

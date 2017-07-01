@@ -16,13 +16,14 @@ class DexterTest < Minitest::Test
   private
 
   def assert_index(statement, index)
-    dexter = Dexter::Client.new(["dexter_test", "-s", statement])
-    assert_output(/Index found: #{Regexp.escape(index)}/) { dexter.perform }
+    assert_output(/Index found: #{Regexp.escape(index)}/) { dexter(statement) }
   end
 
   def assert_no_index(statement)
-    # TODO DRY
-    dexter = Dexter::Client.new(["dexter_test", "-s", statement])
-    assert_output(/No new indexes found/) { dexter.perform }
+    assert_output(/No new indexes found/) { dexter(statement) }
+  end
+
+  def dexter(statement)
+    Dexter::Client.new(["dexter_test", "-s", statement, "--log-level", "debug2"]).perform
   end
 end

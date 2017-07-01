@@ -1,7 +1,7 @@
 module Dexter
   class Query
     attr_reader :statement, :fingerprint, :plans
-    attr_accessor :missing_tables
+    attr_accessor :missing_tables, :new_cost
 
     def initialize(statement, fingerprint)
       @statement = statement
@@ -19,6 +19,10 @@ module Dexter
 
     def costs
       plans.map { |plan| plan["Total Cost"] }
+    end
+
+    def initial_cost
+      costs[0]
     end
   end
 end

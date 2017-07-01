@@ -135,13 +135,13 @@ module Dexter
 
       queries.each do |query|
         if query.explainable?
-          initial_cost, new_cost, new_cost2 = query.costs
+          new_cost, new_cost2 = query.costs[1..2]
 
-          cost_savings = new_cost < initial_cost * 0.5
+          cost_savings = new_cost < query.initial_cost * 0.5
           # set high bar for multicolumn indexes
           cost_savings2 = new_cost > 100 && new_cost2 < new_cost * 0.5
 
-          final_cost = cost_savings2 ? new_cost2 : new_cost
+          query.new_cost = cost_savings2 ? new_cost2 : new_cost
 
           query_indexes = []
           candidates.each do |col_set, index_name|
@@ -165,7 +165,7 @@ module Dexter
         if @log_level == "debug2"
           log "Processed #{query.fingerprint}"
           if query.explainable?
-            log "Cost: #{initial_cost} -> #{final_cost}"
+            log "Cost: #{query.initial_cost} -> #{query.new_cost}"
 
             if query_indexes.any?
               log "Indexes: #{query_indexes.map { |i| "#{i[:table]} (#{i[:columns].join(", ")})" }.join(", ")}"

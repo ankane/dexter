@@ -102,6 +102,7 @@ module Dexter
     def create_hypothetical_indexes(queries, tables)
       # get initial costs for queries
       calculate_plan(queries)
+      explainable_queries = queries.select(&:explainable?)
 
       # get existing indexes
       index_set = Set.new
@@ -118,13 +119,13 @@ module Dexter
       create_hypothetical_indexes_helper(columns_by_table, 1, index_set, candidates)
 
       # get next round of costs
-      calculate_plan(queries.select(&:explainable?))
+      calculate_plan(explainable_queries)
 
       # create multicolumn indexes
       create_hypothetical_indexes_helper(columns_by_table, 2, index_set, candidates)
 
       # get next round of costs
-      calculate_plan(queries.select(&:explainable?))
+      calculate_plan(explainable_queries)
 
       candidates
     end

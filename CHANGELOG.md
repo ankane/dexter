@@ -1,4 +1,4 @@
-## 0.1.3 [unreleased]
+## 0.1.3
 
 - Fixed error with non-lowercase columns
 - Fixed error with `json` columns

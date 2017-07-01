@@ -89,6 +89,7 @@ module Dexter
           if @log_explain
             log "Explaining query"
             puts
+            # Pass format to prevent ANALYZE
             puts select_all("EXPLAIN (FORMAT TEXT) #{query.statement}").map { |r| r["QUERY PLAN"] }.join("\n")
             puts
           end

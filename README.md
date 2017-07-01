@@ -18,7 +18,7 @@ make install # may need sudo
 
 > Note: If you have issues, make sure `postgresql-server-dev-*` is installed.
 
-Enable logging for slow queries.
+Enable logging for slow queries in your Postgres config file
 
 ```ini
 log_min_duration_statement = 10 # ms

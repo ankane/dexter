@@ -6,7 +6,7 @@ module Dexter
     def initialize(statement, fingerprint)
       @statement = statement
       @fingerprint = fingerprint
-      @plans = {}
+      @plans = []
     end
 
     def tables
@@ -14,19 +14,11 @@ module Dexter
     end
 
     def explainable?
-      !initial_cost.nil?
+      plans.any?
     end
 
-    def initial_cost
-      plans[:initial] && plans[:initial]["Total Cost"]
-    end
-
-    def new_cost
-      plans[:single] && plans[:single]["Total Cost"]
-    end
-
-    def final_cost
-      plans[:multi] && plans[:multi]["Total Cost"]
+    def costs
+      plans.map { |plan| plan["Total Cost"] }
     end
   end
 end

@@ -82,10 +82,10 @@ module Dexter
       end
     end
 
-    def calculate_plan(key, queries)
+    def calculate_plan(queries)
       queries.each do |query|
         begin
-          query.plans[key] = plan(query.statement)
+          query.plans << plan(query.statement)
           if @log_explain
             log "Explaining query"
             puts
@@ -101,7 +101,7 @@ module Dexter
 
     def create_hypothetical_indexes(queries, tables)
       # get initial costs for queries
-      calculate_plan(:initial, queries)
+      calculate_plan(queries)
 
       # get existing indexes
       index_set = Set.new
@@ -118,13 +118,13 @@ module Dexter
       create_hypothetical_indexes_helper(columns_by_table, 1, index_set, candidates)
 
       # get next round of costs
-      calculate_plan(:single, queries.select(&:explainable?))
+      calculate_plan(queries.select(&:explainable?))
 
       # create multicolumn indexes
       create_hypothetical_indexes_helper(columns_by_table, 2, index_set, candidates)
 
       # get next round of costs
-      calculate_plan(:multi, queries.select(&:explainable?))
+      calculate_plan(queries.select(&:explainable?))
 
       candidates
     end
@@ -134,14 +134,17 @@ module Dexter
 
       queries.each do |query|
         if query.explainable?
-          cost_savings = query.new_cost < query.initial_cost * 0.5
+          initial_cost, new_cost, new_cost2 = query.costs
+
+          cost_savings = new_cost < initial_cost * 0.5
           # set high bar for multicolumn indexes
-          cost_savings2 = query.new_cost > 100 && query.final_cost < query.new_cost * 0.5
-          final_cost = cost_savings2 ? query.final_cost : query.new_cost
+          cost_savings2 = new_cost > 100 && new_cost2 < new_cost * 0.5
+
+          final_cost = cost_savings2 ? new_cost2 : new_cost
 
           query_indexes = []
           candidates.each do |col_set, index_name|
-            key = cost_savings2 ? :multi : :single
+            key = cost_savings2 ? 2 : 1
 
             if query.plans[key].inspect.include?(index_name)
               index = {
@@ -161,7 +164,7 @@ module Dexter
         if @log_level == "debug2"
           log "Processed #{query.fingerprint}"
           if query.explainable?
-            log "Cost: #{query.initial_cost} -> #{final_cost}"
+            log "Cost: #{initial_cost} -> #{final_cost}"
 
             if query_indexes.any?
               log "Indexes: #{query_indexes.map { |i| "#{i[:table]} (#{i[:columns].join(", ")})" }.join(", ")}"

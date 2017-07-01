@@ -40,7 +40,7 @@ tail -F -n +1 <log-file> | dexter <database-url>
 
 This finds slow queries and generates output like:
 
-```log
+```
 2017-06-25T17:52:19+00:00 Started
 2017-06-25T17:52:22+00:00 Processing 189 new query fingerprints
 2017-06-25T17:52:22+00:00 Index found: genres_movies (genre_id)
@@ -54,9 +54,9 @@ This finds slow queries and generates output like:
 
 To be safe, Dexter will not create indexes unless you pass the `--create` flag. In this case, you’ll see:
 
-```log
+```
 2017-06-25T17:52:22+00:00 Index found: ratings (user_id)
-2017-06-25T17:52:22+00:00 Creating index: CREATE INDEX CONCURRENTLY ON ratings (user_id)
+2017-06-25T17:52:22+00:00 Creating index: CREATE INDEX CONCURRENTLY ON "ratings" ("user_id")
 2017-06-25T17:52:37+00:00 Index created: 15243 ms
 ```
 

@@ -49,7 +49,7 @@ module Dexter
     end
 
     def process_entry(query, duration)
-      @collector.add(query, duration) if query =~ /SELECT/i
+      @collector.add(query, duration)
     end
   end
 end

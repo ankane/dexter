@@ -1,3 +1,7 @@
+## 0.1.5 [unreleased]
+
+- Added support for non-`SELECT` queries
+
 ## 0.1.4
 
 - Added support for multicolumn indexes

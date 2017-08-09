@@ -13,6 +13,14 @@ class DexterTest < Minitest::Test
     assert_index "SELECT * FROM posts WHERE user_id = 1 ORDER BY blog_id LIMIT 1000", "posts (user_id, blog_id)"
   end
 
+  def test_update
+    assert_index "UPDATE posts SET user_id = 2 WHERE user_id = 1", "posts (user_id)"
+  end
+
+  def test_delete
+    assert_index "DELETE FROM posts WHERE user_id = 1", "posts (user_id)"
+  end
+
   private
 
   def assert_index(statement, index)

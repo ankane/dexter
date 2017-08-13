@@ -11,9 +11,10 @@ module Dexter
       STDERR.sync = true
 
       if options[:statement]
-        fingerprint = PgQuery.fingerprint(options[:statement]) rescue "unknown"
-        query = Query.new(options[:statement], fingerprint)
+        query = Query.new(options[:statement])
         Indexer.new(arguments[0], options).process_queries([query])
+      elsif options[:pg_stat_statements]
+        Indexer.new(arguments[0], options).process_stat_statements
       elsif arguments[1]
         Processor.new(arguments[0], arguments[1], options).perform
       else
@@ -31,6 +32,7 @@ Options:)
         o.array "--exclude", "prevent specific tables from being indexed"
         o.integer "--interval", "time to wait between processing queries, in seconds", default: 60
         o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
+        o.boolean "--pg-stat-statements", "use pg_stat_statements", default: false, help: false
         o.boolean "--log-explain", "log explain", default: false, help: false
         o.string "--log-level", "log level", default: "info"
         o.boolean "--log-sql", "log sql", default: false

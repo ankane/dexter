@@ -9,8 +9,15 @@ module Dexter
       @exclude_tables = options[:exclude]
       @log_sql = options[:log_sql]
       @log_explain = options[:log_explain]
+      @min_time = options[:min_time] || 0
 
       create_extension
+    end
+
+    def process_stat_statements
+      queries = stat_statements.map { |q| Query.new(q) }.sort_by(&:fingerprint).group_by(&:fingerprint).map { |_, v| v.first }
+      log "Processing #{queries.size} new query fingerprints"
+      process_queries(queries)
     end
 
     def process_queries(queries)
@@ -284,8 +291,26 @@ module Dexter
         WHERE
           table_catalog = current_database() AND
           table_schema NOT IN ('pg_catalog', 'information_schema')
+          AND table_type = 'BASE TABLE'
       SQL
       result.map { |r| r["table_name"] }
+    end
+
+    def stat_statements
+      result = execute <<-SQL
+        SELECT
+          DISTINCT query
+        FROM
+          pg_stat_statements
+        INNER JOIN
+          pg_database ON pg_database.oid = pg_stat_statements.dbid
+        WHERE
+          datname = current_database()
+          AND total_time >= #{@min_time * 60000}
+        ORDER BY
+          1
+      SQL
+      result.map { |q| q["query"] }
     end
 
     def possible_tables(queries)

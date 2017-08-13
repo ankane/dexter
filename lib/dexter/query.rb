@@ -3,8 +3,11 @@ module Dexter
     attr_reader :statement, :fingerprint, :plans
     attr_accessor :missing_tables, :new_cost
 
-    def initialize(statement, fingerprint)
+    def initialize(statement, fingerprint = nil)
       @statement = statement
+      unless fingerprint
+        fingerprint = PgQuery.fingerprint(statement) rescue "unknown"
+      end
       @fingerprint = fingerprint
       @plans = []
     end

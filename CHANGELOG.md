@@ -1,6 +1,7 @@
 ## 0.1.5 [unreleased]
 
 - Added support for non-`SELECT` queries
+- Added `--pg-stat-statements` option
 
 ## 0.1.4
 

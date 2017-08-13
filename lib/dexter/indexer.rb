@@ -10,6 +10,7 @@ module Dexter
       @log_sql = options[:log_sql]
       @log_explain = options[:log_explain]
       @min_time = options[:min_time] || 0
+      @drop = options[:drop]
 
       create_extension unless extension_exists?
     end
@@ -49,6 +50,29 @@ module Dexter
       show_and_create_indexes(new_indexes)
     end
 
+    def drop_indexes
+      # get last reset time
+      if last_stats_reset_time < Time.now - (30 * 86400)
+        unused_indexes.each do |index|
+          log "Unused index found: #{index["index"]}"
+        end
+
+        if @drop
+          with_advisory_lock do
+            unused_indexes.each do |index|
+              statement = "DROP INDEX CONCURRENTLY IF EXISTS #{quote_ident(index["schema"])}.#{quote_ident(index["index"])}"
+              log "Dropping index: #{statement}"
+              started_at = Time.now
+              execute(statement)
+              log "Index removed: #{((Time.now - started_at) * 1000).to_i} ms"
+            end
+          end
+        end
+      else
+        log "Stats reset within last 30 days"
+      end
+    end
+
     private
 
     def create_extension
@@ -62,6 +86,19 @@ module Dexter
 
     def extension_exists?
       execute("SELECT * FROM pg_available_extensions WHERE name = 'hypopg' AND installed_version IS NOT NULL").any?
+    end
+
+    def last_stats_reset_time
+      reset_time = execute(<<-SQL
+        SELECT
+          pg_stat_get_db_stat_reset_time(oid) AS reset_time
+        FROM
+          pg_database
+        WHERE
+          datname = current_database()
+      SQL
+      ).first["reset_time"]
+      reset_time && Time.parse(reset_time)
     end
 
     def reset_hypothetical_indexes
@@ -400,6 +437,25 @@ module Dexter
           1, 2
       SQL
       ).map { |v| v["columns"] = v["columns"].sub(") WHERE (", " WHERE ").split(", ").map { |c| unquote(c) }; v }
+    end
+
+    def unused_indexes
+      execute <<-SQL
+        SELECT
+          schemaname AS schema,
+          indexrelname AS index,
+          pg_relation_size(i.indexrelid) AS size_bytes
+        FROM
+          pg_stat_user_indexes ui
+        INNER JOIN
+          pg_index i ON ui.indexrelid = i.indexrelid
+        WHERE
+          NOT indisunique
+          AND idx_scan = 0
+        ORDER BY
+          schemaname ASC,
+          indexrelname ASC
+      SQL
     end
 
     def unquote(part)

@@ -29,6 +29,8 @@ module Dexter
 
 Options:)
         o.boolean "--create", "create indexes", default: false
+        o.boolean "--drop", "drop indexes", default: false
+        o.boolean "--unused", "check unused indexes", default: false
         o.array "--exclude", "prevent specific tables from being indexed"
         o.integer "--interval", "time to wait between processing queries, in seconds", default: 60
         o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0

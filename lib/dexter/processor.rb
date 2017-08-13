@@ -14,6 +14,8 @@ module Dexter
       @starting_interval = 3
       @interval = options[:interval]
 
+      @unused = options[:unused]
+
       @mutex = Mutex.new
       @last_checked_at = {}
     end
@@ -56,6 +58,11 @@ module Dexter
 
       log "Processing #{queries.size} new query fingerprints"
       @indexer.process_queries(queries) if queries.any?
+
+      if @unused && (!@drop_last_checked_at || @drop_last_checked_at < now - 86400)
+        @indexer.drop_indexes
+        @drop_last_checked_at = now
+      end
     end
   end
 end

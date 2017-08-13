@@ -252,7 +252,7 @@ module Dexter
         PG::Connection.new(config)
       end
     rescue PG::ConnectionBad
-      abort "Bad database url"
+      abort "Can't connect to database"
     end
 
     def execute(query)

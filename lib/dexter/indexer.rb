@@ -11,7 +11,7 @@ module Dexter
       @log_explain = options[:log_explain]
       @min_time = options[:min_time] || 0
 
-      create_extension
+      create_extension unless extension_exists?
     end
 
     def process_stat_statements
@@ -53,7 +53,15 @@ module Dexter
 
     def create_extension
       execute("SET client_min_messages = warning")
-      execute("CREATE EXTENSION IF NOT EXISTS hypopg")
+      begin
+        execute("CREATE EXTENSION IF NOT EXISTS hypopg")
+      rescue PG::InsufficientPrivilege
+        abort "Use a superuser to run: CREATE EXTENSION hypopg"
+      end
+    end
+
+    def extension_exists?
+      execute("SELECT * FROM pg_available_extensions WHERE name = 'hypopg' AND installed_version IS NOT NULL").any?
     end
 
     def reset_hypothetical_indexes

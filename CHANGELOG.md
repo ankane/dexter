@@ -3,6 +3,7 @@
 - Added support for non-`SELECT` queries
 - Added `--pg-stat-statements` option
 - Added advisory locks
+- Added support for running as a non-superuser
 
 ## 0.1.4
 

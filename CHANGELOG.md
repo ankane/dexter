@@ -2,6 +2,7 @@
 
 - Added support for non-`SELECT` queries
 - Added `--pg-stat-statements` option
+- Added advisory locks
 
 ## 0.1.4
 

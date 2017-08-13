@@ -215,17 +215,20 @@ module Dexter
         end
 
         if @create
-          # TODO use advisory locks
           # 1. create lock
           # 2. refresh existing index list
           # 3. create indexes that still don't exist
           # 4. release lock
-          new_indexes.each do |index|
-            statement = "CREATE INDEX CONCURRENTLY ON #{quote_ident(index[:table])} (#{index[:columns].map { |c| quote_ident(c) }.join(", ")})"
-            log "Creating index: #{statement}"
-            started_at = Time.now
-            execute(statement)
-            log "Index created: #{((Time.now - started_at) * 1000).to_i} ms"
+          with_advisory_lock do
+            new_indexes.each do |index|
+              unless index_exists?(index)
+                statement = "CREATE INDEX CONCURRENTLY ON #{quote_ident(index[:table])} (#{index[:columns].map { |c| quote_ident(c) }.join(", ")})"
+                log "Creating index: #{statement}"
+                started_at = Time.now
+                execute(statement)
+                log "Index created: #{((Time.now - started_at) * 1000).to_i} ms"
+              end
+            end
           end
         end
       else
@@ -315,6 +318,33 @@ module Dexter
 
     def possible_tables(queries)
       Set.new(queries.flat_map(&:tables).uniq & database_tables)
+    end
+
+    def with_advisory_lock
+      lock_id = 123456
+      first_time = true
+      while execute("SELECT pg_try_advisory_lock(#{lock_id})").first["pg_try_advisory_lock"] != "t"
+        if first_time
+          log "Waiting for lock..."
+          first_time = false
+        end
+        sleep(1)
+      end
+    ensure
+      with_min_messages("error") do
+        execute("SELECT pg_advisory_unlock(#{lock_id})")
+      end
+    end
+
+    def with_min_messages(value)
+      execute("SET client_min_messages = #{quote(value)}")
+      yield
+    ensure
+      execute("SET client_min_messages = warning")
+    end
+
+    def index_exists?(index)
+      indexes([index[:table]]).find { |i| i["columns"] == index[:columns] }
     end
 
     def columns(tables)

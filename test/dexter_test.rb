@@ -21,6 +21,11 @@ class DexterTest < Minitest::Test
     assert_index "DELETE FROM posts WHERE user_id = 1", "posts (user_id)"
   end
 
+  def test_view
+    # can't do views yet
+    assert_no_index "SELECT * FROM posts_view WHERE id = 1"
+  end
+
   private
 
   def assert_index(statement, index)

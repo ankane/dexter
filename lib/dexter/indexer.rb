@@ -338,6 +338,7 @@ module Dexter
         end
         sleep(1)
       end
+      yield
     ensure
       with_min_messages("error") do
         execute("SELECT pg_advisory_unlock(#{lock_id})")

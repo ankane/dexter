@@ -94,12 +94,18 @@ You can pass a single statement with:
 dexter <connection-string> -s "SELECT * FROM ..."
 ```
 
-## Example
+## Examples
 
 Ubuntu with PostgreSQL 9.6
 
 ```sh
 tail -F -n +1 /var/log/postgresql/postgresql-9.6-main.log | sudo -u postgres dexter dbname
+```
+
+Homebrew on Mac
+
+```sh
+tail -F -n +1 /usr/local/var/postgres/server.log | dexter dbname
 ```
 
 ## Future Work

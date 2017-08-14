@@ -80,9 +80,9 @@ log-level | `debug` gives additional info for suggested indexes<br />`debug2` gi
 log-sql | log SQL statements executed | false
 min-time | only process queries consuming a min amount of DB time, in minutes | 0
 
-## Remote Databases
+## Connection Options
 
-For remote databases, `<dbname>` can be a connection string with the format:
+You can specify `<dbname>` as a connection string with the format:
 
 ```
 postgresql://user:pass@host:5432/dbname

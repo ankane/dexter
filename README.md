@@ -88,7 +88,7 @@ min-time | only process queries consuming a min amount of DB time, in minutes | 
 
 ## Single Statement Mode
 
-You can also pass a single statement with:
+You can pass a single statement with:
 
 ```sh
 dexter <connection-string> -s "SELECT * FROM ..."

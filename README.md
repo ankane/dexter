@@ -37,7 +37,7 @@ The command line tool is also available as a [Linux package](guides/Linux.md).
 Dexter needs a connection to your database and a log file to process.
 
 ```sh
-tail -F -n +1 <log-file> | dexter <database-url>
+tail -F -n +1 <log-file> | dexter <dbname>
 ```
 
 This finds slow queries and generates output like:
@@ -67,7 +67,7 @@ To be safe, Dexter will not create indexes unless you pass the `--create` flag. 
 You can also pass a single statement with:
 
 ```sh
-dexter <database-url> -s "SELECT * FROM ..."
+dexter <dbname> -s "SELECT * FROM ..."
 ```
 
 ## Options
@@ -79,6 +79,22 @@ interval | time to wait between processing queries, in seconds | 60
 log-level | `debug` gives additional info for suggested indexes<br />`debug2` gives additional info for processed queries | info
 log-sql | log SQL statements executed | false
 min-time | only process queries consuming a min amount of DB time, in minutes | 0
+
+## Remote Databases
+
+For remote databases, `<dbname>` can be a connection string with the format:
+
+```
+postgresql://user:pass@host:5432/dbname
+```
+
+## Example
+
+Ubuntu with PostgreSQL 9.6
+
+```sh
+tail -F -n +1 /var/log/postgresql/postgresql-9.6-main.log | sudo -u postgres dexter dbname
+```
 
 ## Future Work
 

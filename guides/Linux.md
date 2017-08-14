@@ -11,8 +11,9 @@ Distributions
 ### Ubuntu 16.04 (Xenial)
 
 ```sh
-wget -qO - https://deb.packager.io/key | sudo apt-key add -
-echo "deb https://deb.packager.io/gh/pghero/dexter xenial master" | sudo tee /etc/apt/sources.list.d/dexter.list
+wget -qO- https://dl.packager.io/srv/pghero/dexter/key | sudo apt-key add -
+sudo wget -O /etc/apt/sources.list.d/dexter.list \
+  https://dl.packager.io/srv/pghero/dexter/master/installer/ubuntu/16.04.repo
 sudo apt-get update
 sudo apt-get -y install dexter
 ```
@@ -20,8 +21,9 @@ sudo apt-get -y install dexter
 ### Ubuntu 14.04 (Trusty)
 
 ```sh
-wget -qO - https://deb.packager.io/key | sudo apt-key add -
-echo "deb https://deb.packager.io/gh/pghero/dexter trusty master" | sudo tee /etc/apt/sources.list.d/dexter.list
+wget -qO- https://dl.packager.io/srv/pghero/dexter/key | sudo apt-key add -
+sudo wget -O /etc/apt/sources.list.d/dexter.list \
+  https://dl.packager.io/srv/pghero/dexter/master/installer/ubuntu/14.04.repo
 sudo apt-get update
 sudo apt-get install dexter
 ```
@@ -29,8 +31,9 @@ sudo apt-get install dexter
 ### Debian 8 (Jesse)
 
 ```sh
-wget -qO - https://deb.packager.io/key | sudo apt-key add -
-echo "deb https://deb.packager.io/gh/pghero/dexter jessie master" | sudo tee /etc/apt/sources.list.d/dexter.list
+wget -qO- https://dl.packager.io/srv/pghero/dexter/key | sudo apt-key add -
+sudo wget -O /etc/apt/sources.list.d/dexter.list \
+  https://dl.packager.io/srv/pghero/dexter/master/installer/debian/8.repo
 sudo apt-get update
 sudo apt-get install dexter
 ```
@@ -38,19 +41,16 @@ sudo apt-get install dexter
 ### CentOS / RHEL 7
 
 ```sh
-sudo rpm --import https://rpm.packager.io/key
-echo "[dexter]
-name=Repository for pghero/dexter application.
-baseurl=https://rpm.packager.io/gh/pghero/dexter/centos7/master
-enabled=1" | sudo tee /etc/yum.repos.d/dexter.repo
+sudo wget -O /etc/yum.repos.d/dexter.repo \
+  https://dl.packager.io/srv/pghero/dexter/master/installer/el/7.repo
 sudo yum install dexter
 ```
 
 ### SUSE Linux Enterprise Server 12
 
 ```sh
-sudo rpm --import https://rpm.packager.io/key
-sudo zypper addrepo "https://rpm.packager.io/gh/pghero/dexter/sles12/master" "dexter"
+sudo wget -O /etc/zypp/repos.d/dexter.repo \
+  https://dl.packager.io/srv/pghero/dexter/master/installer/sles/12.repo
 sudo zypper install dexter
 ```
 

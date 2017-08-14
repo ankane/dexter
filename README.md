@@ -37,7 +37,7 @@ The command line tool is also available as a [Linux package](guides/Linux.md).
 Dexter needs a connection to your database and a log file to process.
 
 ```sh
-tail -F -n +1 <log-file> | dexter <dbname>
+tail -F -n +1 <log-file> | dexter <connection-string>
 ```
 
 This finds slow queries and generates output like:
@@ -62,12 +62,18 @@ To be safe, Dexter will not create indexes unless you pass the `--create` flag. 
 2017-06-25T17:52:37+00:00 Index created: 15243 ms
 ```
 
-## Single Statement Mode
+## Connection String
 
-You can also pass a single statement with:
+The connection string is a URI with the format:
 
-```sh
-dexter <dbname> -s "SELECT * FROM ..."
+```
+postgresql://user:pass@host:5432/dbname
+```
+
+To connect through a socket, just pass the database name.
+
+```
+dbname
 ```
 
 ## Options
@@ -80,12 +86,12 @@ log-level | `debug` gives additional info for suggested indexes<br />`debug2` gi
 log-sql | log SQL statements executed | false
 min-time | only process queries consuming a min amount of DB time, in minutes | 0
 
-## Connection Options
+## Single Statement Mode
 
-You can specify `<dbname>` as a connection string with the format:
+You can also pass a single statement with:
 
-```
-postgresql://user:pass@host:5432/dbname
+```sh
+dexter <connection-string> -s "SELECT * FROM ..."
 ```
 
 ## Example

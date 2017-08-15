@@ -1,4 +1,4 @@
-## 0.1.5 [unreleased]
+## 0.1.5
 
 - Added support for non-`SELECT` queries
 - Added `--pg-stat-statements` option

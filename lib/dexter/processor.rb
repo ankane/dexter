@@ -3,8 +3,6 @@ module Dexter
     include Logging
 
     def initialize(database_url, logfile, options)
-      log "Started"
-
       @logfile = logfile
 
       @collector = Collector.new(min_time: options[:min_time])
@@ -16,6 +14,8 @@ module Dexter
 
       @mutex = Mutex.new
       @last_checked_at = {}
+
+      log "Started"
     end
 
     def perform

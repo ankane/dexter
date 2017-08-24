@@ -6,6 +6,8 @@ module Dexter
     def initialize(logfile, collector)
       @logfile = logfile
       @collector = collector
+
+      abort "Log file not found" unless File.exist?(logfile)
     end
 
     def perform
@@ -38,12 +40,8 @@ module Dexter
           yield line
         end
       else
-        begin
-          File.foreach(@logfile) do |line|
-            yield line
-          end
-        rescue Errno::ENOENT
-          abort "Log file not found"
+        File.foreach(@logfile) do |line|
+          yield line
         end
       end
     end

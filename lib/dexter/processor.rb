@@ -24,7 +24,11 @@ module Dexter
         Thread.new do
           sleep(@starting_interval)
           loop do
-            process_queries
+            begin
+              process_queries
+            rescue PG::ServerError => e
+              log "ERROR: #{e.class.name}: #{e.message}"
+            end
             sleep(@interval)
           end
         end

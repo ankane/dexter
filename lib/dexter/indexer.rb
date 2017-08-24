@@ -12,6 +12,7 @@ module Dexter
       @min_time = options[:min_time] || 0
 
       create_extension unless extension_exists?
+      execute("SET lock_timeout = '5s'")
     end
 
     def process_stat_statements
@@ -233,8 +234,12 @@ module Dexter
                 statement = "CREATE INDEX CONCURRENTLY ON #{quote_ident(index[:table])} (#{index[:columns].map { |c| quote_ident(c) }.join(", ")})"
                 log "Creating index: #{statement}"
                 started_at = Time.now
-                execute(statement)
-                log "Index created: #{((Time.now - started_at) * 1000).to_i} ms"
+                begin
+                  execute(statement)
+                  log "Index created: #{((Time.now - started_at) * 1000).to_i} ms"
+                rescue PG::LockNotAvailable => e
+                  log "Could not acquire lock: #{index[:table]}"
+                end
               end
             end
           end

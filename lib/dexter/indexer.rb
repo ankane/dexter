@@ -7,6 +7,7 @@ module Dexter
       @create = options[:create]
       @log_level = options[:log_level]
       @exclude_tables = options[:exclude]
+      @include_tables = options[:include]
       @log_sql = options[:log_sql]
       @log_explain = options[:log_explain]
       @min_time = options[:min_time] || 0
@@ -33,6 +34,11 @@ module Dexter
 
       # exclude user specified tables
       # TODO exclude write-heavy tables
+      if @include_tables
+        tables = @include_tables.select do |table|
+          tables.include? table
+        end
+      end
       @exclude_tables.each do |table|
         tables.delete(table)
       end

@@ -61,6 +61,8 @@ module Dexter
       execute("SET client_min_messages = warning")
       begin
         execute("CREATE EXTENSION IF NOT EXISTS hypopg")
+      rescue PG::UndefinedFile
+        abort "Install HypoPG first: https://github.com/ankane/dexter#installation"
       rescue PG::InsufficientPrivilege
         abort "Use a superuser to run: CREATE EXTENSION hypopg"
       end

@@ -134,9 +134,21 @@ module Dexter
         index_set << [index["table"], index["columns"]]
       end
 
+      # since every set of multi-column indexes are expensive
+      # try to parse out columns
+      possible_columns = Set.new
+      explainable_queries.each do |query|
+        find_columns(query.tree).each do |col|
+          last_col = col["fields"].last
+          if last_col["String"]
+            possible_columns << last_col["String"]["str"]
+          end
+        end
+      end
+
       # create hypothetical indexes
       candidates = {}
-      columns_by_table = columns(tables).group_by { |c| c[:table] }
+      columns_by_table = columns(tables).select { |c| possible_columns.include?(c[:column]) }.group_by { |c| c[:table] }
 
       # create single column indexes
       create_hypothetical_indexes_helper(columns_by_table, 1, index_set, candidates)
@@ -153,16 +165,27 @@ module Dexter
       candidates
     end
 
+    def find_columns(plan)
+      find_by_key(plan, "ColumnRef")
+    end
+
     def find_indexes(plan)
+      find_by_key(plan, "Index Name")
+    end
+
+    def find_by_key(plan, key)
       indexes = []
-      plan.each do |k, v|
-        if k == "Index Name"
-          indexes << v
-        elsif v.is_a?(Hash)
-          indexes.concat(find_indexes(v))
-        elsif v.is_a?(Array) && v.first.is_a?(Hash)
-          indexes.concat(v.flat_map { |v2| find_indexes(v2) })
+      case plan
+      when Hash
+        plan.each do |k, v|
+          if k == key
+            indexes << v
+          else
+            indexes.concat(find_by_key(v, key))
+          end
         end
+      when Array
+        indexes.concat(plan.flat_map { |v| find_by_key(v, key) })
       end
       indexes
     end

@@ -13,7 +13,11 @@ module Dexter
     end
 
     def tables
-      @tables ||= PgQuery.parse(statement).tables rescue []
+      @tables ||= parse ? parse.tables : []
+    end
+
+    def tree
+      parse.tree
     end
 
     def explainable?
@@ -30,6 +34,15 @@ module Dexter
 
     def high_cost?
       initial_cost && initial_cost >= 100
+    end
+
+    private
+
+    def parse
+      unless defined?(@parse)
+        @parse = PgQuery.parse(statement) rescue nil
+      end
+      @parse
     end
   end
 end

@@ -153,8 +153,23 @@ module Dexter
       candidates
     end
 
+    def find_indexes(plan)
+      indexes = []
+      plan.each do |k, v|
+        if k == "Index Name"
+          indexes << v
+        elsif v.is_a?(Hash)
+          indexes.concat(find_indexes(v))
+        elsif v.is_a?(Array) && v.first.is_a?(Hash)
+          indexes.concat(v.flat_map { |v2| find_indexes(v2) })
+        end
+      end
+      indexes
+    end
+
     def determine_indexes(queries, candidates, tables)
       new_indexes = {}
+      index_name_to_columns = candidates.invert
 
       queries.each do |query|
         if query.explainable?
@@ -167,10 +182,13 @@ module Dexter
           query.new_cost = cost_savings2 ? new_cost2 : new_cost
 
           query_indexes = []
-          candidates.each do |col_set, index_name|
-            key = cost_savings2 ? 2 : 1
+          key = cost_savings2 ? 2 : 1
+          indexes = find_indexes(query.plans[key]).uniq.sort
 
-            if query.plans[key].inspect.include?(index_name)
+          indexes.each do |index_name|
+            col_set = index_name_to_columns[index_name]
+
+            if col_set
               index = {
                 table: col_set[0][:table],
                 columns: col_set.map { |c| c[:column] }

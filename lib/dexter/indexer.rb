@@ -127,6 +127,9 @@ module Dexter
       calculate_plan(queries)
       explainable_queries = queries.select { |q| q.explainable? && q.high_cost? }
 
+      # filter tables for performance
+      tables = Set.new(explainable_queries.flat_map(&:tables))
+
       # get existing indexes
       index_set = Set.new
       indexes(tables).each do |index|
@@ -230,7 +233,7 @@ module Dexter
           log "Processed #{query.fingerprint}"
           if tables.empty?
             log "No candidate tables for indexes"
-          elsif !query.high_cost?
+          elsif query.explainable? && !query.high_cost?
             log "Low initial cost: #{query.initial_cost}"
           elsif query.explainable?
             log "Cost: #{query.initial_cost} -> #{query.new_cost}"

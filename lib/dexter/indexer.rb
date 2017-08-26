@@ -125,7 +125,7 @@ module Dexter
     def create_hypothetical_indexes(queries, tables)
       # get initial costs for queries
       calculate_plan(queries)
-      explainable_queries = queries.select(&:explainable?)
+      explainable_queries = queries.select { |q| q.explainable? && q.high_cost? }
 
       # get existing indexes
       index_set = Set.new
@@ -172,7 +172,7 @@ module Dexter
       index_name_to_columns = candidates.invert
 
       queries.each do |query|
-        if query.explainable?
+        if query.explainable? && query.high_cost?
           new_cost, new_cost2 = query.costs[1..2]
 
           cost_savings = new_cost < query.initial_cost * 0.5
@@ -207,6 +207,8 @@ module Dexter
           log "Processed #{query.fingerprint}"
           if tables.empty?
             log "No candidate tables for indexes"
+          elsif !query.high_cost?
+            log "Low initial cost: #{query.initial_cost}"
           elsif query.explainable?
             log "Cost: #{query.initial_cost} -> #{query.new_cost}"
 

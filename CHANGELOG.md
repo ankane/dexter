@@ -1,3 +1,8 @@
+## 0.1.6
+
+- Significant performance improvements
+- Added `--include` option
+
 ## 0.1.5
 
 - Added support for non-`SELECT` queries

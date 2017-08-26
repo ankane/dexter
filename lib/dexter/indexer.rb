@@ -123,6 +123,8 @@ module Dexter
     end
 
     def create_hypothetical_indexes(queries, tables)
+      candidates = {}
+
       # get initial costs for queries
       calculate_plan(queries)
       explainable_queries = queries.select { |q| q.explainable? && q.high_cost? }
@@ -130,40 +132,41 @@ module Dexter
       # filter tables for performance
       tables = Set.new(explainable_queries.flat_map(&:tables))
 
-      # get existing indexes
-      index_set = Set.new
-      indexes(tables).each do |index|
-        # TODO make sure btree
-        index_set << [index["table"], index["columns"]]
-      end
+      if tables.any?
+        # get existing indexes
+        index_set = Set.new
+        indexes(tables).each do |index|
+          # TODO make sure btree
+          index_set << [index["table"], index["columns"]]
+        end
 
-      # since every set of multi-column indexes are expensive
-      # try to parse out columns
-      possible_columns = Set.new
-      explainable_queries.each do |query|
-        find_columns(query.tree).each do |col|
-          last_col = col["fields"].last
-          if last_col["String"]
-            possible_columns << last_col["String"]["str"]
+        # since every set of multi-column indexes are expensive
+        # try to parse out columns
+        possible_columns = Set.new
+        explainable_queries.each do |query|
+          find_columns(query.tree).each do |col|
+            last_col = col["fields"].last
+            if last_col["String"]
+              possible_columns << last_col["String"]["str"]
+            end
           end
         end
+
+        # create hypothetical indexes
+        columns_by_table = columns(tables).select { |c| possible_columns.include?(c[:column]) }.group_by { |c| c[:table] }
+
+        # create single column indexes
+        create_hypothetical_indexes_helper(columns_by_table, 1, index_set, candidates)
+
+        # get next round of costs
+        calculate_plan(explainable_queries)
+
+        # create multicolumn indexes
+        create_hypothetical_indexes_helper(columns_by_table, 2, index_set, candidates)
+
+        # get next round of costs
+        calculate_plan(explainable_queries)
       end
-
-      # create hypothetical indexes
-      candidates = {}
-      columns_by_table = columns(tables).select { |c| possible_columns.include?(c[:column]) }.group_by { |c| c[:table] }
-
-      # create single column indexes
-      create_hypothetical_indexes_helper(columns_by_table, 1, index_set, candidates)
-
-      # get next round of costs
-      calculate_plan(explainable_queries)
-
-      # create multicolumn indexes
-      create_hypothetical_indexes_helper(columns_by_table, 2, index_set, candidates)
-
-      # get next round of costs
-      calculate_plan(explainable_queries)
 
       candidates
     end

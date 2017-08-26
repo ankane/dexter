@@ -7,6 +7,7 @@ module Dexter
       @create = options[:create]
       @log_level = options[:log_level]
       @exclude_tables = options[:exclude]
+      @include_tables = Array(options[:include].split(",")) if options[:include]
       @log_sql = options[:log_sql]
       @log_explain = options[:log_explain]
       @min_time = options[:min_time] || 0
@@ -31,6 +32,10 @@ module Dexter
         query.missing_tables = !query.tables.all? { |t| tables.include?(t) }
       end
 
+      if @include_tables
+        tables = Set.new(tables.to_a & @include_tables)
+      end
+
       # exclude user specified tables
       # TODO exclude write-heavy tables
       @exclude_tables.each do |table|
@@ -44,7 +49,7 @@ module Dexter
       candidates = tables.any? ? create_hypothetical_indexes(queries.reject(&:missing_tables), tables) : {}
 
       # see if new indexes were used and meet bar
-      new_indexes = determine_indexes(queries, candidates)
+      new_indexes = determine_indexes(queries, candidates, tables)
 
       # display and create new indexes
       show_and_create_indexes(new_indexes)
@@ -146,7 +151,7 @@ module Dexter
       candidates
     end
 
-    def determine_indexes(queries, candidates)
+    def determine_indexes(queries, candidates, tables)
       new_indexes = {}
 
       queries.each do |query|
@@ -180,7 +185,9 @@ module Dexter
 
         if @log_level == "debug2"
           log "Processed #{query.fingerprint}"
-          if query.explainable?
+          if tables.empty?
+            log "No candidate tables for indexes"
+          elsif query.explainable?
             log "Cost: #{query.initial_cost} -> #{query.new_cost}"
 
             if query_indexes.any?

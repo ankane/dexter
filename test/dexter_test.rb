@@ -26,18 +26,34 @@ class DexterTest < Minitest::Test
     assert_no_index "SELECT * FROM posts_view WHERE id = 1"
   end
 
+  def test_exclude
+    assert_no_index "SELECT * FROM posts WHERE id = 1", "--exclude posts"
+  end
+
+  def test_exclude_other
+    assert_index "SELECT * FROM posts WHERE id = 1", "posts (id)", "--exclude other"
+  end
+
+  def test_include
+    assert_index "SELECT * FROM posts WHERE id = 1", "posts (id)", "--include posts"
+  end
+
+  def test_include_other
+    assert_no_index "SELECT * FROM posts WHERE id = 1", "--include other"
+  end
+
   private
 
-  def assert_index(statement, index)
-    assert_dexter_output statement, "Index found: #{index}"
+  def assert_index(statement, index, options = nil)
+    assert_dexter_output statement, "Index found: #{index}", options
   end
 
-  def assert_no_index(statement)
-    assert_dexter_output statement, "No new indexes found"
+  def assert_no_index(statement, options = nil)
+    assert_dexter_output statement, "No new indexes found", options
   end
 
-  def assert_dexter_output(statement, output)
-    dexter = Dexter::Client.new(["dexter_test", "-s", statement, "--log-level", "debug2"])
+  def assert_dexter_output(statement, output, options)
+    dexter = Dexter::Client.new(["dexter_test", "-s", statement, "--log-level", "debug2"] + options.to_s.split(" "))
     assert_output(/#{Regexp.escape(output)}/) { dexter.perform }
   end
 end

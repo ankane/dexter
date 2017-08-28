@@ -47,7 +47,7 @@ gem install pgdexter # may need sudo
 
 Create an IAM user with the policy below:
 
-```sh
+```
 {
   "Statement": [
     {

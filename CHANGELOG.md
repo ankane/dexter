@@ -1,9 +1,13 @@
-## 0.2.0 [unreleased]
+## 0.2.0
 
 - Added same connection options as `psql`
 - Added support for multiple files
 - Added `error` log level
 - Better error messages when cannot connect
+
+Breaking
+
+- `-h` option changed to `--host` instead of `--help` for consistency with `psql`
 
 ## 0.1.6
 

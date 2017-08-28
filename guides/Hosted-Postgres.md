@@ -96,7 +96,7 @@ pg_restore -v -j 8 -x -O --format=d -d dexter_restore /tmp/newout.dir/
 ### Run Dexter
 
 ```sh
-cat postgresql.log* | dexter dexter_restore
+dexter dexter_restore postgresql.log*
 ```
 
 :tada:

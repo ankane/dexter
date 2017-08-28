@@ -74,6 +74,7 @@ class DexterTest < Minitest::Test
   end
 
   def assert_connection(flags)
-    assert Dexter::Client.new(flags + ["-s", "SELECT 1"]).perform
+    dexter = Dexter::Client.new(flags + ["-s", "SELECT 1"])
+    assert_output(/#{Regexp.escape("No new indexes found")}/) { dexter.perform }
   end
 end

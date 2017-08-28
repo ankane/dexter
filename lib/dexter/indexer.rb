@@ -312,24 +312,17 @@ module Dexter
     def conn
       @conn ||= begin
         if @options[:dbname] =~ /\Apostgres(ql)?:\/\//
-          uri = URI.parse(@options[:dbname])
-          config = {
-            host: uri.host,
-            port: uri.port,
-            dbname: uri.path.sub(/\A\//, ""),
-            user: uri.user,
-            password: uri.password
-          }
+          config = @options[:dbname]
         else
           config = {
             host: @options[:host],
             port: @options[:port],
             dbname: @options[:dbname],
             user: @options[:user]
-          }
+          }.reject { |_, value| value.to_s.empty? }
+          config = config[:dbname] if config.keys == [:dbname] && config[:dbname].include?("=")
         end
-        config[:connect_timeout] = 3
-        PG::Connection.new(config.reject { |_, value| value.to_s.empty? })
+        PG::Connection.new(config)
       end
     rescue PG::ConnectionBad => e
       abort e.message

@@ -42,6 +42,22 @@ class DexterTest < Minitest::Test
     assert_no_index "SELECT * FROM posts WHERE id = 1", "--include other"
   end
 
+  def test_connection_flag
+    assert_connection ["-d", "dexter_test"]
+  end
+
+  def test_connection_string
+    assert_connection ["dbname=dexter_test"]
+  end
+
+  def test_connection_url_postgres
+    assert_connection ["postgres://localhost/dexter_test"]
+  end
+
+  def test_connection_url_postgresql
+    assert_connection ["postgresql://localhost/dexter_test"]
+  end
+
   private
 
   def assert_index(statement, index, options = nil)
@@ -55,5 +71,9 @@ class DexterTest < Minitest::Test
   def assert_dexter_output(statement, output, options)
     dexter = Dexter::Client.new(["dexter_test", "-s", statement, "--log-level", "debug2"] + options.to_s.split(" "))
     assert_output(/#{Regexp.escape(output)}/) { dexter.perform }
+  end
+
+  def assert_connection(flags)
+    assert Dexter::Client.new(flags + ["-s", "SELECT 1"]).perform
   end
 end

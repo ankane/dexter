@@ -1,3 +1,7 @@
+## 0.2.1 [unreleased]
+
+- Fixed bad suggestions for multicolumn indexes
+
 ## 0.2.0
 
 - Added same connection options as `psql`

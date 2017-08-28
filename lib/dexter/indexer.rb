@@ -205,6 +205,7 @@ module Dexter
           new_cost, new_cost2 = query.costs[1..2]
 
           cost_savings = new_cost < query.initial_cost * 0.5
+
           # set high bar for multicolumn indexes
           cost_savings2 = new_cost > 100 && new_cost2 < new_cost * 0.5
 
@@ -224,7 +225,7 @@ module Dexter
               }
               query_indexes << index
 
-              if cost_savings
+              if cost_savings || cost_savings2
                 new_indexes[index] ||= index.dup
                 (new_indexes[index][:queries] ||= []) << query
               end

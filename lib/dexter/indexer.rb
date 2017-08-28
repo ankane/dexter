@@ -249,9 +249,7 @@ module Dexter
           elsif query.explainable? && !query.high_cost?
             log "Low initial cost: #{query.initial_cost}"
           elsif query.explainable?
-            log "Initial: Cost: #{query.initial_cost}"
-            log "Pass 1: Cost: #{new_cost}, Indexes: #{log_indexes(hypo_indexes_from_plan(index_name_to_columns, query.plans[1]))}"
-            log "Pass 2: Cost: #{new_cost2}, Indexes: #{log_indexes(hypo_indexes_from_plan(index_name_to_columns, query.plans[2]))}"
+            log "Cost: #{query.initial_cost} -> #{query.new_cost}"
             log "Indexes: #{log_indexes(query_indexes)}"
             if query_indexes.any?
               if likely_bad_suggestion
@@ -260,6 +258,8 @@ module Dexter
                 log "Need 50% cost savings to suggest index"
               end
             end
+            log "Pass 1: #{new_cost} : #{log_indexes(hypo_indexes_from_plan(index_name_to_columns, query.plans[1]))}"
+            log "Pass 2: #{new_cost2} : #{log_indexes(hypo_indexes_from_plan(index_name_to_columns, query.plans[2]))}"
           elsif query.fingerprint == "unknown"
             log "Could not parse query"
           elsif query.tables.empty?

@@ -1,6 +1,7 @@
 ## 0.2.0 [unreleased]
 
-- Support same connection options as `psql`
+- Added same connection options as `psql`
+- Added support for multiple files
 - Added `error` log level
 - Better error messages when cannot connect
 

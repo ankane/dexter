@@ -90,7 +90,7 @@ Then shutdown the dump instance. Restore with:
 
 ```sh
 createdb dexter_restore
-pg_restore -j 8 -x -O --format=d -d dexter_restore /tmp/newout.dir/
+pg_restore -v -j 8 -x -O --format=d -d dexter_restore /tmp/newout.dir/
 ```
 
 ### Run Dexter

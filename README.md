@@ -88,12 +88,18 @@ log-level | `debug` gives additional info for suggested indexes<br />`debug2` gi
 log-sql | log SQL statements executed | false
 min-time | only process queries consuming a min amount of DB time, in minutes | 0
 
-## Single Statement Mode
+## Non-Streaming Modes
 
 You can pass a single statement with:
 
 ```sh
 dexter <connection-string> -s "SELECT * FROM ..."
+```
+
+or a file with:
+
+```sh
+dexter <connection-string> <file>
 ```
 
 ## Examples

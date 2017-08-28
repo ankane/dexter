@@ -32,13 +32,13 @@ cd /tmp
 curl -L https://github.com/dalibo/hypopg/archive/1.0.0.tar.gz | tar xz
 cd hypopg-1.0.0
 make
-make install # sudo for Linux
+make install # may need sudo
 ```
 
 Dexter
 
 ```sh
-gem install pgdexter # sudo for Linux
+gem install pgdexter # may need sudo
 ```
 
 ### Download logs
@@ -47,14 +47,14 @@ AWS
 
 ```sh
 aws configure
-gem install pghero_logs # sudo for Linux
+gem install pghero_logs # may need sudo
 pghero_logs download <instance-id>
 ```
 
 Heroku (production-tier databases only)
 
 ```sh
-heroku logs -p postgres -t > postgresql.log
+heroku logs -p postgres > postgresql.log
 ```
 
 ### Dump and restore

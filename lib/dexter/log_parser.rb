@@ -6,8 +6,6 @@ module Dexter
     def initialize(logfile, collector)
       @logfile = logfile
       @collector = collector
-
-      abort "Log file not found" unless File.exist?(logfile)
     end
 
     def perform
@@ -35,14 +33,8 @@ module Dexter
     private
 
     def each_line
-      if @logfile == STDIN
-        STDIN.each_line do |line|
-          yield line
-        end
-      else
-        File.foreach(@logfile) do |line|
-          yield line
-        end
+      @logfile.each_line do |line|
+        yield line
       end
     end
 

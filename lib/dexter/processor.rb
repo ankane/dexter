@@ -34,7 +34,11 @@ module Dexter
         end
       end
 
-      @log_parser.perform
+      begin
+        @log_parser.perform
+      rescue Errno::ENOENT => e
+        abort e.message
+      end
 
       process_queries
     end

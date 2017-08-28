@@ -15,8 +15,9 @@ module Dexter
         Indexer.new(options).process_queries([query])
       elsif options[:pg_stat_statements]
         Indexer.new(options).process_stat_statements
-      elsif arguments[1]
-        Processor.new(arguments[1], options).perform
+      elsif arguments.any?
+        ARGV.replace(arguments)
+        Processor.new(ARGF, options).perform
       else
         Processor.new(STDIN, options).perform
       end
@@ -58,8 +59,6 @@ Options:)
       options = opts.to_hash
 
       options[:dbname] = arguments.shift unless options[:dbname]
-
-      abort "Too many arguments" if arguments.size > 2
 
       abort "Unknown log level" unless ["info", "debug", "debug2"].include?(options[:log_level].to_s.downcase)
 

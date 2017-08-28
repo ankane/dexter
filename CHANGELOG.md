@@ -1,3 +1,7 @@
+## 0.1.7 [unreleased]
+
+- Better error messages when cannot connect
+
 ## 0.1.6
 
 - Significant performance improvements

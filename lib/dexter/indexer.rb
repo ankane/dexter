@@ -322,8 +322,8 @@ module Dexter
         }.reject { |_, value| value.to_s.empty? }
         PG::Connection.new(config)
       end
-    rescue PG::ConnectionBad
-      abort "Can't connect to database"
+    rescue PG::ConnectionBad => e
+      abort e.message
     end
 
     def execute(query)

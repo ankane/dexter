@@ -39,6 +39,7 @@ Options:)
         o.string "--log-level", "log level", default: "info"
         o.boolean "--log-sql", "log sql", default: false
         o.string "-s", "--statement", "process a single statement"
+        # separator must go here to show up correctly - slop bug?
         o.separator ""
         o.separator "Connection options:"
         o.on "-v", "--version", "print the version" do

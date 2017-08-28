@@ -231,8 +231,13 @@ module Dexter
           key = cost_savings2 ? 2 : 1
           query_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[key])
 
-          likely_bad_suggestion = cost_savings2 && query_indexes.size > 1
-          suggest_index = (cost_savings || cost_savings2) && !likely_bad_suggestion
+          # likely a bad suggestion, so try single column
+          if cost_savings2 && query_indexes.size > 1
+            query_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[1])
+            cost_savings2 = false
+          end
+
+          suggest_index = cost_savings || cost_savings2
 
           if suggest_index
             query_indexes.each do |index|
@@ -251,12 +256,8 @@ module Dexter
           elsif query.explainable?
             log "Cost: #{query.initial_cost} -> #{query.new_cost}"
             log "Indexes: #{log_indexes(query_indexes)}"
-            if query_indexes.any?
-              if likely_bad_suggestion
-                log "Likely bad suggestion"
-              elsif !suggest_index
-                log "Need 50% cost savings to suggest index"
-              end
+            if query_indexes.any? && !suggest_index
+              log "Need 50% cost savings to suggest index"
             end
             log "Pass 1: #{new_cost} : #{log_indexes(hypo_indexes_from_plan(index_name_to_columns, query.plans[1]))}"
             log "Pass 2: #{new_cost2} : #{log_indexes(hypo_indexes_from_plan(index_name_to_columns, query.plans[2]))}"

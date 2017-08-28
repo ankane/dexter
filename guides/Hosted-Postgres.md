@@ -43,7 +43,27 @@ gem install pgdexter # may need sudo
 
 ### Download logs
 
-AWS
+#### AWS
+
+Create an IAM user with the policy below:
+
+```sh
+{
+  "Statement": [
+    {
+      "Sid": "Stmt1410669817271",
+      "Action": [
+        "rds:DescribeDBLogFiles",
+        "rds:DownloadDBLogFilePortion"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+And run:
 
 ```sh
 aws configure
@@ -51,7 +71,9 @@ gem install pghero_logs # may need sudo
 pghero_logs download <instance-id>
 ```
 
-Heroku (production-tier databases only)
+#### Heroku
+
+Production-tier databases only
 
 ```sh
 heroku logs -p postgres > postgresql.log

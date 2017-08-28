@@ -2,12 +2,12 @@ module Dexter
   class Processor
     include Logging
 
-    def initialize(database_url, logfile, options)
+    def initialize(logfile, options)
       @logfile = logfile
 
       @collector = Collector.new(min_time: options[:min_time])
       @log_parser = LogParser.new(logfile, @collector)
-      @indexer = Indexer.new(database_url, options)
+      @indexer = Indexer.new(options)
 
       @starting_interval = 3
       @interval = options[:interval]

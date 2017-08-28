@@ -1,5 +1,6 @@
-## 0.1.7 [unreleased]
+## 0.2.0 [unreleased]
 
+- Support same connection options as `psql`
 - Better error messages when cannot connect
 
 ## 0.1.6

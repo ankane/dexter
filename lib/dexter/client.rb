@@ -12,20 +12,20 @@ module Dexter
 
       if options[:statement]
         query = Query.new(options[:statement])
-        Indexer.new(arguments[0], options).process_queries([query])
+        Indexer.new(options).process_queries([query])
       elsif options[:pg_stat_statements]
-        Indexer.new(arguments[0], options).process_stat_statements
+        Indexer.new(options).process_stat_statements
       elsif arguments[1]
-        Processor.new(arguments[0], arguments[1], options).perform
+        Processor.new(arguments[1], options).perform
       else
-        Processor.new(arguments[0], STDIN, options).perform
+        Processor.new(STDIN, options).perform
       end
     end
 
     def parse_args(args)
       opts = Slop.parse(args) do |o|
         o.banner = %(Usage:
-    dexter <database-url> [options]
+    dexter [options]
 
 Options:)
         o.boolean "--create", "create indexes", default: false
@@ -38,28 +38,32 @@ Options:)
         o.string "--log-level", "log level", default: "info"
         o.boolean "--log-sql", "log sql", default: false
         o.string "-s", "--statement", "process a single statement"
+        o.separator ""
+        o.separator "Connection options:"
         o.on "-v", "--version", "print the version" do
           log Dexter::VERSION
           exit
         end
-        o.on "-h", "--help", "prints help" do
+        o.on "--help", "prints help" do
           log o
           exit
         end
+        o.string "-U", "--username"
+        o.string "-d", "--dbname"
+        o.string "-h", "--host"
+        o.integer "-p", "--port"
       end
 
       arguments = opts.arguments
+      options = opts.to_hash
 
-      if arguments.empty?
-        log opts
-        exit
-      end
+      options[:dbname] = arguments.shift unless options[:dbname]
 
       abort "Too many arguments" if arguments.size > 2
 
-      abort "Unknown log level" unless ["info", "debug", "debug2"].include?(opts.to_hash[:log_level].to_s.downcase)
+      abort "Unknown log level" unless ["info", "debug", "debug2"].include?(options[:log_level].to_s.downcase)
 
-      [arguments, opts.to_hash]
+      [arguments, options]
     rescue Slop::Error => e
       abort e.message
     end

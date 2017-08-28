@@ -2,8 +2,7 @@ module Dexter
   class Indexer
     include Logging
 
-    def initialize(database_url, options)
-      @database_url = database_url
+    def initialize(options)
       @create = options[:create]
       @log_level = options[:log_level]
       @exclude_tables = options[:exclude]
@@ -11,6 +10,7 @@ module Dexter
       @log_sql = options[:log_sql]
       @log_explain = options[:log_explain]
       @min_time = options[:min_time] || 0
+      @options = options
 
       create_extension unless extension_exists?
       execute("SET lock_timeout = '5s'")
@@ -311,16 +311,25 @@ module Dexter
 
     def conn
       @conn ||= begin
-        uri = URI.parse(@database_url)
-        config = {
-          host: uri.host,
-          port: uri.port,
-          dbname: uri.path.sub(/\A\//, ""),
-          user: uri.user,
-          password: uri.password,
-          connect_timeout: 3
-        }.reject { |_, value| value.to_s.empty? }
-        PG::Connection.new(config)
+        if @options[:dbname] =~ /\Apostgres(ql)?:\/\//
+          uri = URI.parse(@options[:dbname])
+          config = {
+            host: uri.host,
+            port: uri.port,
+            dbname: uri.path.sub(/\A\//, ""),
+            user: uri.user,
+            password: uri.password
+          }
+        else
+          config = {
+            host: @options[:host],
+            port: @options[:port],
+            dbname: @options[:dbname],
+            user: @options[:user]
+          }
+        end
+        config[:connect_timeout] = 3
+        PG::Connection.new(config.reject { |_, value| value.to_s.empty? })
       end
     rescue PG::ConnectionBad => e
       abort e.message

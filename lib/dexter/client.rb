@@ -60,7 +60,9 @@ Options:)
 
       options[:dbname] = arguments.shift unless options[:dbname]
 
-      abort "Unknown log level" unless ["info", "debug", "debug2"].include?(options[:log_level].to_s.downcase)
+      # TODO don't use global var
+      $log_level = options[:log_level].to_s.downcase
+      abort "Unknown log level" unless ["error", "info", "debug", "debug2"].include?($log_level)
 
       [arguments, options]
     rescue Slop::Error => e

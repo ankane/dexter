@@ -1,6 +1,7 @@
 ## 0.2.0 [unreleased]
 
 - Support same connection options as `psql`
+- Added `error` log level
 - Better error messages when cannot connect
 
 ## 0.1.6

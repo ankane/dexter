@@ -43,7 +43,7 @@ gem install pgdexter # may need sudo
 
 ### Download logs
 
-#### AWS
+#### Amazon RDS
 
 Create an IAM user with the policy below:
 
@@ -51,7 +51,6 @@ Create an IAM user with the policy below:
 {
   "Statement": [
     {
-      "Sid": "Stmt1410669817271",
       "Action": [
         "rds:DescribeDBLogFiles",
         "rds:DownloadDBLogFilePortion"

@@ -231,7 +231,9 @@ module Dexter
           key = cost_savings2 ? 2 : 1
           query_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[key])
 
-          if cost_savings || cost_savings2
+          suggest_index = cost_savings || cost_savings2
+
+          if suggest_index
             query_indexes.each do |index|
               new_indexes[index] ||= index.dup
               (new_indexes[index][:queries] ||= []) << query
@@ -246,13 +248,12 @@ module Dexter
           elsif query.explainable? && !query.high_cost?
             log "Low initial cost: #{query.initial_cost}"
           elsif query.explainable?
-            log "Cost: #{query.initial_cost} -> #{query.new_cost}"
-
-            if query_indexes.any?
-              log "Indexes: #{query_indexes.map { |i| "#{i[:table]} (#{i[:columns].join(", ")})" }.join(", ")}"
-              log "Need 50% cost savings to suggest index" unless cost_savings || cost_savings2
-            else
-              log "Indexes: None"
+            log "Initial: Cost: #{query.initial_cost}"
+            log "Pass 1: Cost: #{new_cost}, Indexes: #{log_indexes(hypo_indexes_from_plan(index_name_to_columns, query.plans[1]))}"
+            log "Pass 2: Cost: #{new_cost2}, Indexes: #{log_indexes(hypo_indexes_from_plan(index_name_to_columns, query.plans[2]))}"
+            log "Final: Cost: #{query.new_cost}, Indexes: #{log_indexes(query_indexes)}"
+            if query_indexes.any? && !suggest_index
+              log "Need 50% cost savings to suggest index"
             end
           elsif query.fingerprint == "unknown"
             log "Could not parse query"
@@ -271,6 +272,14 @@ module Dexter
       end
 
       new_indexes.values.sort_by(&:to_a)
+    end
+
+    def log_indexes(indexes)
+      if indexes.any?
+        indexes.map { |i| "#{i[:table]} (#{i[:columns].join(", ")})" }.join(", ")
+      else
+        "None"
+      end
     end
 
     def show_and_create_indexes(new_indexes)

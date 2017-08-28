@@ -59,7 +59,7 @@ heroku logs -p postgres > postgresql.log
 
 ### Dump and restore
 
-To avoid affecting customers, we recommend creating a new instance from a snapshot for the dump.
+We recommend creating a new instance from a snapshot for the dump to avoid affecting customers.
 
 ```sh
 pg_dump -v -j 8 -Fd -f /tmp/newout.dir <connection-string>

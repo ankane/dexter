@@ -231,7 +231,8 @@ module Dexter
           key = cost_savings2 ? 2 : 1
           query_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[key])
 
-          suggest_index = cost_savings || cost_savings2
+          likely_bad_suggestion = cost_savings2 && query_indexes.size > 1
+          suggest_index = (cost_savings || cost_savings2) && !likely_bad_suggestion
 
           if suggest_index
             query_indexes.each do |index|
@@ -251,9 +252,13 @@ module Dexter
             log "Initial: Cost: #{query.initial_cost}"
             log "Pass 1: Cost: #{new_cost}, Indexes: #{log_indexes(hypo_indexes_from_plan(index_name_to_columns, query.plans[1]))}"
             log "Pass 2: Cost: #{new_cost2}, Indexes: #{log_indexes(hypo_indexes_from_plan(index_name_to_columns, query.plans[2]))}"
-            log "Final: Cost: #{query.new_cost}, Indexes: #{log_indexes(query_indexes)}"
-            if query_indexes.any? && !suggest_index
-              log "Need 50% cost savings to suggest index"
+            log "Indexes: #{log_indexes(query_indexes)}"
+            if query_indexes.any?
+              if likely_bad_suggestion
+                log "Likely bad suggestion"
+              elsif !suggest_index
+                log "Need 50% cost savings to suggest index"
+              end
             end
           elsif query.fingerprint == "unknown"
             log "Could not parse query"

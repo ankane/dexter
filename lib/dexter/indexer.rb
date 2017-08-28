@@ -196,6 +196,23 @@ module Dexter
       indexes
     end
 
+    def hypo_indexes_from_plan(index_name_to_columns, plan)
+      query_indexes = []
+
+      find_indexes(plan).uniq.sort.each do |index_name|
+        col_set = index_name_to_columns[index_name]
+
+        if col_set
+          query_indexes << {
+            table: col_set[0][:table],
+            columns: col_set.map { |c| c[:column] }
+          }
+        end
+      end
+
+      query_indexes
+    end
+
     def determine_indexes(queries, candidates, tables)
       new_indexes = {}
       index_name_to_columns = candidates.invert
@@ -211,24 +228,13 @@ module Dexter
 
           query.new_cost = cost_savings2 ? new_cost2 : new_cost
 
-          query_indexes = []
           key = cost_savings2 ? 2 : 1
-          indexes = find_indexes(query.plans[key]).uniq.sort
+          query_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[key])
 
-          indexes.each do |index_name|
-            col_set = index_name_to_columns[index_name]
-
-            if col_set
-              index = {
-                table: col_set[0][:table],
-                columns: col_set.map { |c| c[:column] }
-              }
-              query_indexes << index
-
-              if cost_savings || cost_savings2
-                new_indexes[index] ||= index.dup
-                (new_indexes[index][:queries] ||= []) << query
-              end
+          if cost_savings || cost_savings2
+            query_indexes.each do |index|
+              new_indexes[index] ||= index.dup
+              (new_indexes[index][:queries] ||= []) << query
             end
           end
         end

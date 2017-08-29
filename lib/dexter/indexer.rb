@@ -136,8 +136,10 @@ module Dexter
         # get existing indexes
         index_set = Set.new
         indexes(tables).each do |index|
+          # don't add indexes that are already covered
           # TODO make sure btree
-          index_set << [index["table"], index["columns"]]
+          index_set << [index["table"], index["columns"].first(1)]
+          index_set << [index["table"], index["columns"].first(2)]
         end
 
         # since every set of multi-column indexes are expensive

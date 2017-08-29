@@ -12,7 +12,7 @@ module Dexter
       active_line = nil
       duration = nil
 
-      each_line do |line|
+      @logfile.each_line do |line|
         if active_line
           if line.include?(LINE_SEPERATOR)
             process_entry(active_line, duration)
@@ -31,12 +31,6 @@ module Dexter
     end
 
     private
-
-    def each_line
-      @logfile.each_line do |line|
-        yield line
-      end
-    end
 
     def process_entry(query, duration)
       @collector.add(query, duration)

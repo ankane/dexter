@@ -277,7 +277,15 @@ module Dexter
         end
       end
 
-      new_indexes.values.sort_by(&:to_a)
+      # filter out covered indexes
+      covered = Set.new
+      new_indexes.values.each do |index|
+        if index[:columns].size > 1
+          covered << [index[:table], index[:columns].first(1)]
+        end
+      end
+
+      new_indexes.values.reject { |i| covered.include?([i[:table], i[:columns]]) }.sort_by(&:to_a)
     end
 
     def log_indexes(indexes)

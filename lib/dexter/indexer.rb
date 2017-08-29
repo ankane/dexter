@@ -133,15 +133,6 @@ module Dexter
       tables = Set.new(explainable_queries.flat_map(&:tables))
 
       if tables.any?
-        # get existing indexes
-        index_set = Set.new
-        indexes(tables).each do |index|
-          # don't add indexes that are already covered
-          # TODO make sure btree
-          index_set << [index["table"], index["columns"].first(1)]
-          index_set << [index["table"], index["columns"].first(2)]
-        end
-
         # since every set of multi-column indexes are expensive
         # try to parse out columns
         possible_columns = Set.new
@@ -158,13 +149,13 @@ module Dexter
         columns_by_table = columns(tables).select { |c| possible_columns.include?(c[:column]) }.group_by { |c| c[:table] }
 
         # create single column indexes
-        create_hypothetical_indexes_helper(columns_by_table, 1, index_set, candidates)
+        create_hypothetical_indexes_helper(columns_by_table, 1, candidates)
 
         # get next round of costs
         calculate_plan(explainable_queries)
 
         # create multicolumn indexes
-        create_hypothetical_indexes_helper(columns_by_table, 2, index_set, candidates)
+        create_hypothetical_indexes_helper(columns_by_table, 2, candidates)
 
         # get next round of costs
         calculate_plan(explainable_queries)
@@ -279,6 +270,20 @@ module Dexter
         end
       end
 
+      # filter out existing indexes
+      # this must happen at end of process
+      # since sometimes hypothetical indexes
+      # can give lower cost than actual indexes
+      index_set = Set.new
+      if tables.any?
+        indexes(tables).each do |index|
+          # don't add indexes that are already covered
+          # TODO make sure btree
+          index_set << [index["table"], index["columns"].first(1)]
+          index_set << [index["table"], index["columns"].first(2)]
+        end
+      end
+
       # filter out covered indexes
       covered = Set.new
       new_indexes.values.each do |index|
@@ -287,7 +292,7 @@ module Dexter
         end
       end
 
-      new_indexes.values.reject { |i| covered.include?([i[:table], i[:columns]]) }.sort_by(&:to_a)
+      new_indexes.values.reject { |i| index_set.include?([i[:table], i[:columns]]) || covered.include?([i[:table], i[:columns]]) }.sort_by(&:to_a)
     end
 
     def log_indexes(indexes)
@@ -379,13 +384,11 @@ module Dexter
     end
 
     # TODO for multicolumn indexes, use ordering
-    def create_hypothetical_indexes_helper(columns_by_table, n, index_set, candidates)
+    def create_hypothetical_indexes_helper(columns_by_table, n, candidates)
       columns_by_table.each do |table, cols|
         # no reason to use btree index for json columns
         cols.reject { |c| ["json", "jsonb"].include?(c[:type]) }.permutation(n) do |col_set|
-          if !index_set.include?([table, col_set.map { |col| col[:column] }])
-            candidates[col_set] = execute("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{col_set.map { |c| quote_ident(c[:column])  }.join(", ")})')").first["indexname"]
-          end
+          candidates[col_set] = execute("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{col_set.map { |c| quote_ident(c[:column])  }.join(", ")})')").first["indexname"]
         end
       end
     end

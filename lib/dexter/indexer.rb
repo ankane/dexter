@@ -242,6 +242,7 @@ module Dexter
 
         if @log_level == "debug2"
           log "Processed #{query.fingerprint}"
+          log "Total time: #{(query.total_time / 60000.0).round(1)} min, avg time: #{(query.total_time / query.calls.to_f).round} ms, calls: #{query.calls}" if query.total_time
           if tables.empty?
             log "No candidate tables for indexes"
           elsif query.explainable? && !query.high_cost?

@@ -1,7 +1,7 @@
 module Dexter
   class Query
     attr_reader :statement, :fingerprint, :plans
-    attr_accessor :missing_tables, :new_cost
+    attr_accessor :missing_tables, :new_cost, :total_time, :calls
 
     def initialize(statement, fingerprint = nil)
       @statement = statement

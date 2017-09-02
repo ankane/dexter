@@ -37,7 +37,10 @@ module Dexter
       queries = []
       @top_queries.each do |k, v|
         if new_queries.include?(k) && v[:total_time] > @min_time
-          queries << Query.new(v[:query], k)
+          query = Query.new(v[:query], k)
+          query.total_time = v[:total_time]
+          query.calls = v[:calls]
+          queries << query
         end
       end
 

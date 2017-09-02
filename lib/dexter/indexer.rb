@@ -247,7 +247,10 @@ module Dexter
             cost_savings2 = false
           end
 
-          suggest_index = (cost_savings || cost_savings2) && query_indexes.size <= 2
+          # TODO if multiple indexes are found (for either single or multicolumn)
+          # determine the impact of each individually
+          # for now, be conservative and don't suggest if more than one index
+          suggest_index = (cost_savings || cost_savings2) && query_indexes.size == 1
 
           if suggest_index
             query_indexes.each do |index|

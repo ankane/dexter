@@ -275,7 +275,7 @@ module Dexter
         end
       end
 
-      new_indexes.values.reject { |i| index_set.include?([i[:table], i[:columns]]) || covered.include?([i[:table], i[:columns]]) }.sort_by(&:to_a)
+      new_indexes.values.reject { |i| covered.include?([i[:table], i[:columns]]) }.sort_by(&:to_a)
     end
 
     def log_indexes(indexes)

@@ -247,7 +247,7 @@ module Dexter
             cost_savings2 = false
           end
 
-          suggest_index = cost_savings || cost_savings2
+          suggest_index = (cost_savings || cost_savings2) && query_indexes.size <= 2
 
           if suggest_index
             query_indexes.each do |index|

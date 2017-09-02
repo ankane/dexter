@@ -189,17 +189,21 @@ module Dexter
       indexes
     end
 
-    def hypo_indexes_from_plan(index_name_to_columns, plan)
+    def hypo_indexes_from_plan(index_name_to_columns, plan, index_set)
       query_indexes = []
 
       find_indexes(plan).uniq.sort.each do |index_name|
         col_set = index_name_to_columns[index_name]
 
         if col_set
-          query_indexes << {
+          index = {
             table: col_set[0][:table],
             columns: col_set.map { |c| c[:column] }
           }
+
+          unless index_set.include?([index[:table], index[:columns]])
+            query_indexes << index
+          end
         end
       end
 
@@ -209,6 +213,20 @@ module Dexter
     def determine_indexes(queries, candidates, tables)
       new_indexes = {}
       index_name_to_columns = candidates.invert
+
+      # filter out existing indexes
+      # this must happen at end of process
+      # since sometimes hypothetical indexes
+      # can give lower cost than actual indexes
+      index_set = Set.new
+      if tables.any?
+        indexes(tables).each do |index|
+          # don't add indexes that are already covered
+          # TODO make sure btree
+          index_set << [index["table"], index["columns"].first(1)]
+          index_set << [index["table"], index["columns"].first(2)]
+        end
+      end
 
       queries.each do |query|
         if query.explainable? && query.high_cost?
@@ -220,7 +238,7 @@ module Dexter
           cost_savings2 = new_cost > 100 && new_cost2 < new_cost * 0.5
 
           key = cost_savings2 ? 2 : 1
-          query_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[key])
+          query_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[key], index_set)
 
           # likely a bad suggestion, so try single column
           if cost_savings2 && query_indexes.size > 1
@@ -243,23 +261,9 @@ module Dexter
 
           # TODO optimize
           if @log_level.start_with?("debug")
-            query.pass1_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[1])
-            query.pass2_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[2])
+            query.pass1_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[1], index_set)
+            query.pass2_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[2], index_set)
           end
-        end
-      end
-
-      # filter out existing indexes
-      # this must happen at end of process
-      # since sometimes hypothetical indexes
-      # can give lower cost than actual indexes
-      index_set = Set.new
-      if tables.any?
-        indexes(tables).each do |index|
-          # don't add indexes that are already covered
-          # TODO make sure btree
-          index_set << [index["table"], index["columns"].first(1)]
-          index_set << [index["table"], index["columns"].first(2)]
         end
       end
 

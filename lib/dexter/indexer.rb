@@ -219,8 +219,6 @@ module Dexter
           # set high bar for multicolumn indexes
           cost_savings2 = new_cost > 100 && new_cost2 < new_cost * 0.5
 
-          query.new_cost = cost_savings2 ? new_cost2 : new_cost
-
           key = cost_savings2 ? 2 : 1
           query_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[key])
 
@@ -241,6 +239,7 @@ module Dexter
 
           query.indexes = query_indexes
           query.suggest_index = suggest_index
+          query.new_cost = cost_savings2 ? new_cost2 : new_cost
 
           # TODO optimize
           if @log_level.start_with?("debug")

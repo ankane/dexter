@@ -52,7 +52,7 @@ module Dexter
       new_indexes = determine_indexes(queries, candidates, tables)
 
       # display and create new indexes
-      show_and_create_indexes(new_indexes)
+      show_and_create_indexes(new_indexes, queries, tables)
     end
 
     private
@@ -238,36 +238,15 @@ module Dexter
               (new_indexes[index][:queries] ||= []) << query
             end
           end
-        end
 
-        if @log_level == "debug2"
-          log "Processed #{query.fingerprint}"
-          log "Total time: #{(query.total_time / 60000.0).round(1)} min, avg time: #{(query.total_time / query.calls.to_f).round} ms, calls: #{query.calls}" if query.total_time
-          if tables.empty?
-            log "No candidate tables for indexes"
-          elsif query.explainable? && !query.high_cost?
-            log "Low initial cost: #{query.initial_cost}"
-          elsif query.explainable?
-            log "Cost: #{query.initial_cost} -> #{query.new_cost}"
-            log "Indexes: #{log_indexes(query_indexes)}"
-            if query_indexes.any? && !suggest_index
-              log "Need 50% cost savings to suggest index"
-            end
-            log "Pass 1: #{new_cost} : #{log_indexes(hypo_indexes_from_plan(index_name_to_columns, query.plans[1]))}"
-            log "Pass 2: #{new_cost2} : #{log_indexes(hypo_indexes_from_plan(index_name_to_columns, query.plans[2]))}"
-          elsif query.fingerprint == "unknown"
-            log "Could not parse query"
-          elsif query.tables.empty?
-            log "No tables"
-          elsif query.missing_tables
-            log "Tables not present in current database"
-          else
-            log "Could not run explain"
+          query.indexes = query_indexes
+          query.suggest_index = suggest_index
+
+          # TODO optimize
+          if @log_level.start_with?("debug")
+            query.pass1_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[1])
+            query.pass2_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[2])
           end
-
-          puts
-          puts query.statement
-          puts
         end
       end
 
@@ -304,18 +283,47 @@ module Dexter
       end
     end
 
-    def show_and_create_indexes(new_indexes)
+    def show_and_create_indexes(new_indexes, queries, tables)
       if new_indexes.any?
         new_indexes.each do |index|
           log "Index found: #{index[:table]} (#{index[:columns].join(", ")})"
+        end
 
-          if @log_level.start_with?("debug")
-            index[:queries].sort_by(&:fingerprint).each do |query|
-              log "Query #{query.fingerprint} (Cost: #{query.initial_cost} -> #{query.new_cost})"
-              puts
-              puts query.statement
-              puts
+        if @log_level.start_with?("debug")
+          index_queries = new_indexes.flat_map { |i| i[:queries].sort_by(&:fingerprint) }
+          if @log_level == "debug2"
+            fingerprints = Set.new(index_queries.map(&:fingerprint))
+            index_queries.concat(queries.reject { |q| fingerprints.include?(q.fingerprint) }.sort_by(&:fingerprint))
+          end
+          index_queries.each do |query|
+            log "-" * 80
+            log "Query #{query.fingerprint}"
+            log "Total time: #{(query.total_time / 60000.0).round(1)} min, avg time: #{(query.total_time / query.calls.to_f).round} ms, calls: #{query.calls}" if query.total_time
+            if tables.empty?
+              log "No candidate tables for indexes"
+            elsif query.explainable? && !query.high_cost?
+              log "Low initial cost: #{query.initial_cost}"
+            elsif query.explainable?
+              query_indexes = query.indexes || []
+              log "Start: #{query.costs[0]}"
+              log "Pass1: #{query.costs[1]} : #{log_indexes(query.pass1_indexes || [])}"
+              log "Pass2: #{query.costs[2]} : #{log_indexes(query.pass2_indexes || [])}"
+              log "Final: #{query.new_cost} : #{log_indexes(query_indexes)}"
+              if query_indexes.any? && !query.suggest_index
+                log "Need 50% cost savings to suggest index"
+              end
+            elsif query.fingerprint == "unknown"
+              log "Could not parse query"
+            elsif query.tables.empty?
+              log "No tables"
+            elsif query.missing_tables
+              log "Tables not present in current database"
+            else
+              log "Could not run explain"
             end
+            log
+            log query.statement
+            log
           end
         end
 

@@ -261,7 +261,12 @@ module Dexter
 
           query.indexes = query_indexes
           query.suggest_index = suggest_index
-          query.new_cost = cost_savings2 ? new_cost2 : new_cost
+          query.new_cost =
+            if suggest_index
+              cost_savings2 ? new_cost2 : new_cost
+            else
+              query.initial_cost
+            end
 
           # TODO optimize
           if @log_level.start_with?("debug")

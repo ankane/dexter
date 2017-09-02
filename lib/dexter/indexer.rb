@@ -243,7 +243,7 @@ module Dexter
 
           # likely a bad suggestion, so try single column
           if cost_savings2 && query_indexes.size > 1
-            query_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[1])
+            query_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[1], index_set)
             cost_savings2 = false
           end
 

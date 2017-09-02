@@ -221,10 +221,11 @@ module Dexter
       index_set = Set.new
       if tables.any?
         indexes(tables).each do |index|
-          # don't add indexes that are already covered
-          # TODO make sure btree
-          index_set << [index["table"], index["columns"].first(1)]
-          index_set << [index["table"], index["columns"].first(2)]
+          if index["using"] == "btree"
+            # don't add indexes that are already covered
+            index_set << [index["table"], index["columns"].first(1)]
+            index_set << [index["table"], index["columns"].first(2)]
+          end
         end
       end
 

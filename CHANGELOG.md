@@ -1,6 +1,7 @@
-## 0.2.1 [unreleased]
+## 0.2.1
 
-- Fixed bad suggestions for multicolumn indexes
+- Fixed bad suggestions
+- Improved debugging output
 
 ## 0.2.0
 

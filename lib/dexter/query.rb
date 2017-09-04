@@ -13,7 +13,14 @@ module Dexter
     end
 
     def tables
-      @tables ||= parse ? parse.tables : []
+      @tables ||= begin
+        parse ? parse.tables : []
+      rescue NoMethodError
+        # possible pg_query bug
+        $stderr.puts "Error extracting tables. Please report to https://github.com/ankane/dexter/issues/new"
+        $stderr.puts statement
+        []
+      end
     end
 
     def tree

@@ -1,3 +1,7 @@
+## 0.2.2 [unreleased]
+
+- Fixed debug output when indexes not found
+
 ## 0.2.1
 
 - Fixed bad suggestions

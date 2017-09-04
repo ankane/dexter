@@ -26,6 +26,19 @@ class DexterTest < Minitest::Test
     assert_no_index "SELECT * FROM posts_view WHERE id = 1"
   end
 
+  def test_order
+    assert_index "SELECT * FROM posts ORDER BY user_id DESC LIMIT 10", "posts (user_id)"
+  end
+
+  def test_order_multiple
+    assert_index "SELECT * FROM posts ORDER BY user_id, blog_id LIMIT 10", "posts (user_id, blog_id)"
+  end
+
+  def test_order_multiple_direction
+    skip
+    assert_index "SELECT * FROM posts ORDER BY user_id DESC, blog_id LIMIT 10", "posts (user_id DESC, blog_id)"
+  end
+
   def test_exclude
     assert_no_index "SELECT * FROM posts WHERE id = 1", "--exclude posts"
   end

@@ -130,6 +130,21 @@ Some hosted providers like Amazon RDS and Heroku do not support the HypoPG exten
 
 [Here are some ideas](https://github.com/ankane/dexter/issues/1)
 
+## Upgrading
+
+Run:
+
+```sh
+gem install pgdexter
+```
+
+To use master, run:
+
+```sh
+gem install specific_install
+gem specific_install ankane/pgdexter
+```
+
 ## Thanks
 
 This software wouldn’t be possible without [HypoPG](https://github.com/dalibo/hypopg), which allows you to create hypothetical indexes, and [pg_query](https://github.com/lfittl/pg_query), which allows you to parse and fingerprint queries. A big thanks to Dalibo and Lukas Fittl respectively.

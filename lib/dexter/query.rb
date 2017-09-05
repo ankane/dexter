@@ -15,9 +15,10 @@ module Dexter
     def tables
       @tables ||= begin
         parse ? parse.tables : []
-      rescue NoMethodError
+      rescue => e
         # possible pg_query bug
-        $stderr.puts "Error extracting tables. Please report to https://github.com/ankane/dexter/issues/new"
+        $stderr.puts "Error extracting tables. Please report to https://github.com/ankane/dexter/issues"
+        $stderr.puts "#{e.class.name}: #{e.message}"
         $stderr.puts statement
         []
       end

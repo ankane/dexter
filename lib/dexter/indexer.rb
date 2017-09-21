@@ -137,6 +137,7 @@ module Dexter
         # try to parse out columns
         possible_columns = Set.new
         explainable_queries.each do |query|
+          log "Finding columns: #{query}" if @log_level == "debug3"
           find_columns(query.tree).each do |col|
             last_col = col["fields"].last
             if last_col["String"]

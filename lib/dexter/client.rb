@@ -63,7 +63,7 @@ Options:)
 
       # TODO don't use global var
       $log_level = options[:log_level].to_s.downcase
-      abort "Unknown log level" unless ["error", "info", "debug", "debug2"].include?($log_level)
+      abort "Unknown log level" unless ["error", "info", "debug", "debug2", "debug3"].include?($log_level)
 
       [arguments, options]
     rescue Slop::Error => e

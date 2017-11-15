@@ -360,7 +360,7 @@ module Dexter
               begin
                 execute(statement)
                 log "Index created: #{((Time.now - started_at) * 1000).to_i} ms"
-              rescue PG::LockNotAvailable => e
+              rescue PG::LockNotAvailable
                 log "Could not acquire lock: #{index[:table]}"
               end
             end

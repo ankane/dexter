@@ -12,8 +12,8 @@ First, install [HypoPG](https://github.com/dalibo/hypopg) on your database serve
 
 ```sh
 cd /tmp
-curl -L https://github.com/dalibo/hypopg/archive/1.0.0.tar.gz | tar xz
-cd hypopg-1.0.0
+curl -L https://github.com/dalibo/hypopg/archive/1.1.0.tar.gz | tar xz
+cd hypopg-1.1.0
 make
 make install # may need sudo
 ```

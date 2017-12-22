@@ -40,8 +40,8 @@ module Dexter
       search_path_index = Hash[search_path.map.with_index.to_a]
 
       no_schema_tables = {}
-      tables.sort_by { |t| search_path_index[t.split(".")[0]] || 1000000 }.each do |table|
-        no_schema_tables[table.split(".")[-1]] ||= table
+      tables.group_by { |t| t.split(".")[-1] }.each do |group, t2|
+        no_schema_tables[group] = t2.sort_by { |t| search_path_index[t.split(".")[0]] || 1000000 }[0]
       end
 
       # filter queries from other databases and system tables

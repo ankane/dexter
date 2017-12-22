@@ -511,8 +511,7 @@ module Dexter
     def indexes(tables)
       execute(<<-SQL
         SELECT
-          schemaname AS schema,
-          t.relname AS table,
+          schemaname || '.' || t.relname AS table,
           ix.relname AS name,
           regexp_replace(pg_get_indexdef(i.indexrelid), '^[^\\(]*\\((.*)\\)$', '\\1') AS columns,
           regexp_replace(pg_get_indexdef(i.indexrelid), '.* USING ([^ ]*) \\(.*', '\\1') AS using
@@ -525,8 +524,7 @@ module Dexter
         LEFT JOIN
           pg_stat_user_indexes ui ON ui.indexrelid = i.indexrelid
         WHERE
-          t.relname IN (#{tables.map { |t| quote(t) }.join(", ")}) AND
-          schemaname IS NOT NULL AND
+          schemaname || '.' || t.relname IN (#{tables.map { |t| quote(t) }.join(", ")}) AND
           indisvalid = 't' AND
           indexprs IS NULL AND
           indpred IS NULL

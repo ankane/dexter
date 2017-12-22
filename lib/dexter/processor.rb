@@ -7,7 +7,7 @@ module Dexter
 
       @collector = Collector.new(min_time: options[:min_time])
       @log_parser =
-        if options[:log_format] == "csv"
+        if options[:input_format] == "csv"
           CsvLogParser.new(logfile, @collector)
         else
           LogParser.new(logfile, @collector)

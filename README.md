@@ -105,7 +105,7 @@ tail -F -n +1 <log-file> | dexter <connection-options>
 Specify the format with: [master]
 
 ```sh
-dexter <connection-options> --log-format csv
+dexter <connection-options> --input-format csv
 ```
 
 Pass a single statement with:

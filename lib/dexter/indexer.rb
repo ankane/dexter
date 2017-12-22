@@ -37,8 +37,10 @@ module Dexter
       tables.delete_if { |t| exclude_set.include?(t) || exclude_set.include?(t.split(".")[-1]) }
 
       # TODO use search path for order
+      search_path_index = Hash[search_path.map.with_index.to_a]
+
       no_schema_tables = {}
-      tables.each do |table|
+      tables.sort_by { |t| search_path_index[t.split(".")[0]] || 1000000 }.each do |table|
         no_schema_tables[table.split(".")[-1]] ||= table
       end
 
@@ -531,6 +533,10 @@ module Dexter
           1, 2
       SQL
       ).map { |v| v["columns"] = v["columns"].sub(") WHERE (", " WHERE ").split(", ").map { |c| unquote(c) }; v }
+    end
+
+    def search_path
+      execute("SHOW search_path")[0]["search_path"].split(",").map(&:strip)
     end
 
     def unquote(part)

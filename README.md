@@ -96,7 +96,7 @@ min-time | only process queries consuming a min amount of DB time, in minutes | 
 
 ## Collecting Queries
 
-There are many ways to collect queries. The preferred piping your logfile:
+There are many ways to collect queries. For real-time indexing, pipe your logfile:
 
 ```sh
 tail -F -n +1 <log-file> | dexter <connection-options>

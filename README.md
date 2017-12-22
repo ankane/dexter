@@ -168,7 +168,7 @@ To use master, run:
 
 ```sh
 gem install specific_install
-gem specific_install ankane/pgdexter
+gem specific_install https://github.com/ankane/dexter.git
 ```
 
 ## Thanks

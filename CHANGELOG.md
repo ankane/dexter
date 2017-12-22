@@ -1,5 +1,6 @@
 ## 0.2.2 [unreleased]
 
+- Added support for csv format
 - Fixed debug output when indexes not found
 
 ## 0.2.1

@@ -6,7 +6,13 @@ module Dexter
       @logfile = logfile
 
       @collector = Collector.new(min_time: options[:min_time])
-      @log_parser = LogParser.new(logfile, @collector)
+      @log_parser =
+        if options[:log_format] == "csv"
+          CsvLogParser.new(logfile, @collector)
+        else
+          LogParser.new(logfile, @collector)
+        end
+
       @indexer = Indexer.new(options)
 
       @starting_interval = 3

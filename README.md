@@ -102,6 +102,12 @@ There are many ways to collect queries. The preferred piping your logfile:
 tail -F -n +1 <log-file> | dexter <connection-options>
 ```
 
+Specify the format with: [master]
+
+```sh
+dexter <connection-options> --log-format csv
+```
+
 Pass a single statement with:
 
 ```sh

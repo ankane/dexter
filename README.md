@@ -134,6 +134,14 @@ Homebrew on Mac
 tail -F -n +1 /usr/local/var/postgres/server.log | dexter dbname
 ```
 
+## Debugging
+
+See how Dexter is processing queries with:
+
+```sh
+dexter <connection-options> --log-sql --log-level debug2
+```
+
 ## Hosted Postgres
 
 Some hosted providers like Amazon RDS and Heroku do not support the HypoPG extension, which Dexter needs to run. See [how to use Dexter](guides/Hosted-Postgres.md) in these cases.

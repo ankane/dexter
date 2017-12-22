@@ -22,7 +22,7 @@ module Dexter
           end
         end
 
-        if !active_line && m = REGEX.match(line.chomp)
+        if !active_line && (m = REGEX.match(line.chomp))
           duration = m[1].to_f
           active_line = m[3]
         end

@@ -33,8 +33,10 @@ module Dexter
         tables.keep_if { |t| include_set.include?(t) || include_set.include?(t.split(".")[-1]) }
       end
 
-      exclude_set = Set.new(@exclude_tables)
-      tables.delete_if { |t| exclude_set.include?(t) || exclude_set.include?(t.split(".")[-1]) }
+      if @exclude_tables.any?
+        exclude_set = Set.new(@exclude_tables)
+        tables.delete_if { |t| exclude_set.include?(t) || exclude_set.include?(t.split(".")[-1]) }
+      end
 
       # TODO use search path for order
       search_path_index = Hash[search_path.map.with_index.to_a]

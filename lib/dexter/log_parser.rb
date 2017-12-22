@@ -1,6 +1,6 @@
 module Dexter
   class LogParser
-    REGEX = /duration: (\d+\.\d+) ms  (statement|execute <unnamed>): (.+)/
+    REGEX = /duration: (\d+\.\d+) ms  (statement|execute <unnamed>|parse <unnamed>): (.+)/
     LINE_SEPERATOR = ":  ".freeze
 
     def initialize(logfile, collector)

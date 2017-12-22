@@ -26,21 +26,33 @@ module Dexter
       # reset hypothetical indexes
       reset_hypothetical_indexes
 
+      tables = Set.new(database_tables)
+
+      if @include_tables
+        include_set = Set.new(@include_tables)
+        tables.keep_if { |t| include_set.include?(t) || include_set.include?(t.split(".")[-1]) }
+      end
+
+      exclude_set = Set.new(@exclude_tables)
+      tables.delete_if { |t| exclude_set.include?(t) || exclude_set.include?(t.split(".")[-1]) }
+
+      # TODO use search path for order
+      no_schema_tables = {}
+      tables.each do |table|
+        no_schema_tables[table.split(".")[-1]] ||= table
+      end
+
       # filter queries from other databases and system tables
-      tables = possible_tables(queries)
       queries.each do |query|
+        # add schema to table if needed
+        query.tables = query.tables.map { |t| no_schema_tables[t] || t }
+
+        # check for missing tables
         query.missing_tables = !query.tables.all? { |t| tables.include?(t) }
       end
 
-      if @include_tables
-        tables = Set.new(tables.to_a & @include_tables)
-      end
-
-      # exclude user specified tables
-      # TODO exclude write-heavy tables
-      @exclude_tables.each do |table|
-        tables.delete(table)
-      end
+      # set tables
+      tables = Set.new(queries.reject(&:missing_tables).flat_map(&:tables))
 
       # analyze tables if needed
       analyze_tables(tables) if tables.any?
@@ -81,14 +93,13 @@ module Dexter
 
       analyze_stats = execute <<-SQL
         SELECT
-          schemaname AS schema,
-          relname AS table,
+          schemaname || '.' || relname AS table,
           last_analyze,
           last_autoanalyze
         FROM
           pg_stat_user_tables
         WHERE
-          relname IN (#{tables.map { |t| quote(t) }.join(", ")})
+          schemaname || '.' || relname IN (#{tables.map { |t| quote(t) }.join(", ")})
       SQL
 
       last_analyzed = {}
@@ -421,7 +432,7 @@ module Dexter
     def database_tables
       result = execute <<-SQL
         SELECT
-          table_name
+          table_schema || '.' || table_name AS table_name
         FROM
           information_schema.tables
         WHERE
@@ -447,10 +458,6 @@ module Dexter
           1
       SQL
       result.map { |q| q["query"] }
-    end
-
-    def possible_tables(queries)
-      Set.new(queries.flat_map(&:tables).uniq & database_tables)
     end
 
     def with_advisory_lock
@@ -484,14 +491,13 @@ module Dexter
     def columns(tables)
       columns = execute <<-SQL
         SELECT
-          table_name,
+          table_schema || '.' || table_name AS table_name,
           column_name,
           data_type
         FROM
           information_schema.columns
         WHERE
-          table_schema = 'public' AND
-          table_name IN (#{tables.map { |t| quote(t) }.join(", ")})
+          table_schema || '.' || table_name IN (#{tables.map { |t| quote(t) }.join(", ")})
         ORDER BY
           1, 2
       SQL
@@ -536,7 +542,7 @@ module Dexter
     end
 
     def quote_ident(value)
-      conn.quote_ident(value)
+      value.split(".").map { |v| conn.quote_ident(v) }.join(".")
     end
 
     def quote(value)

@@ -21,4 +21,10 @@ CREATE TABLE posts (
 INSERT INTO posts (SELECT n AS id, n % 1000 AS blog_id, n % 10 AS user_id FROM generate_series(1, 100000) n);
 CREATE VIEW posts_view AS SELECT * FROM posts;
 ANALYZE posts;
+
+DROP SCHEMA IF EXISTS bar CASCADE;
+CREATE SCHEMA bar;
+CREATE TABLE bar.foo(id int);
+INSERT INTO bar.foo
+SELECT * FROM generate_series(1, 100000);
 SQL

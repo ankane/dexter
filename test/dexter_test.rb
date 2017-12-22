@@ -2,7 +2,7 @@ require_relative "test_helper"
 
 class DexterTest < Minitest::Test
   def test_basic_index
-    assert_index "SELECT * FROM posts WHERE id = 1", "posts (id)"
+    assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)"
   end
 
   def test_basic_no_index
@@ -10,15 +10,15 @@ class DexterTest < Minitest::Test
   end
 
   def test_multicolumn_order
-    assert_index "SELECT * FROM posts WHERE user_id = 1 ORDER BY blog_id LIMIT 1000", "posts (user_id, blog_id)"
+    assert_index "SELECT * FROM posts WHERE user_id = 1 ORDER BY blog_id LIMIT 1000", "public.posts (user_id, blog_id)"
   end
 
   def test_update
-    assert_index "UPDATE posts SET user_id = 2 WHERE user_id = 1", "posts (user_id)"
+    assert_index "UPDATE posts SET user_id = 2 WHERE user_id = 1", "public.posts (user_id)"
   end
 
   def test_delete
-    assert_index "DELETE FROM posts WHERE user_id = 1", "posts (user_id)"
+    assert_index "DELETE FROM posts WHERE user_id = 1", "public.posts (user_id)"
   end
 
   def test_view
@@ -27,16 +27,16 @@ class DexterTest < Minitest::Test
   end
 
   def test_order
-    assert_index "SELECT * FROM posts ORDER BY user_id DESC LIMIT 10", "posts (user_id)"
+    assert_index "SELECT * FROM posts ORDER BY user_id DESC LIMIT 10", "public.posts (user_id)"
   end
 
   def test_order_multiple
-    assert_index "SELECT * FROM posts ORDER BY user_id, blog_id LIMIT 10", "posts (user_id, blog_id)"
+    assert_index "SELECT * FROM posts ORDER BY user_id, blog_id LIMIT 10", "public.posts (user_id, blog_id)"
   end
 
   def test_order_multiple_direction
     skip
-    assert_index "SELECT * FROM posts ORDER BY user_id DESC, blog_id LIMIT 10", "posts (user_id DESC, blog_id)"
+    assert_index "SELECT * FROM posts ORDER BY user_id DESC, blog_id LIMIT 10", "public.posts (user_id DESC, blog_id)"
   end
 
   def test_exclude
@@ -44,15 +44,19 @@ class DexterTest < Minitest::Test
   end
 
   def test_exclude_other
-    assert_index "SELECT * FROM posts WHERE id = 1", "posts (id)", "--exclude other"
+    assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--exclude other"
   end
 
   def test_include
-    assert_index "SELECT * FROM posts WHERE id = 1", "posts (id)", "--include posts"
+    assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--include posts"
   end
 
   def test_include_other
     assert_no_index "SELECT * FROM posts WHERE id = 1", "--include other"
+  end
+
+  def test_schema
+    assert_index "SELECT * FROM bar.foo WHERE id = 10000", "bar.foo (id)"
   end
 
   def test_connection_flag
@@ -87,7 +91,7 @@ class DexterTest < Minitest::Test
 
   def assert_index_file(file, input_format)
     file = File.expand_path("../support/#{file}", __FILE__)
-    assert_dexter_output "Index found: posts (id)", [file, "--input-format", input_format]
+    assert_dexter_output "Index found: public.posts (id)", [file, "--input-format", input_format]
   end
 
   def assert_no_index(statement, options = nil)

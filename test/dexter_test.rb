@@ -71,18 +71,31 @@ class DexterTest < Minitest::Test
     assert_connection ["postgresql://localhost/dexter_test"]
   end
 
+  def test_input_format_stderr
+    assert_index_file "queries.log", "stderr"
+  end
+
+  def test_input_format_csv
+    assert_index_file "queries.csv", "csv"
+  end
+
   private
 
   def assert_index(statement, index, options = nil)
-    assert_dexter_output statement, "Index found: #{index}", options
+    assert_dexter_output "Index found: #{index}", ["-s", statement] + options.to_s.split(" ")
+  end
+
+  def assert_index_file(file, input_format)
+    file = File.expand_path("../support/#{file}", __FILE__)
+    assert_dexter_output "Index found: posts (id)", [file, "--input-format", input_format]
   end
 
   def assert_no_index(statement, options = nil)
-    assert_dexter_output statement, "No new indexes found", options
+    assert_dexter_output "No new indexes found", ["-s", statement] + options.to_s.split(" ")
   end
 
-  def assert_dexter_output(statement, output, options)
-    dexter = Dexter::Client.new(["dexter_test", "-s", statement, "--log-level", "debug2"] + options.to_s.split(" "))
+  def assert_dexter_output(output, options)
+    dexter = Dexter::Client.new(["dexter_test"] + options + ["--log-level", "debug2"])
     assert_output(/#{Regexp.escape(output)}/) { dexter.perform }
   end
 

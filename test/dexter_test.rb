@@ -56,7 +56,7 @@ class DexterTest < Minitest::Test
   end
 
   def test_schema
-    assert_index "SELECT * FROM bar.foo WHERE id = 10000", "bar.foo (id)"
+    assert_index "SELECT * FROM \"Bar\".\"Foo\" WHERE \"Id\" = 10000", "Bar.Foo (Id)"
   end
 
   def test_connection_flag

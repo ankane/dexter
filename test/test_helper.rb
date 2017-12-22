@@ -22,9 +22,9 @@ INSERT INTO posts (SELECT n AS id, n % 1000 AS blog_id, n % 10 AS user_id FROM g
 CREATE VIEW posts_view AS SELECT * FROM posts;
 ANALYZE posts;
 
-DROP SCHEMA IF EXISTS bar CASCADE;
-CREATE SCHEMA bar;
-CREATE TABLE bar.foo(id int);
-INSERT INTO bar.foo
+DROP SCHEMA IF EXISTS "Bar" CASCADE;
+CREATE SCHEMA "Bar";
+CREATE TABLE "Bar"."Foo"("Id" int);
+INSERT INTO "Bar"."Foo"
 SELECT * FROM generate_series(1, 100000);
 SQL

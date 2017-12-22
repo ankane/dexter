@@ -47,12 +47,12 @@ This finds slow queries and generates output like:
 ```
 Started
 Processing 189 new query fingerprints
-Index found: genres_movies (genre_id)
-Index found: genres_movies (movie_id)
-Index found: movies (title)
-Index found: ratings (movie_id)
-Index found: ratings (rating)
-Index found: ratings (user_id)
+Index found: public.genres_movies (genre_id)
+Index found: public.genres_movies (movie_id)
+Index found: public.movies (title)
+Index found: public.ratings (movie_id)
+Index found: public.ratings (rating)
+Index found: public.ratings (user_id)
 Processing 12 new query fingerprints
 ```
 

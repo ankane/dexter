@@ -94,18 +94,30 @@ log-level | `debug` gives additional info for suggested indexes<br />`debug2` gi
 log-sql | log SQL statements executed | false
 min-time | only process queries consuming a min amount of DB time, in minutes | 0
 
-## Non-Streaming Modes
+## Collecting Queries
 
-You can pass a single statement with:
+There are many ways to collect queries. The preferred piping your logfile:
+
+```sh
+tail -F -n +1 <log-file> | dexter <connection-options>
+```
+
+Pass a single statement with:
 
 ```sh
 dexter <connection-options> -s "SELECT * FROM ..."
 ```
 
-or files with:
+or pass files:
 
 ```sh
 dexter <connection-options> <file1> <file2>
+```
+
+or use the [pg_stat_statements](https://www.postgresql.org/docs/current/static/pgstatstatements.html) extension:
+
+```sh
+dexter <connection-options> --pg-stat-statements
 ```
 
 ## Examples

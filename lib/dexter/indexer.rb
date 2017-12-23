@@ -10,6 +10,7 @@ module Dexter
       @log_sql = options[:log_sql]
       @log_explain = options[:log_explain]
       @min_time = options[:min_time] || 0
+      @analyze = options[:analyze]
       @options = options
 
       create_extension unless extension_exists?
@@ -58,7 +59,7 @@ module Dexter
       tables = Set.new(queries.reject(&:missing_tables).flat_map(&:tables))
 
       # analyze tables if needed
-      analyze_tables(tables) if tables.any?
+      analyze_tables(tables) if tables.any? && (@analyze || @log_level == "debug2")
 
       # create hypothetical indexes and explain queries
       candidates = tables.any? ? create_hypothetical_indexes(queries.reject(&:missing_tables), tables) : {}
@@ -111,7 +112,14 @@ module Dexter
       end
 
       tables.each do |table|
-        if !last_analyzed[table] || last_analyzed[table] < Time.now - 3600
+        la = last_analyzed[table]
+
+        if @log_level == "debug2"
+          time_str = la ? la.iso8601 : "Unknown"
+          log "Last analyze: #{table} : #{time_str}"
+        end
+
+        if @analyze && (!la || la < Time.now - 3600)
           statement = "ANALYZE #{quote_ident(table)}"
           log "Running analyze: #{statement}"
           execute(statement)

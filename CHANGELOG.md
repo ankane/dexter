@@ -3,6 +3,7 @@
 - Added support for schemas
 - Added support for csv format
 - Fixed debug output when indexes not found
+- Added `--analyze` option and do not analyze by default
 
 ## 0.2.1
 

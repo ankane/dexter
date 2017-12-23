@@ -148,6 +148,14 @@ See how Dexter is processing queries with:
 dexter <connection-options> --log-sql --log-level debug2
 ```
 
+## Analyze
+
+For best results, make sure your tables have been recently analyzed so statistics are up-to-date. You can ask Dexter to analyze tables it comes across that haven’t been analyzed in the past hour with:
+
+```sh
+dexter <connection-options> --analyze
+```
+
 ## Hosted Postgres
 
 Some hosted providers like Amazon RDS and Heroku do not support the HypoPG extension, which Dexter needs to run. See [how to use Dexter](guides/Hosted-Postgres.md) in these cases.

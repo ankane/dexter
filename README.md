@@ -112,16 +112,16 @@ dexter <connection-options> --pg-stat-statements
 
 ### Collection Options
 
-To prevent one-off queries from being indexed, specify a minimum amount of time queries must consume before they are considered for indexing
-
-```sh
-dexter --min-time 10 # minutes
-```
-
-You can do the same for the number of calls [master]
+To prevent one-off queries from being indexed, specify a minimum number of calls before a query is considered for indexing
 
 ```sh
 dexter --min-calls 100
+```
+
+You can do the same for total time a query has run
+
+```sh
+dexter --min-time 10 # minutes
 ```
 
 Specify the format [master]

@@ -124,16 +124,16 @@ You can do the same for the number of calls [master]
 dexter --min-calls 100
 ```
 
-Specify the time to wait between processing queries
-
-```sh
-dexter --interval 60 # seconds
-```
-
 Specify the format [master]
 
 ```sh
 dexter --input-format csv
+```
+
+When steaming logs, specify the time to wait between processing queries
+
+```sh
+dexter --interval 60 # seconds
 ```
 
 ## Examples

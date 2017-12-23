@@ -274,15 +274,8 @@ module Dexter
             end
           end
 
+          query.indexes = query_indexes
           query.suggest_index = suggest_index
-
-          query.indexes =
-            if suggest_index
-              query_indexes
-            else
-              []
-            end
-
           query.new_cost =
             if suggest_index
               cost_savings2 ? new_cost2 : new_cost

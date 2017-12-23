@@ -59,8 +59,8 @@ Processing 12 new query fingerprints
 To be safe, Dexter will not create indexes unless you pass the `--create` flag. In this case, you’ll see:
 
 ```
-Index found: ratings (user_id)
-Creating index: CREATE INDEX CONCURRENTLY ON "ratings" ("user_id")
+Index found: public.ratings (user_id)
+Creating index: CREATE INDEX CONCURRENTLY ON "public"."ratings" ("user_id")
 Index created: 15243 ms
 ```
 

@@ -5,7 +5,7 @@ module Dexter
     def initialize(logfile, options)
       @logfile = logfile
 
-      @collector = Collector.new(min_time: options[:min_time])
+      @collector = Collector.new(min_time: options[:min_time], min_calls: options[:min_calls])
       @log_parser =
         if options[:input_format] == "csv"
           CsvLogParser.new(logfile, @collector)

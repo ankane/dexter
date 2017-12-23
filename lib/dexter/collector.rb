@@ -5,6 +5,7 @@ module Dexter
       @new_queries = Set.new
       @mutex = Mutex.new
       @min_time = options[:min_time] * 60000 # convert minutes to ms
+      @min_calls = options[:min_calls]
     end
 
     def add(query, duration)
@@ -36,7 +37,7 @@ module Dexter
 
       queries = []
       @top_queries.each do |k, v|
-        if new_queries.include?(k) && v[:total_time] > @min_time
+        if new_queries.include?(k) && v[:total_time] >= @min_time && v[:calls] >= @min_calls
           query = Query.new(v[:query], k)
           query.total_time = v[:total_time]
           query.calls = v[:calls]

@@ -4,6 +4,7 @@
 - Added support for csv format
 - Fixed debug output when indexes not found
 - Added `--analyze` option and do not analyze by default
+- Added `--min-calls` option
 
 ## 0.2.1
 

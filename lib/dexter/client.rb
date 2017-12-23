@@ -35,6 +35,7 @@ Options:)
         o.string "--include", "only include specific tables"
         o.string "--input-format", "input format", default: "stderr"
         o.integer "--interval", "time to wait between processing queries, in seconds", default: 60
+        o.float "--min-calls", "only process queries that have been called a certain number of times", default: 0
         o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
         o.boolean "--pg-stat-statements", "use pg_stat_statements", default: false, help: false
         o.boolean "--log-explain", "log explain", default: false, help: false

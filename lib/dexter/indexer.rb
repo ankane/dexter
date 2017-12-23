@@ -10,6 +10,7 @@ module Dexter
       @log_sql = options[:log_sql]
       @log_explain = options[:log_explain]
       @min_time = options[:min_time] || 0
+      @min_calls = options[:min_calls] || 0
       @analyze = options[:analyze]
       @options = options
 
@@ -465,6 +466,7 @@ module Dexter
         WHERE
           datname = current_database()
           AND total_time >= #{@min_time * 60000}
+          AND calls >= #{@min_calls}
         ORDER BY
           1
       SQL

@@ -150,6 +150,14 @@ Homebrew on Mac
 tail -F -n +1 /usr/local/var/postgres/server.log | dexter dbname
 ```
 
+## Analyze
+
+For best results, make sure your tables have been recently analyzed so statistics are up-to-date. You can ask Dexter to analyze tables it comes across that haven’t been analyzed in the past hour with:
+
+```sh
+dexter --analyze
+```
+
 ## Tables
 
 You can exclude large or write-heavy tables from indexing with:
@@ -170,14 +178,6 @@ See how Dexter is processing queries with:
 
 ```sh
 dexter --log-sql --log-level debug2
-```
-
-## Analyze
-
-For best results, make sure your tables have been recently analyzed so statistics are up-to-date. You can ask Dexter to analyze tables it comes across that haven’t been analyzed in the past hour with:
-
-```sh
-dexter --analyze
 ```
 
 ## Hosted Postgres

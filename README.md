@@ -84,28 +84,12 @@ and connection strings:
 host=localhost port=5432 dbname=mydb
 ```
 
-## Options
-
-Name | Description | Default
---- | --- | ---
-exclude | prevent specific tables from being indexed | None
-interval | time to wait between processing queries, in seconds | 60
-log-level | `debug` gives additional info for suggested indexes<br />`debug2` gives additional info for processed queries<br />`error` suppresses logging | info
-log-sql | log SQL statements executed | false
-min-time | only process queries consuming a min amount of DB time, in minutes | 0
-
 ## Collecting Queries
 
 There are many ways to collect queries. For real-time indexing, pipe your logfile:
 
 ```sh
 tail -F -n +1 <log-file> | dexter <connection-options>
-```
-
-Specify the format with: [master]
-
-```sh
-dexter <connection-options> --input-format csv
 ```
 
 Pass a single statement with:
@@ -126,6 +110,26 @@ or use the [pg_stat_statements](https://www.postgresql.org/docs/current/static/p
 dexter <connection-options> --pg-stat-statements
 ```
 
+### Collection Options
+
+To prevent one-off queries from being indexed, specify a minimum amount of DB time queries must consume before they are considered for indexing
+
+```sh
+dexter --min-time 10 # minutes
+```
+
+Specify the time to wait between processing queries
+
+```sh
+dexter --interval 60 # seconds
+```
+
+Specify the format [master]
+
+```sh
+dexter --input-format csv
+```
+
 ## Examples
 
 Ubuntu with PostgreSQL 9.6
@@ -140,12 +144,26 @@ Homebrew on Mac
 tail -F -n +1 /usr/local/var/postgres/server.log | dexter dbname
 ```
 
+## Tables
+
+You can exclude large or write-heavy tables from indexing with:
+
+```sh
+dexter --exclude table1,table2
+```
+
+Alternatively, you can specify which tables to index with:
+
+```sh
+dexter --include table3,table4
+```
+
 ## Debugging
 
 See how Dexter is processing queries with:
 
 ```sh
-dexter <connection-options> --log-sql --log-level debug2
+dexter --log-sql --log-level debug2
 ```
 
 ## Analyze
@@ -153,7 +171,7 @@ dexter <connection-options> --log-sql --log-level debug2
 For best results, make sure your tables have been recently analyzed so statistics are up-to-date. You can ask Dexter to analyze tables it comes across that haven’t been analyzed in the past hour with:
 
 ```sh
-dexter <connection-options> --analyze
+dexter --analyze
 ```
 
 ## Hosted Postgres

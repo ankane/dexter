@@ -25,7 +25,6 @@ ANALYZE posts;
 DROP SCHEMA IF EXISTS "Bar" CASCADE;
 CREATE SCHEMA "Bar";
 CREATE TABLE "Bar"."Foo"("Id" int);
-INSERT INTO "Bar"."Foo"
-SELECT * FROM generate_series(1, 100000);
+INSERT INTO "Bar"."Foo" SELECT * FROM generate_series(1, 100000);
 ANALYZE "Bar"."Foo";
 SQL

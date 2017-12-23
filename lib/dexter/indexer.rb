@@ -340,7 +340,7 @@ module Dexter
             log "Start: #{query.costs[0]}"
             log "Pass1: #{query.costs[1]} : #{log_indexes(query.pass1_indexes || [])}"
             log "Pass2: #{query.costs[2]} : #{log_indexes(query.pass2_indexes || [])}"
-            log "Final: #{query.new_cost} : #{log_indexes(query_indexes)}"
+            log "Final: #{query.new_cost} : #{log_indexes(query.suggest_index ? query_indexes : [])}"
             if query_indexes.any? && !query.suggest_index
               log "Need 50% cost savings to suggest index"
             end

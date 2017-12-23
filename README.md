@@ -130,7 +130,7 @@ Specify the format
 dexter --input-format csv
 ```
 
-When steaming logs, specify the time to wait between processing queries
+When streaming logs, specify the time to wait between processing queries
 
 ```sh
 dexter --interval 60 # seconds

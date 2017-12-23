@@ -124,7 +124,7 @@ You can do the same for total time a query has run
 dexter --min-time 10 # minutes
 ```
 
-Specify the format [master]
+Specify the format
 
 ```sh
 dexter --input-format csv

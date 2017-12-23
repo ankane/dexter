@@ -1,10 +1,10 @@
-## 0.2.2 [unreleased]
+## 0.3.0
 
 - Added support for schemas
 - Added support for csv format
-- Fixed debug output when indexes not found
 - Added `--analyze` option and do not analyze by default
 - Added `--min-calls` option
+- Fixed debug output when indexes not found
 
 ## 0.2.1
 

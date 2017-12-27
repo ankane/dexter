@@ -1,3 +1,7 @@
+## 0.3.1 [unreleased]
+
+- Fixed error with streaming logs as csv format
+
 ## 0.3.0
 
 - Added support for schemas

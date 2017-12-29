@@ -1,6 +1,7 @@
 ## 0.3.2 [unreleased]
 
 - Fixed issue with multiline queries in csv format
+- Better explanations for indexing decisions
 
 ## 0.3.1
 

@@ -63,11 +63,15 @@ module Dexter
       # remove system tables
       tables.delete_if { |t| t.start_with?("information_schema.") || t.start_with?("pg_catalog.") }
 
+      queries.each do |query|
+        query.candidate_tables = !query.missing_tables && query.tables.any? { |t| tables.include?(t) }
+      end
+
       # analyze tables if needed
       analyze_tables(tables) if tables.any? && (@analyze || @log_level == "debug2")
 
       # create hypothetical indexes and explain queries
-      candidates = tables.any? ? create_hypothetical_indexes(queries.reject(&:missing_tables), tables) : {}
+      candidates = tables.any? ? create_hypothetical_indexes(queries.select(&:candidate_tables), tables) : {}
 
       # see if new indexes were used and meet bar
       new_indexes = determine_indexes(queries, candidates, tables)
@@ -348,7 +352,14 @@ module Dexter
           log "-" * 80
           log "Query #{query.fingerprint}"
           log "Total time: #{(query.total_time / 60000.0).round(1)} min, avg time: #{(query.total_time / query.calls.to_f).round} ms, calls: #{query.calls}" if query.total_time
-          if tables.empty?
+
+          if query.fingerprint == "unknown"
+            log "Could not parse query"
+          elsif query.tables.empty?
+            log "No tables"
+          elsif query.missing_tables
+            log "Tables not present in current database"
+          elsif !query.candidate_tables
             log "No candidate tables for indexes"
           elsif query.explainable? && !query.high_cost?
             log "Low initial cost: #{query.initial_cost}"
@@ -361,12 +372,6 @@ module Dexter
             if query_indexes.any? && !query.suggest_index
               log "Need 50% cost savings to suggest index"
             end
-          elsif query.fingerprint == "unknown"
-            log "Could not parse query"
-          elsif query.tables.empty?
-            log "No tables"
-          elsif query.missing_tables
-            log "Tables not present in current database"
           else
             log "Could not run explain"
           end

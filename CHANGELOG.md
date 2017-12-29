@@ -1,5 +1,6 @@
 ## 0.3.1 [unreleased]
 
+- Added support for queries with bind variables
 - Fixed error with streaming logs as csv format
 - Handle malformed CSV gracefully
 

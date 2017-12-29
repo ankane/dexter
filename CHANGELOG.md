@@ -1,6 +1,7 @@
 ## 0.3.1 [unreleased]
 
 - Fixed error with streaming logs as csv format
+- Handle malformed CSV gracefully
 
 ## 0.3.0
 

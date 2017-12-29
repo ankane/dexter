@@ -30,16 +30,6 @@ module Dexter
 
       tables = Set.new(database_tables)
 
-      if @include_tables
-        include_set = Set.new(@include_tables)
-        tables.keep_if { |t| include_set.include?(t) || include_set.include?(t.split(".")[-1]) }
-      end
-
-      if @exclude_tables.any?
-        exclude_set = Set.new(@exclude_tables)
-        tables.delete_if { |t| exclude_set.include?(t) || exclude_set.include?(t.split(".")[-1]) }
-      end
-
       # map tables without schema to schema
       no_schema_tables = {}
       search_path_index = Hash[search_path.map.with_index.to_a]
@@ -58,6 +48,20 @@ module Dexter
 
       # set tables
       tables = Set.new(queries.reject(&:missing_tables).flat_map(&:tables))
+
+      # must come after missing tables set
+      if @include_tables
+        include_set = Set.new(@include_tables)
+        tables.keep_if { |t| include_set.include?(t) || include_set.include?(t.split(".")[-1]) }
+      end
+
+      if @exclude_tables.any?
+        exclude_set = Set.new(@exclude_tables)
+        tables.delete_if { |t| exclude_set.include?(t) || exclude_set.include?(t.split(".")[-1]) }
+      end
+
+      # remove system tables
+      tables.delete_if { |t| t.start_with?("information_schema.") || t.start_with?("pg_catalog.") }
 
       # analyze tables if needed
       analyze_tables(tables) if tables.any? && (@analyze || @log_level == "debug2")
@@ -452,9 +456,7 @@ module Dexter
         FROM
           information_schema.tables
         WHERE
-          table_catalog = current_database() AND
-          table_schema NOT IN ('pg_catalog', 'information_schema')
-          AND table_type = 'BASE TABLE'
+          table_catalog = current_database()
       SQL
       result.map { |r| r["table_name"] }
     end

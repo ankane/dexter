@@ -1,3 +1,7 @@
+## 0.3.2 [unreleased]
+
+- Fixed issue with multiline queries in csv format
+
 ## 0.3.1
 
 - Added support for queries with bind variables

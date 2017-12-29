@@ -551,7 +551,7 @@ module Dexter
     end
 
     def search_path
-      execute("SHOW search_path")[0]["search_path"].split(",").map(&:strip)
+      execute("SELECT current_schemas(true)")[0]["current_schemas"][1..-2].split(",")
     end
 
     def unquote(part)

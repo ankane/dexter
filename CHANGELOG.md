@@ -1,4 +1,4 @@
-## 0.3.1 [unreleased]
+## 0.3.1
 
 - Added support for queries with bind variables
 - Fixed error with streaming logs as csv format

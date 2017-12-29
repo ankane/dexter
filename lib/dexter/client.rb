@@ -1,5 +1,7 @@
 module Dexter
   class Client
+    include Logging
+
     attr_reader :arguments, :options
 
     def initialize(args)
@@ -71,10 +73,6 @@ Options:)
       [arguments, options]
     rescue Slop::Error => e
       abort e.message
-    end
-
-    def log(message)
-      $stderr.puts message
     end
   end
 end

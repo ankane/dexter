@@ -13,3 +13,7 @@ require "dexter/log_parser"
 require "dexter/csv_log_parser"
 require "dexter/processor"
 require "dexter/query"
+
+module Dexter
+  class Abort < StandardError; end
+end

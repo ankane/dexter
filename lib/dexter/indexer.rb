@@ -130,20 +130,22 @@ module Dexter
 
     def calculate_plan(queries)
       queries.each do |query|
+        if @log_explain
+          puts "Explaining query"
+          puts
+        end
         begin
           query.plans << plan(query.statement)
           if @log_explain
-            log "Explaining query"
-            puts
             # Pass format to prevent ANALYZE
             puts execute("EXPLAIN (FORMAT TEXT) #{safe_statement(query.statement)}").map { |r| r["QUERY PLAN"] }.join("\n")
-            puts
           end
         rescue PG::Error => e
           if @log_explain
-            log "Explain Error: #{e.message}"
+            log e.message
           end
         end
+        puts if @log_explain
       end
     end
 

@@ -16,6 +16,7 @@ module Dexter
 
       create_extension unless extension_exists?
       execute("SET lock_timeout = '5s'")
+      execute("SET client_min_messages = FATAL")
     end
 
     def process_stat_statements

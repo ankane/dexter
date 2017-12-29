@@ -139,8 +139,10 @@ module Dexter
             puts execute("EXPLAIN (FORMAT TEXT) #{safe_statement(query.statement)}").map { |r| r["QUERY PLAN"] }.join("\n")
             puts
           end
-        rescue PG::Error
-          # do nothing
+        rescue PG::Error => e
+          if @log_explain
+            log "Explain Error: #{e.message}"
+          end
         end
       end
     end

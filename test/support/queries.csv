@@ -1,2 +1,2 @@
 2017-12-22 02:51:27.549 UTC,"dexter","dexter_test",21239,"127.0.0.1:52302",5a3c732f.52f7,1,"SELECT",2017-12-22 02:51:27 UTC,15/6,0,LOG,00000,"duration: 18.249 ms  execute <unnamed>: SELECT * FROM posts
-WHERE id = 1",,,,,,,,"app"
+WHERE id = $1","parameters: $1 = '1'",,,,,,,"app"

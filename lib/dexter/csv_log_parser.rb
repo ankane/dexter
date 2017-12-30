@@ -5,7 +5,7 @@ module Dexter
     FIRST_LINE_REGEX = /\A.+/
 
     def perform
-      CSV.new(@logfile).each do |row|
+      CSV.new(@logfile.to_io).each do |row|
         if (m = REGEX.match(row[13]))
           # replace first line with match
           # needed for multiline queries

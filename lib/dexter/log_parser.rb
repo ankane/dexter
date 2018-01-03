@@ -2,7 +2,7 @@ module Dexter
   class LogParser
     include Logging
 
-    REGEX = /duration: (\d+\.\d+) ms  (statement|execute <unnamed>): (.+)/
+    REGEX = /duration: (\d+\.\d+) ms  (statement|execute [^:]+): (.+)/
     LINE_SEPERATOR = ":  ".freeze
     DETAIL_LINE = "DETAIL:  ".freeze
 

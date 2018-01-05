@@ -1,6 +1,7 @@
-## 0.3.2 [unreleased]
+## 0.3.2
 
-- Fixed issue with multiline queries in csv format
+- Fixed parsing issue with named prepared statements
+- Fixed parsing issue with multiline queries in csv format
 - Better explanations for indexing decisions
 
 ## 0.3.1

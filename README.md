@@ -110,6 +110,8 @@ or use the [pg_stat_statements](https://www.postgresql.org/docs/current/static/p
 dexter <connection-options> --pg-stat-statements
 ```
 
+> Note: Logs are highly preferred over pg_stat_statements, as pg_stat_statements often doesn’t store enough information to optimize queries.
+
 ### Collection Options
 
 To prevent one-off queries from being indexed, specify a minimum number of calls before a query is considered for indexing

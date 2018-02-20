@@ -12,6 +12,7 @@ module Dexter
       @min_time = options[:min_time] || 0
       @min_calls = options[:min_calls] || 0
       @analyze = options[:analyze]
+      @min_savings_pct = options[:min_savings_pct].to_i
       @options = options
 
       create_extension unless extension_exists?
@@ -265,14 +266,16 @@ module Dexter
         end
       end
 
+      savings_ratio = (1 - @min_savings_pct / 100.0)
+
       queries.each do |query|
         if query.explainable? && query.high_cost?
           new_cost, new_cost2 = query.costs[1..2]
 
-          cost_savings = new_cost < query.initial_cost * 0.5
+          cost_savings = new_cost < query.initial_cost * savings_ratio
 
           # set high bar for multicolumn indexes
-          cost_savings2 = new_cost > 100 && new_cost2 < new_cost * 0.5
+          cost_savings2 = new_cost > 100 && new_cost2 < new_cost * savings_ratio
 
           key = cost_savings2 ? 2 : 1
           query_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[key], index_set)
@@ -317,9 +320,9 @@ module Dexter
             # TODO DRY
             use_winning =
               if cost_savings2
-                new_cost > 100 && winning_cost < new_cost * 0.5
+                new_cost > 100 && winning_cost < new_cost * savings_ratio
               else
-                winning_cost < query.initial_cost * 0.5
+                winning_cost < query.initial_cost * savings_ratio
               end
 
             if use_winning
@@ -417,7 +420,7 @@ module Dexter
             end
             log "Final: #{query.new_cost} : #{log_indexes(query.suggest_index ? query_indexes : [])}"
             if query_indexes.size == 1 && !query.suggest_index
-              log "Need 50% cost savings to suggest index"
+              log "Need #{@min_savings_pct}% cost savings to suggest index"
             end
           else
             log "Could not run explain"

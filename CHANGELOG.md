@@ -1,3 +1,8 @@
+## 0.3.3 [unreleased]
+
+- Better handle case when multiple indexes are found for a query
+- Added `--min-savings-pct` option
+
 ## 0.3.2
 
 - Fixed parsing issue with named prepared statements

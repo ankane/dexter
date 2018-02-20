@@ -296,6 +296,7 @@ module Dexter
           # there may be a better single index that we're not considering
           # that didn't get picked up by pass1 or pass2
           # TODO clean this up
+          # TODO suggest more than one index from this if savings are there
           if suggest_index && query_indexes.size > 1
             winning_index = nil
             winning_cost = nil

@@ -1,7 +1,7 @@
 ## 0.3.3 [unreleased]
 
 - Better handle case when multiple indexes are found for a query
-- Added `--min-savings-pct` option
+- Added `--min-cost-savings-pct` option
 
 ## 0.3.2
 

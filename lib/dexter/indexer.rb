@@ -12,7 +12,7 @@ module Dexter
       @min_time = options[:min_time] || 0
       @min_calls = options[:min_calls] || 0
       @analyze = options[:analyze]
-      @min_savings_pct = options[:min_savings_pct].to_i
+      @min_cost_savings_pct = options[:min_cost_savings_pct].to_i
       @options = options
 
       create_extension unless extension_exists?
@@ -266,7 +266,7 @@ module Dexter
         end
       end
 
-      savings_ratio = (1 - @min_savings_pct / 100.0)
+      savings_ratio = (1 - @min_cost_savings_pct / 100.0)
 
       queries.each do |query|
         if query.explainable? && query.high_cost?
@@ -420,7 +420,7 @@ module Dexter
             end
             log "Final: #{query.new_cost} : #{log_indexes(query.suggest_index ? query_indexes : [])}"
             if query_indexes.size == 1 && !query.suggest_index
-              log "Need #{@min_savings_pct}% cost savings to suggest index"
+              log "Need #{@min_cost_savings_pct}% cost savings to suggest index"
             end
           else
             log "Could not run explain"

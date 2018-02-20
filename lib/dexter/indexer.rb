@@ -283,10 +283,54 @@ module Dexter
             cost_savings2 = false
           end
 
-          # TODO if multiple indexes are found (for either single or multicolumn)
+          suggest_index = cost_savings || cost_savings2
+
+          cost_savings3 = false
+          new_cost3 = nil
+
+          # if multiple indexes are found (for either single or multicolumn)
           # determine the impact of each individually
-          # for now, be conservative and don't suggest if more than one index
-          suggest_index = (cost_savings || cost_savings2) && query_indexes.size == 1
+          # there may be a better single index that we're not considering
+          # that didn't get picked up by pass1 or pass2
+          # TODO clean this up
+          if suggest_index && query_indexes.size > 1
+            winning_index = nil
+            winning_cost = nil
+            winning_plan = nil
+
+            query_indexes.each do |query_index|
+              reset_hypothetical_indexes
+              create_hypothetical_index(query_index[:table], query_index[:columns].map { |v| {column: v} })
+              plan3 = plan(query.statement)
+              cost3 = plan3["Total Cost"]
+
+              if !winning_cost || cost3 < winning_cost
+                winning_cost = cost3
+                winning_index = query_index
+                winning_plan = plan3
+              end
+            end
+
+            query.plans << winning_plan
+
+            # duplicated from above
+            # TODO DRY
+            use_winning =
+              if cost_savings2
+                new_cost > 100 && winning_cost < new_cost * 0.5
+              else
+                winning_cost < query.initial_cost * 0.5
+              end
+
+            if use_winning
+              query_indexes = [winning_index]
+              cost_savings3 = true
+              new_cost3 = winning_cost
+              query.pass3_indexes = query_indexes
+            else
+              suggest_index = false
+            end
+          end
 
           if suggest_index
             query_indexes.each do |index|
@@ -299,7 +343,7 @@ module Dexter
           query.suggest_index = suggest_index
           query.new_cost =
             if suggest_index
-              cost_savings2 ? new_cost2 : new_cost
+              cost_savings3 ? new_cost3 : (cost_savings2 ? new_cost2 : new_cost)
             else
               query.initial_cost
             end
@@ -368,6 +412,9 @@ module Dexter
             log "Start: #{query.costs[0]}"
             log "Pass1: #{query.costs[1]} : #{log_indexes(query.pass1_indexes || [])}"
             log "Pass2: #{query.costs[2]} : #{log_indexes(query.pass2_indexes || [])}"
+            if query.costs[3]
+              log "Pass3: #{query.costs[3]} : #{log_indexes(query.pass3_indexes || [])}"
+            end
             log "Final: #{query.new_cost} : #{log_indexes(query.suggest_index ? query_indexes : [])}"
             if query_indexes.size == 1 && !query.suggest_index
               log "Need 50% cost savings to suggest index"
@@ -449,9 +496,13 @@ module Dexter
       columns_by_table.each do |table, cols|
         # no reason to use btree index for json columns
         cols.reject { |c| ["json", "jsonb"].include?(c[:type]) }.permutation(n) do |col_set|
-          candidates[col_set] = execute("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{col_set.map { |c| quote_ident(c[:column])  }.join(", ")})')").first["indexname"]
+          candidates[col_set] = create_hypothetical_index(table, col_set)
         end
       end
+    end
+
+    def create_hypothetical_index(table, col_set)
+      execute("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{col_set.map { |c| quote_ident(c[:column])  }.join(", ")})')").first["indexname"]
     end
 
     def database_tables

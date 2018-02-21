@@ -541,13 +541,21 @@ module Dexter
     end
 
     def materialized_views
-      result = execute <<-SQL
-        SELECT
-          schemaname || '.' || matviewname AS table_name
-        FROM
-          pg_matviews
-      SQL
-      result.map { |r| r["table_name"] }
+      if server_version_num >= 90300
+        result = execute <<-SQL
+          SELECT
+            schemaname || '.' || matviewname AS table_name
+          FROM
+            pg_matviews
+        SQL
+        result.map { |r| r["table_name"] }
+      else
+        []
+      end
+    end
+
+    def server_version_num
+      execute("SHOW server_version_num").first["server_version_num"].to_i
     end
 
     def database_view_tables

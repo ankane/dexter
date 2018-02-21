@@ -6,7 +6,6 @@ addons:
   postgresql: "9.6"
 before_script:
   - sudo apt-get install postgresql-server-dev-9.6
-  - cd /tmp
   - git clone https://github.com/dalibo/hypopg.git
   - cd hypopg
   - make

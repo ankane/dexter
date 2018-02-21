@@ -22,8 +22,7 @@ class DexterTest < Minitest::Test
   end
 
   def test_view
-    # can't do views yet
-    assert_no_index "SELECT * FROM posts_view WHERE id = 1"
+    assert_index "SELECT * FROM posts_view WHERE view_id = 1", "public.posts (id)"
   end
 
   def test_materialized_view

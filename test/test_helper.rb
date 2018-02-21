@@ -18,7 +18,7 @@ CREATE TABLE posts (
   hstore hstore
 );
 INSERT INTO posts (SELECT n AS id, n % 1000 AS blog_id, n % 10 AS user_id FROM generate_series(1, 100000) n);
-CREATE VIEW posts_view AS SELECT * FROM posts;
+CREATE VIEW posts_view AS SELECT id AS view_id FROM posts;
 CREATE MATERIALIZED VIEW posts_materialized AS SELECT * FROM posts;
 ANALYZE posts;
 

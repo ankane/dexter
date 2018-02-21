@@ -2,7 +2,7 @@ module Dexter
   class Query
     attr_reader :statement, :fingerprint, :plans
     attr_writer :tables
-    attr_accessor :missing_tables, :new_cost, :total_time, :calls, :indexes, :suggest_index, :pass1_indexes, :pass2_indexes, :pass3_indexes, :candidate_tables
+    attr_accessor :missing_tables, :new_cost, :total_time, :calls, :indexes, :suggest_index, :pass1_indexes, :pass2_indexes, :pass3_indexes, :candidate_tables, :tables_from_views
 
     def initialize(statement, fingerprint = nil)
       @statement = statement
@@ -11,6 +11,7 @@ module Dexter
       end
       @fingerprint = fingerprint
       @plans = []
+      @tables_from_views = []
     end
 
     def tables

@@ -1,6 +1,6 @@
 ## 0.3.3 [unreleased]
 
-- Added support for materialized views
+- Added support for views and materialized views
 - Better handle case when multiple indexes are found for a query
 - Added `--min-cost-savings-pct` option
 

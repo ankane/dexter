@@ -38,10 +38,27 @@ module Dexter
         no_schema_tables[group] = t2.sort_by { |t| [search_path_index[t.split(".")[0]] || 1000000, t] }[0]
       end
 
+      # add tables from views
+      view_tables = database_view_tables
+      view_tables.each do |v, vt|
+        view_tables[v] = vt.map { |t| no_schema_tables[t] || t }
+      end
+
+      # fully resolve tables
+      # make sure no views in result
+      view_tables.each do |v, vt|
+        view_tables[v] = vt.flat_map { |t| view_tables[t] || [t] }.uniq
+      end
+
       # filter queries from other databases and system tables
       queries.each do |query|
         # add schema to table if needed
         query.tables = query.tables.map { |t| no_schema_tables[t] || t }
+
+        # substitute view tables
+        new_tables = query.tables.flat_map { |t| view_tables[t] || [t] }.uniq
+        query.tables_from_views = new_tables - query.tables
+        query.tables = new_tables
 
         # check for missing tables
         query.missing_tables = !query.tables.all? { |t| tables.include?(t) }
@@ -167,6 +184,7 @@ module Dexter
 
       # filter tables for performance
       tables = Set.new(explainable_queries.flat_map(&:tables))
+      tables_from_views = Set.new(explainable_queries.flat_map(&:tables_from_views))
 
       if tables.any?
         # since every set of multi-column indexes are expensive
@@ -183,7 +201,8 @@ module Dexter
         end
 
         # create hypothetical indexes
-        columns_by_table = columns(tables).select { |c| possible_columns.include?(c[:column]) }.group_by { |c| c[:table] }
+        # use all columns in tables from views
+        columns_by_table = columns(tables).select { |c| possible_columns.include?(c[:column]) || tables_from_views.include?(c[:table]) }.group_by { |c| c[:table] }
 
         # create single column indexes
         create_hypothetical_indexes_helper(columns_by_table, 1, candidates)
@@ -529,6 +548,25 @@ module Dexter
           pg_matviews
       SQL
       result.map { |r| r["table_name"] }
+    end
+
+    def database_view_tables
+      result = execute <<-SQL
+        SELECT
+          schemaname || '.' || viewname AS table_name,
+          definition
+        FROM
+          pg_views
+        WHERE
+          schemaname NOT IN ('information_schema', 'pg_catalog')
+      SQL
+
+      view_tables = {}
+      result.each do |row|
+        view_tables[row["table_name"]] = PgQuery.parse(row["definition"]).tables
+      end
+
+      view_tables
     end
 
     def stat_statements

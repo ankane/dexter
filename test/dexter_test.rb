@@ -26,6 +26,10 @@ class DexterTest < Minitest::Test
     assert_no_index "SELECT * FROM posts_view WHERE id = 1"
   end
 
+  def test_materialized_view
+    assert_index "SELECT * FROM posts_materialized WHERE id = 1", "public.posts_materialized (id)"
+  end
+
   def test_order
     assert_index "SELECT * FROM posts ORDER BY user_id DESC LIMIT 10", "public.posts (user_id)"
   end

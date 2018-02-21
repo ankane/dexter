@@ -6,9 +6,9 @@ addons:
   postgresql: "9.6"
 before_script:
   - sudo apt-get install postgresql-server-dev-9.6
-  - wget https://github.com/dalibo/hypopg/archive/1.0.0.tar.gz
-  - tar xf 1.0.0.tar.gz
-  - cd hypopg-1.0.0
+  - cd /tmp
+  - git clone https://github.com/dalibo/hypopg.git
+  - cd hypopg
   - make
   - sudo make install
   - psql -c 'create database dexter_test;' -U postgres

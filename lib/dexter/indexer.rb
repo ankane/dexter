@@ -29,7 +29,7 @@ module Dexter
       # reset hypothetical indexes
       reset_hypothetical_indexes
 
-      tables = Set.new(database_tables)
+      tables = Set.new(database_tables + materialized_views)
 
       # map tables without schema to schema
       no_schema_tables = {}
@@ -521,6 +521,16 @@ module Dexter
       result.map { |r| r["table_name"] }
     end
 
+    def materialized_views
+      result = execute <<-SQL
+        SELECT
+          schemaname || '.' || matviewname AS table_name
+        FROM
+          pg_matviews
+      SQL
+      result.map { |r| r["table_name"] }
+    end
+
     def stat_statements
       result = execute <<-SQL
         SELECT
@@ -570,13 +580,15 @@ module Dexter
     def columns(tables)
       columns = execute <<-SQL
         SELECT
-          table_schema || '.' || table_name AS table_name,
-          column_name,
-          data_type
-        FROM
-          information_schema.columns
-        WHERE
-          table_schema || '.' || table_name IN (#{tables.map { |t| quote(t) }.join(", ")})
+          s.nspname || '.' || t.relname AS table_name,
+          a.attname AS column_name,
+          pg_catalog.format_type(a.atttypid, a.atttypmod) AS data_type
+        FROM pg_attribute a
+          JOIN pg_class t on a.attrelid = t.oid
+          JOIN pg_namespace s on t.relnamespace = s.oid
+        WHERE a.attnum > 0
+          AND NOT a.attisdropped
+          AND s.nspname || '.' || t.relname IN (#{tables.map { |t| quote(t) }.join(", ")})
         ORDER BY
           1, 2
       SQL

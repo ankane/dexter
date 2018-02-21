@@ -8,8 +8,7 @@ conn = PG::Connection.open(dbname: "dexter_test")
 conn.exec <<-SQL
 SET client_min_messages = warning;
 CREATE EXTENSION IF NOT EXISTS hstore;
-DROP VIEW IF EXISTS posts_view;
-DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS posts CASCADE;
 CREATE TABLE posts (
   id int,
   blog_id int,
@@ -20,6 +19,7 @@ CREATE TABLE posts (
 );
 INSERT INTO posts (SELECT n AS id, n % 1000 AS blog_id, n % 10 AS user_id FROM generate_series(1, 100000) n);
 CREATE VIEW posts_view AS SELECT * FROM posts;
+CREATE MATERIALIZED VIEW posts_materialized AS SELECT * FROM posts;
 ANALYZE posts;
 
 DROP SCHEMA IF EXISTS "Bar" CASCADE;

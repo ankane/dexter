@@ -1,4 +1,4 @@
-## 0.3.3 [unreleased]
+## 0.3.3
 
 - Added support for views and materialized views
 - Better handle case when multiple indexes are found for a query

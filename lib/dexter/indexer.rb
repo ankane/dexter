@@ -479,6 +479,9 @@ module Dexter
 
     def conn
       @conn ||= begin
+        # set connect timeout if none set
+        ENV["PGCONNECT_TIMEOUT"] ||= "2"
+
         if @options[:dbname] =~ /\Apostgres(ql)?:\/\//
           config = @options[:dbname]
         else

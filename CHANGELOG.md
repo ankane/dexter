@@ -1,3 +1,7 @@
+## 0.3.4 [unreleased]
+
+- Fixed `JSON::NestingError`
+
 ## 0.3.3
 
 - Added support for views and materialized views

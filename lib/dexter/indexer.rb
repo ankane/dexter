@@ -166,7 +166,7 @@ module Dexter
             # Pass format to prevent ANALYZE
             puts execute("EXPLAIN (FORMAT TEXT) #{safe_statement(query.statement)}").map { |r| r["QUERY PLAN"] }.join("\n")
           end
-        rescue PG::Error => e
+        rescue PG::Error, JSON::NestingError => e
           if @log_explain
             log e.message
           end
@@ -514,7 +514,7 @@ module Dexter
 
     def plan(query)
       # strip semi-colons as another measure of defense
-      JSON.parse(execute("EXPLAIN (FORMAT JSON) #{safe_statement(query)}").first["QUERY PLAN"]).first["Plan"]
+      JSON.parse(execute("EXPLAIN (FORMAT JSON) #{safe_statement(query)}").first["QUERY PLAN"], max_nesting: 1000).first["Plan"]
     end
 
     # TODO for multicolumn indexes, use ordering

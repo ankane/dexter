@@ -104,6 +104,12 @@ or pass files:
 dexter <connection-options> <file1> <file2>
 ```
 
+or collect running queries with: [master]
+
+```sh
+dexter <connection-options> --pg-stat-activity
+```
+
 or use the [pg_stat_statements](https://www.postgresql.org/docs/current/static/pgstatstatements.html) extension:
 
 ```sh

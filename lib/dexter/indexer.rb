@@ -25,6 +25,23 @@ module Dexter
       process_queries(queries)
     end
 
+    def stat_activity
+      execute <<-SQL
+        SELECT
+          pid || ':' || COALESCE(query_start, xact_start) AS id,
+          query,
+          EXTRACT(EPOCH FROM NOW() - COALESCE(query_start, xact_start)) * 1000.0 AS duration_ms
+        FROM
+          pg_stat_activity
+        WHERE
+          datname = current_database()
+          AND state = 'active'
+          AND pid != pg_backend_pid()
+        ORDER BY
+          1
+      SQL
+    end
+
     def process_queries(queries)
       # reset hypothetical indexes
       reset_hypothetical_indexes

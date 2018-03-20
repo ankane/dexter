@@ -18,6 +18,8 @@ module Dexter
       elsif options[:pg_stat_statements]
         # TODO support streaming option
         Indexer.new(options).process_stat_statements
+      elsif options[:pg_stat_activity]
+        Processor.new(:pg_stat_activity, options).perform
       elsif arguments.any?
         ARGV.replace(arguments)
         Processor.new(ARGF, options).perform
@@ -44,6 +46,7 @@ Options:)
         o.float "--min-calls", "only process queries that have been called a certain number of times", default: 0
         o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
         o.integer "--min-cost-savings-pct", default: 50, help: false
+        o.boolean "--pg-stat-activity", "use pg_stat_activity", default: false, help: false
         o.boolean "--pg-stat-statements", "use pg_stat_statements", default: false, help: false
         o.string "-s", "--statement", "process a single statement"
         # separator must go here to show up correctly - slop bug?

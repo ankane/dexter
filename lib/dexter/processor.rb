@@ -6,14 +6,16 @@ module Dexter
       @logfile = logfile
 
       @collector = Collector.new(min_time: options[:min_time], min_calls: options[:min_calls])
+      @indexer = Indexer.new(options)
+
       @log_parser =
-        if options[:input_format] == "csv"
+        if @logfile == :pg_stat_activity
+          PgStatActivityParser.new(@indexer, @collector)
+        elsif options[:input_format] == "csv"
           CsvLogParser.new(logfile, @collector)
         else
           LogParser.new(logfile, @collector)
         end
-
-      @indexer = Indexer.new(options)
 
       @starting_interval = 3
       @interval = options[:interval]
@@ -25,7 +27,7 @@ module Dexter
     end
 
     def perform
-      if @logfile == STDIN
+      if [STDIN, :pg_stat_activity].include?(@logfile)
         Thread.abort_on_exception = true
         Thread.new do
           sleep(@starting_interval)

@@ -1,6 +1,7 @@
 ## 0.3.4 [unreleased]
 
 - Fixed `JSON::NestingError`
+- Added `--pg-stat-activity` option
 
 ## 0.3.3
 

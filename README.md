@@ -116,7 +116,7 @@ or use the [pg_stat_statements](https://www.postgresql.org/docs/current/static/p
 dexter <connection-options> --pg-stat-statements
 ```
 
-> Note: Logs are highly preferred over pg_stat_statements, as pg_stat_statements often doesn’t store enough information to optimize queries.
+> Note: Logs or running queries are highly preferred over pg_stat_statements, as pg_stat_statements often doesn’t store enough information to optimize queries.
 
 ### Collection Options
 

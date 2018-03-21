@@ -1,5 +1,6 @@
 ## 0.3.4 [unreleased]
 
+- Fixed `--username` option
 - Fixed `JSON::NestingError`
 - Added `--pg-stat-activity` option
 

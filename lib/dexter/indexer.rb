@@ -506,7 +506,7 @@ module Dexter
             host: @options[:host],
             port: @options[:port],
             dbname: @options[:dbname],
-            user: @options[:user]
+            user: @options[:username]
           }.reject { |_, value| value.to_s.empty? }
           config = config[:dbname] if config.keys == [:dbname] && config[:dbname].include?("=")
         end

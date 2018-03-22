@@ -32,6 +32,7 @@ sudo apt-get install dexter
 ### Debian 9 (Stretch)
 
 ```sh
+sudo apt-get -y install apt-transport-https
 wget -qO- https://dl.packager.io/srv/pghero/dexter/key | sudo apt-key add -
 sudo wget -O /etc/apt/sources.list.d/dexter.list \
   https://dl.packager.io/srv/pghero/dexter/master/installer/debian/9.repo
@@ -42,6 +43,7 @@ sudo apt-get install dexter
 ### Debian 8 (Jesse)
 
 ```sh
+sudo apt-get -y install apt-transport-https
 wget -qO- https://dl.packager.io/srv/pghero/dexter/key | sudo apt-key add -
 sudo wget -O /etc/apt/sources.list.d/dexter.list \
   https://dl.packager.io/srv/pghero/dexter/master/installer/debian/8.repo

@@ -8,7 +8,7 @@ before_script:
   - sudo apt-get install postgresql-server-dev-9.6
   - git clone https://github.com/HypoPG/hypopg.git
   - cd hypopg
-  - git checkout 0a6d64a8e784fff96e80c22ddd35fa4ece4af4b2
+  - git checkout 1.1.1
   - make
   - sudo make install
   - psql -c 'create database dexter_test;' -U postgres

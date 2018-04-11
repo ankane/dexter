@@ -104,7 +104,7 @@ or pass files:
 dexter <connection-options> <file1> <file2>
 ```
 
-or collect running queries with: [master]
+or collect running queries with:
 
 ```sh
 dexter <connection-options> --pg-stat-activity

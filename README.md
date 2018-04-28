@@ -240,5 +240,6 @@ rake install
 To run tests, use:
 
 ```sh
+createdb dexter_test
 rake test
 ```

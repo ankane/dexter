@@ -14,6 +14,7 @@ module Dexter
       @analyze = options[:analyze]
       @min_cost_savings_pct = options[:min_cost_savings_pct].to_i
       @options = options
+      @mutex = Mutex.new
 
       create_extension unless extension_exists?
       execute("SET lock_timeout = '5s'")
@@ -526,7 +527,10 @@ module Dexter
       # https://www.postgresql.org/docs/current/static/libpq-exec.html
       query = squish(query)
       log "SQL: #{query}" if @log_sql
-      conn.exec_params(query, []).to_a
+
+      @mutex.synchronize do
+        conn.exec_params(query, []).to_a
+      end
     end
 
     def plan(query)

@@ -363,11 +363,12 @@ module Dexter
                 winning_cost < query.initial_cost * savings_ratio
               end
 
+            query_indexes = [winning_index]
+            new_cost3 = winning_cost
+            query.pass3_indexes = query_indexes
+
             if use_winning
-              query_indexes = [winning_index]
               cost_savings3 = true
-              new_cost3 = winning_cost
-              query.pass3_indexes = query_indexes
             else
               suggest_index = false
             end
@@ -457,7 +458,7 @@ module Dexter
               log "Pass3: #{query.costs[3]} : #{log_indexes(query.pass3_indexes || [])}"
             end
             log "Final: #{query.new_cost} : #{log_indexes(query.suggest_index ? query_indexes : [])}"
-            if query_indexes.size == 1 && !query.suggest_index
+            if query_indexes.size >= 1 && !query.suggest_index
               log "Need #{@min_cost_savings_pct}% cost savings to suggest index"
             end
           else

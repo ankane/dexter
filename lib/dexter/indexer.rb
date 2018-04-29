@@ -458,7 +458,7 @@ module Dexter
               log "Pass3: #{query.costs[3]} : #{log_indexes(query.pass3_indexes || [])}"
             end
             log "Final: #{query.new_cost} : #{log_indexes(query.suggest_index ? query_indexes : [])}"
-            if query_indexes.size >= 1 && !query.suggest_index
+            if (query.pass1_indexes.any? || query.pass2_indexes.any?) && !query.suggest_index
               log "Need #{@min_cost_savings_pct}% cost savings to suggest index"
             end
           else

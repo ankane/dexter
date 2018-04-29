@@ -18,7 +18,7 @@ module Dexter
 
         queries = new_queries
 
-        sleep(5)
+        sleep(1)
       end
     end
   end

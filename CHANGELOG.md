@@ -2,6 +2,7 @@
 
 - Added `--file` option
 - Fixed error for queries with double dash comments
+- Fixed connection threading issue with `--pg-stat-activity` option
 
 ## 0.3.4
 

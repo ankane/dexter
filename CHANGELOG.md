@@ -1,3 +1,8 @@
+## 0.3.5 [unreleased]
+
+- Added `--file` option
+- Fixed error for queries with double dash comments
+
 ## 0.3.4
 
 - Fixed `--username` option

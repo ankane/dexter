@@ -12,8 +12,17 @@ module Dexter
       STDOUT.sync = true
       STDERR.sync = true
 
-      if options[:statement]
-        query = Query.new(options[:statement])
+      statement = options[:statement]
+      if options[:file]
+        begin
+          statement = File.read(options[:file])
+        rescue Errno::ENOENT
+          abort "File not found: #{options[:file]}"
+        end
+      end
+
+      if statement
+        query = Query.new(statement)
         Indexer.new(options).process_queries([query])
       elsif options[:pg_stat_statements]
         # TODO support streaming option
@@ -37,6 +46,7 @@ Options:)
         o.boolean "--analyze", "analyze tables that haven't been analyzed in the past hour", default: false
         o.boolean "--create", "create indexes", default: false
         o.array "--exclude", "prevent specific tables from being indexed"
+        o.string "-f", "--file", "process a single statement from a file"
         o.string "--include", "only include specific tables"
         o.string "--input-format", "input format", default: "stderr"
         o.integer "--interval", "time to wait between processing queries, in seconds", default: 60

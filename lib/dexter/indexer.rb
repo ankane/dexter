@@ -182,7 +182,7 @@ module Dexter
           query.plans << plan(query.statement)
           if @log_explain
             # Pass format to prevent ANALYZE
-            puts execute("EXPLAIN (FORMAT TEXT) #{safe_statement(query.statement)}").map { |r| r["QUERY PLAN"] }.join("\n")
+            puts execute("EXPLAIN (FORMAT TEXT) #{safe_statement(query.statement)}", pretty: false).map { |r| r["QUERY PLAN"] }.join("\n")
           end
         rescue PG::Error, JSON::NestingError => e
           if @log_explain
@@ -518,7 +518,7 @@ module Dexter
       abort e.message
     end
 
-    def execute(query)
+    def execute(query, pretty: true)
       # use exec_params instead of exec for security
       #
       # Unlike PQexec, PQexecParams allows at most one SQL command in the given string.
@@ -526,7 +526,7 @@ module Dexter
       # This is a limitation of the underlying protocol, but has some usefulness
       # as an extra defense against SQL-injection attacks.
       # https://www.postgresql.org/docs/current/static/libpq-exec.html
-      query = squish(query)
+      query = squish(query) if pretty
       log "SQL: #{query}" if @log_sql
 
       @mutex.synchronize do
@@ -536,7 +536,7 @@ module Dexter
 
     def plan(query)
       # strip semi-colons as another measure of defense
-      JSON.parse(execute("EXPLAIN (FORMAT JSON) #{safe_statement(query)}").first["QUERY PLAN"], max_nesting: 1000).first["Plan"]
+      JSON.parse(execute("EXPLAIN (FORMAT JSON) #{safe_statement(query)}", pretty: false).first["QUERY PLAN"], max_nesting: 1000).first["Plan"]
     end
 
     # TODO for multicolumn indexes, use ordering

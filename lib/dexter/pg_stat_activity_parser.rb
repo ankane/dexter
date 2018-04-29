@@ -1,16 +1,11 @@
 module Dexter
   class PgStatActivityParser < LogParser
-    def initialize(logfile, collector, mutex)
-      super(logfile, collector)
-      @mutex = mutex
-    end
-
     def perform
       queries = {}
 
       loop do
         new_queries = {}
-        @mutex.synchronize { @logfile.stat_activity }.each do |row|
+        @logfile.stat_activity.each do |row|
           new_queries[row["id"]] = row
         end
 
@@ -23,7 +18,7 @@ module Dexter
 
         queries = new_queries
 
-        sleep(1)
+        sleep(5)
       end
     end
   end

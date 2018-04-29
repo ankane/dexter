@@ -8,10 +8,9 @@ module Dexter
       @collector = Collector.new(min_time: options[:min_time], min_calls: options[:min_calls])
       @indexer = Indexer.new(options)
 
-      @mutex = Mutex.new
       @log_parser =
         if @logfile == :pg_stat_activity
-          PgStatActivityParser.new(@indexer, @collector, @mutex)
+          PgStatActivityParser.new(@indexer, @collector)
         elsif options[:input_format] == "csv"
           CsvLogParser.new(logfile, @collector)
         else
@@ -21,6 +20,7 @@ module Dexter
       @starting_interval = 3
       @interval = options[:interval]
 
+      @mutex = Mutex.new
       @last_checked_at = {}
 
       log "Started"

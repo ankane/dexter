@@ -1,4 +1,4 @@
-## 0.3.5 [unreleased]
+## 0.3.5
 
 - Added `sql` input format
 - Fixed error for queries with double dash comments

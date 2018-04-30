@@ -1,5 +1,5 @@
 module Dexter
-  class SqlParser < LogParser
+  class SqlLogParser < LogParser
     def perform
       # TODO support streaming
       @logfile.read.split(";").each do |statement|

@@ -14,7 +14,7 @@ module Dexter
         elsif options[:input_format] == "csv"
           CsvLogParser.new(logfile, @collector)
         elsif options[:input_format] == "sql"
-          SqlParser.new(logfile, @collector)
+          SqlLogParser.new(logfile, @collector)
         else
           LogParser.new(logfile, @collector)
         end

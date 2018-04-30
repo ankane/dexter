@@ -1,6 +1,6 @@
 ## 0.3.5 [unreleased]
 
-- Added `--file` option
+- Added `sql` input format
 - Fixed error for queries with double dash comments
 - Fixed connection threading issue with `--pg-stat-activity` option
 

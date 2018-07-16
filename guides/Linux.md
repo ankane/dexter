@@ -2,12 +2,23 @@
 
 Distributions
 
+- [Ubuntu 18.04 (Bionic)](#ubuntu-1804-bionic)
 - [Ubuntu 16.04 (Xenial)](#ubuntu-1604-xenial)
 - [Ubuntu 14.04 (Trusty)](#ubuntu-1404-trusty)
 - [Debian 9 (Stretch)](#debian-9-stretch)
 - [Debian 8 (Jesse)](#debian-8-jesse)
 - [CentOS / RHEL 7](#centos--rhel-7)
 - [SUSE Linux Enterprise Server 12](#suse-linux-enterprise-server-12)
+
+### Ubuntu 18.04 (Bionic)
+
+```sh
+wget -qO- https://dl.packager.io/srv/pghero/dexter/key | sudo apt-key add -
+sudo wget -O /etc/apt/sources.list.d/dexter.list \
+  https://dl.packager.io/srv/pghero/dexter/master/installer/ubuntu/18.04.repo
+sudo apt-get update
+sudo apt-get -y install dexter
+```
 
 ### Ubuntu 16.04 (Xenial)
 

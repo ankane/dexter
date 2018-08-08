@@ -5,6 +5,6 @@ begin
   Dexter::Client.new(ARGV).perform
 rescue Dexter::Abort => e
   abort e.message
-rescue Interrupt => e
+rescue Interrupt
   # do nothing
 end

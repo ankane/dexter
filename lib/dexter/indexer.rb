@@ -107,13 +107,13 @@ module Dexter
       analyze_tables(tables) if tables.any? && (@analyze || @log_level == "debug2")
 
       # create hypothetical indexes and explain queries
-      candidates = tables.any? ? create_hypothetical_indexes(queries.select(&:candidate_tables), tables) : {}
+      candidates = tables.any? ? create_hypothetical_indexes(queries.select(&:candidate_tables)) : {}
 
       # see if new indexes were used and meet bar
       new_indexes = determine_indexes(queries, candidates, tables)
 
       # display and create new indexes
-      show_and_create_indexes(new_indexes, queries, tables)
+      show_and_create_indexes(new_indexes, queries)
     end
 
     private
@@ -193,7 +193,7 @@ module Dexter
       end
     end
 
-    def create_hypothetical_indexes(queries, tables)
+    def create_hypothetical_indexes(queries)
       candidates = {}
 
       # get initial costs for queries
@@ -417,7 +417,7 @@ module Dexter
       end
     end
 
-    def show_and_create_indexes(new_indexes, queries, tables)
+    def show_and_create_indexes(new_indexes, queries)
       # print summary
       if new_indexes.any?
         new_indexes.each do |index|

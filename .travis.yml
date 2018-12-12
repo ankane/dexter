@@ -1,11 +1,16 @@
+dist: xenial
 language: ruby
-rvm: 2.4.1
-cache: bundler
-script: bundle exec rake test
+rvm: 2.5.3
+gemfile:
+  - Gemfile
+services:
+  - postgresql
 addons:
-  postgresql: "9.6"
-before_script:
-  - sudo apt-get install postgresql-server-dev-9.6
+  apt:
+    packages:
+      - postgresql-server-dev-9.6
+script: bundle exec rake test
+before_install:
   - git clone https://github.com/HypoPG/hypopg.git
   - cd hypopg
   - git checkout 1.1.2

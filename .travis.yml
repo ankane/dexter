@@ -1,6 +1,6 @@
 dist: xenial
 language: ruby
-rvm: 2.5.3
+rvm: 2.6.3
 gemfile:
   - Gemfile
 services:
@@ -16,7 +16,7 @@ before_install:
   - git checkout 1.1.2
   - make
   - sudo make install
-  - psql -c 'create database dexter_test;' -U postgres
+  - createdb dexter_test
 notifications:
   email:
     on_success: never

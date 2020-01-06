@@ -233,13 +233,13 @@ To get started, run:
 ```sh
 git clone https://github.com/ankane/dexter.git
 cd dexter
-bundle
-rake install
+bundle install
+bundle exec rake install
 ```
 
 To run tests, use:
 
 ```sh
 createdb dexter_test
-rake test
+bundle exec rake test
 ```

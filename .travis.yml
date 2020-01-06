@@ -7,9 +7,9 @@ services:
   - postgresql
 addons:
   postgresql: 10
-apt:
-  packages:
-    - postgresql-server-dev-10
+  apt:
+    packages:
+      - postgresql-server-dev-10
 script: bundle exec rake test
 before_install:
   - git clone https://github.com/HypoPG/hypopg.git

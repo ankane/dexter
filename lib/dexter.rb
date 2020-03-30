@@ -5,7 +5,6 @@ require "slop"
 
 # stdlib
 require "set"
-require "thread"
 require "time"
 
 # modules

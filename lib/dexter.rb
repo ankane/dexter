@@ -1,10 +1,15 @@
-require "dexter/version"
-require "slop"
+# dependencies
 require "pg"
 require "pg_query"
-require "time"
+require "slop"
+
+# stdlib
 require "set"
 require "thread"
+require "time"
+
+# modules
+require "dexter/version"
 require "dexter/logging"
 require "dexter/client"
 require "dexter/collector"

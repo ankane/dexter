@@ -4,6 +4,12 @@ module Dexter
 
     attr_reader :arguments, :options
 
+    def self.start
+      Dexter::Client.new(ARGV).perform
+    rescue Dexter::Abort => e
+      abort e.message
+    end
+
     def initialize(args)
       @arguments, @options = parse_args(args)
     end

@@ -1,3 +1,7 @@
+## 0.3.6 (2020-03-30)
+
+- Fixed warning with Ruby 2.7
+
 ## 0.3.5 (2018-04-30)
 
 - Added `sql` input format

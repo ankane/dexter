@@ -71,13 +71,11 @@ class DexterTest < Minitest::Test
   end
 
   def test_connection_url_postgres
-    # no host for Travis
-    assert_connection ["postgres://:5432/dexter_test"]
+    assert_connection ["postgres:///dexter_test"]
   end
 
   def test_connection_url_postgresql
-    # no host for Travis
-    assert_connection ["postgresql://:5432/dexter_test"]
+    assert_connection ["postgresql:///dexter_test"]
   end
 
   def test_input_format_stderr

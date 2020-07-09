@@ -4,6 +4,7 @@ jobs:
   include:
     - name: "Postgres 13"
       rvm: 2.7
+      dist: focal
       addons:
         postgresql: "13"
         apt:
@@ -13,18 +14,15 @@ jobs:
           packages:
             - postgresql-13
             - postgresql-server-dev-13
-      env:
-        - PGPORT=5433
     - name: "Postgres 12"
       rvm: 2.7
+      dist: focal
       addons:
         postgresql: "12"
         apt:
           packages:
             - postgresql-12
             - postgresql-server-dev-12
-      env:
-        - PGPORT=5433
     - name: "Postgres 11"
       rvm: 2.6
       addons:

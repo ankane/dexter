@@ -37,9 +37,9 @@ module Dexter
     def parse_args(args)
       opts = Slop.parse(args) do |o|
         o.banner = %(Usage:
-    dexter [options]
-
-Options:)
+    dexter [options])
+        o.separator ""
+        o.separator "Options:"
         o.boolean "--analyze", "analyze tables that haven't been analyzed in the past hour", default: false
         o.boolean "--create", "create indexes", default: false
         o.array "--exclude", "prevent specific tables from being indexed"
@@ -53,11 +53,11 @@ Options:)
         o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
         o.integer "--min-cost-savings-pct", default: 50, help: false
         o.boolean "--pg-stat-activity", "use pg_stat_activity", default: false, help: false
-        o.boolean "--pg-stat-statements", "use pg_stat_statements", default: false, help: false
-        o.string "-s", "--statement", "process a single statement"
         # separator must go here to show up correctly - slop bug?
         o.separator ""
         o.separator "Connection options:"
+        o.boolean "--pg-stat-statements", "use pg_stat_statements", default: false, help: false
+        o.string "-s", "--statement", "process a single statement"
         o.on "-v", "--version", "print the version" do
           log Dexter::VERSION
           exit

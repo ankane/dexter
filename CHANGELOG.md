@@ -1,3 +1,7 @@
+## 0.3.7 (unreleased)
+
+- Fixed help output
+
 ## 0.3.6 (2020-03-30)
 
 - Fixed warning with Ruby 2.7

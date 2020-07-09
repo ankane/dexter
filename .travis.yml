@@ -1,20 +1,58 @@
 dist: bionic
 language: ruby
-rvm: 2.7
-gemfile:
-  - Gemfile
+jobs:
+  include:
+    - name: "Postgres 13"
+      rvm: 2.7
+      addons:
+        postgresql: "13"
+        apt:
+          sources:
+            - sourceline: deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main 13
+              key_url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          packages:
+            - postgresql-13
+            - postgresql-server-dev-13
+      env:
+        - PGPORT=5433
+    - name: "Postgres 12"
+      rvm: 2.7
+      addons:
+        postgresql: "12"
+        apt:
+          packages:
+            - postgresql-12
+            - postgresql-server-dev-12
+      env:
+        - PGPORT=5433
+    - name: "Postgres 11"
+      rvm: 2.6
+      addons:
+        postgresql: "11"
+        apt:
+          packages:
+            - postgresql-server-dev-11
+    - name: "Postgres 10"
+      rvm: 2.5
+      addons:
+        postgresql: "10"
+        apt:
+          packages:
+            - postgresql-server-dev-10
+    - name: "Postgres 9.6"
+      rvm: 2.4
+      addons:
+        postgresql: "9.6"
+        apt:
+          packages:
+            - postgresql-server-dev-9.6
 services:
   - postgresql
-addons:
-  postgresql: 11
-  apt:
-    packages:
-      - postgresql-server-dev-11
 script: bundle exec rake test
 before_install:
   - git clone https://github.com/HypoPG/hypopg.git
   - cd hypopg
-  - git checkout 1.1.3
+  - git checkout 1.1.4
   - make
   - sudo make install
   - createdb dexter_test

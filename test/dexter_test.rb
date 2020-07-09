@@ -71,12 +71,12 @@ class DexterTest < Minitest::Test
   end
 
   def test_connection_url_postgres
-    port = ENV["PGPORT"] || 5432
+    skip if ENV["TRAVIS"]
     assert_connection ["postgres://localhost:#{port}/dexter_test"]
   end
 
   def test_connection_url_postgresql
-    port = ENV["PGPORT"] || 5432
+    skip if ENV["TRAVIS"]
     assert_connection ["postgresql://localhost:#{port}/dexter_test"]
   end
 

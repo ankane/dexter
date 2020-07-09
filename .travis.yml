@@ -38,6 +38,7 @@ jobs:
         postgresql: "10"
         apt:
           packages:
+            - clang-6.0
             - postgresql-server-dev-10
     - name: "Postgres 9.6"
       rvm: 2.4
@@ -45,6 +46,7 @@ jobs:
         postgresql: "9.6"
         apt:
           packages:
+            - clang-6.0
             - postgresql-server-dev-9.6
 services:
   - postgresql

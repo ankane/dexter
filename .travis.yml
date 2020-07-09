@@ -39,7 +39,9 @@ jobs:
         apt:
           packages:
             - clang-6.0
-            - postgresql-server-dev-all
+            - postgresql-server-dev-10
+      env:
+        - PG_CONFIG=/usr/lib/postgresql/10/bin/pg_config
     - name: "Postgres 9.6"
       rvm: 2.4
       addons:
@@ -47,9 +49,9 @@ jobs:
         apt:
           packages:
             - clang-6.0
-            - postgresql-server-dev-all
-services:
-  - postgresql
+            - postgresql-server-dev-9.6
+      env:
+        - PG_CONFIG=/usr/lib/postgresql/9.6/bin/pg_config
 script: bundle exec rake test
 before_install:
   - git clone https://github.com/HypoPG/hypopg.git

@@ -37,16 +37,24 @@ jobs:
       addons:
         postgresql: "10"
         apt:
+          sources:
+            - sourceline: deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main 10
+              key_url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
           packages:
             - clang-6.0
+            - postgresql-10
             - postgresql-server-dev-10
     - name: "Postgres 9.6"
       rvm: 2.4
       addons:
         postgresql: "9.6"
         apt:
+          sources:
+            - sourceline: deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main 9.6
+              key_url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
           packages:
             - clang-6.0
+            - postgresql-9.6
             - postgresql-server-dev-9.6
 services:
   - postgresql

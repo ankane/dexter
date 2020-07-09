@@ -71,11 +71,13 @@ class DexterTest < Minitest::Test
   end
 
   def test_connection_url_postgres
-    assert_connection ["postgres://localhost/dexter_test"]
+    port = ENV["PGPORT"] || 5432
+    assert_connection ["postgres://localhost:#{port}/dexter_test"]
   end
 
   def test_connection_url_postgresql
-    assert_connection ["postgresql://localhost/dexter_test"]
+    port = ENV["PGPORT"] || 5432
+    assert_connection ["postgresql://localhost:#{port}/dexter_test"]
   end
 
   def test_input_format_stderr

@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.2"
 
-  spec.add_dependency "slop", ">= 4.8.1"
+  spec.add_dependency "slop", ">= 4.8.2"
   spec.add_dependency "pg", ">= 0.18.2"
   spec.add_dependency "pg_query"
 

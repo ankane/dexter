@@ -1,3 +1,7 @@
+## 0.3.8 (unreleased)
+
+- Fixed error when unable to parse view definitions
+
 ## 0.3.7 (2020-07-10)
 
 - Fixed help output

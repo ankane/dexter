@@ -596,7 +596,13 @@ module Dexter
 
       view_tables = {}
       result.each do |row|
-        view_tables[row["table_name"]] = PgQuery.parse(row["definition"]).tables
+        begin
+          view_tables[row["table_name"]] = PgQuery.parse(row["definition"]).tables
+        rescue PgQuery::ParseError
+          if @log_level.start_with?("debug")
+            log "ERROR: Cannot parse view definition: #{row["table_name"]}"
+          end
+        end
       end
 
       view_tables

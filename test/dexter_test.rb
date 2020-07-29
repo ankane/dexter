@@ -107,11 +107,15 @@ class DexterTest < Minitest::Test
 
   def assert_dexter_output(output, options)
     dexter = Dexter::Client.new(["dexter_test"] + options + ["--log-level", "debug2"])
-    assert_output(/#{Regexp.escape(output)}/) { dexter.perform }
+    stdout, _ = capture_io { dexter.perform }
+    puts stdout if ENV["VERBOSE"]
+    assert_match output, stdout
   end
 
   def assert_connection(flags)
     dexter = Dexter::Client.new(flags + ["-s", "SELECT 1"])
-    assert_output(/#{Regexp.escape("No new indexes found")}/) { dexter.perform }
+    stdout, _ = capture_io { dexter.perform }
+    puts stdout if ENV["VERBOSE"]
+    assert_match "No new indexes found", stdout
   end
 end

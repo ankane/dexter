@@ -6,7 +6,7 @@ module Dexter
 
     def self.start
       Dexter::Client.new(ARGV).perform
-    rescue Dexter::Abort => e
+    rescue Dexter::Abort, PG::UndefinedFile => e
       abort e.message
     end
 

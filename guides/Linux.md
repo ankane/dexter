@@ -1,6 +1,4 @@
-# Dexter Linux
-
-## Installation
+# Linux Packages
 
 - [Ubuntu](#ubuntu)
 - [Debian](#debian)

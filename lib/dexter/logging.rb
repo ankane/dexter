@@ -15,10 +15,6 @@ module Dexter
       output.puts(message) unless $log_level == "error"
     end
 
-    def abort(message)
-      raise Dexter::Abort, message
-    end
-
     def colorize(message, color)
       if output.tty?
         "\e[#{COLOR_CODES[color]}m#{message}\e[0m"

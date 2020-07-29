@@ -47,7 +47,7 @@ module Dexter
       begin
         @log_parser.perform
       rescue Errno::ENOENT => e
-        abort "ERROR: #{e.message}"
+        raise Dexter::Abort, "ERROR: #{e.message}"
       end
 
       process_queries

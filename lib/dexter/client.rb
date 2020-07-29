@@ -1,5 +1,6 @@
 module Dexter
   class Client
+    extend Logging
     include Logging
 
     attr_reader :arguments, :options
@@ -7,7 +8,7 @@ module Dexter
     def self.start
       Dexter::Client.new(ARGV).perform
     rescue Dexter::Abort, PG::UndefinedFile => e
-      abort e.message
+      abort colorize(e.message.strip, :red)
     end
 
     def initialize(args)
@@ -78,11 +79,11 @@ module Dexter
 
       # TODO don't use global var
       $log_level = options[:log_level].to_s.downcase
-      abort "Unknown log level" unless ["error", "info", "debug", "debug2", "debug3"].include?($log_level)
+      raise Dexter::Abort, "Unknown log level" unless ["error", "info", "debug", "debug2", "debug3"].include?($log_level)
 
       [arguments, options]
     rescue Slop::Error => e
-      abort e.message
+      raise Dexter::Abort, e.message
     end
   end
 end

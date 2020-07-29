@@ -123,9 +123,9 @@ module Dexter
       begin
         execute("CREATE EXTENSION IF NOT EXISTS hypopg")
       rescue PG::UndefinedFile
-        abort "Install HypoPG first: https://github.com/ankane/dexter#installation"
+        raise Dexter::Abort, "Install HypoPG first: https://github.com/ankane/dexter#installation"
       rescue PG::InsufficientPrivilege
-        abort "Use a superuser to run: CREATE EXTENSION hypopg"
+        raise Dexter::Abort, "Use a superuser to run: CREATE EXTENSION hypopg"
       end
     end
 
@@ -515,7 +515,7 @@ module Dexter
         PG::Connection.new(config)
       end
     rescue PG::ConnectionBad => e
-      abort e.message
+      raise Dexter::Abort, e.message
     end
 
     def execute(query, pretty: true)

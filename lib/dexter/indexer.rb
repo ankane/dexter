@@ -527,7 +527,7 @@ module Dexter
       # as an extra defense against SQL-injection attacks.
       # https://www.postgresql.org/docs/current/static/libpq-exec.html
       query = squish(query) if pretty
-      log colorize("SQL: #{query}", :cyan) if @log_sql
+      log colorize("[sql] #{query}", :cyan) if @log_sql
 
       @mutex.synchronize do
         conn.exec_params(query, []).to_a

@@ -37,7 +37,7 @@ module Dexter
             begin
               process_queries
             rescue PG::ServerError => e
-              log "ERROR: #{e.class.name}: #{e.message}"
+              log colorize("ERROR: #{e.class.name}: #{e.message}", :red)
             end
             sleep(@interval)
           end

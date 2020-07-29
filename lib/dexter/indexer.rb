@@ -421,7 +421,7 @@ module Dexter
       # print summary
       if new_indexes.any?
         new_indexes.each do |index|
-          log "Index found: #{index[:table]} (#{index[:columns].join(", ")})"
+          log colorize("Index found: #{index[:table]} (#{index[:columns].join(", ")})", :green)
         end
       else
         log "No new indexes found"
@@ -527,7 +527,7 @@ module Dexter
       # as an extra defense against SQL-injection attacks.
       # https://www.postgresql.org/docs/current/static/libpq-exec.html
       query = squish(query) if pretty
-      log "SQL: #{query}" if @log_sql
+      log colorize("SQL: #{query}", :cyan) if @log_sql
 
       @mutex.synchronize do
         conn.exec_params(query, []).to_a
@@ -600,7 +600,7 @@ module Dexter
           view_tables[row["table_name"]] = PgQuery.parse(row["definition"]).tables
         rescue PgQuery::ParseError
           if @log_level.start_with?("debug")
-            log "ERROR: Cannot parse view definition: #{row["table_name"]}"
+            log colorize("ERROR: Cannot parse view definition: #{row["table_name"]}", :red)
           end
         end
       end

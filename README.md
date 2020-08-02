@@ -146,10 +146,10 @@ dexter --interval 60 # seconds
 
 ## Examples
 
-Ubuntu with PostgreSQL 9.6
+Ubuntu with PostgreSQL 12
 
 ```sh
-tail -F -n +1 /var/log/postgresql/postgresql-9.6-main.log | sudo -u postgres dexter dbname
+tail -F -n +1 /var/log/postgresql/postgresql-12-main.log | sudo -u postgres dexter dbname
 ```
 
 Homebrew on Mac

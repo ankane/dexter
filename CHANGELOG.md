@@ -1,4 +1,4 @@
-## 0.3.8 (unreleased)
+## 0.3.8 (2020-08-17)
 
 - Colorize output
 - Fixed error when unable to parse view definitions

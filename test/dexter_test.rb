@@ -90,6 +90,18 @@ class DexterTest < Minitest::Test
     assert_no_index "SELECT * FROM posts WHERE id = 1", "--min-cost-savings-pct 100"
   end
 
+  def test_create
+    assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--create"
+  ensure
+    $conn.exec("DROP INDEX posts_id_idx")
+  end
+
+  def test_tablespace
+    assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--create --tablespace pg_default"
+  ensure
+    $conn.exec("DROP INDEX posts_id_idx")
+  end
+
   private
 
   def assert_index(statement, index, options = nil)
@@ -106,7 +118,7 @@ class DexterTest < Minitest::Test
   end
 
   def assert_dexter_output(output, options)
-    dexter = Dexter::Client.new(["dexter_test"] + options + ["--log-level", "debug2"])
+    dexter = Dexter::Client.new(["dexter_test"] + options + ["--log-level", "debug2", "--log-sql"])
     stdout, _ = capture_io { dexter.perform }
     puts stdout if ENV["VERBOSE"]
     assert_match output, stdout

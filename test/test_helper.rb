@@ -4,8 +4,8 @@ require "minitest/autorun"
 require "minitest/pride"
 require "dexter"
 
-conn = PG::Connection.open(dbname: "dexter_test")
-conn.exec <<-SQL
+$conn = PG::Connection.open(dbname: "dexter_test")
+$conn.exec <<-SQL
 SET client_min_messages = warning;
 CREATE EXTENSION IF NOT EXISTS hstore;
 DROP TABLE IF EXISTS posts CASCADE;

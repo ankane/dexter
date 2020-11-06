@@ -1,3 +1,7 @@
+## 0.3.9 (unreleased)
+
+- Added `--tablespace` option
+
 ## 0.3.8 (2020-08-17)
 
 - Colorize output

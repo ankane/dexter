@@ -4,6 +4,7 @@ module Dexter
 
     def initialize(options)
       @create = options[:create]
+      @tablespace = options[:tablespace]
       @log_level = options[:log_level]
       @exclude_tables = options[:exclude]
       @include_tables = Array(options[:include].split(",")) if options[:include]
@@ -479,7 +480,8 @@ module Dexter
         with_advisory_lock do
           new_indexes.each do |index|
             unless index_exists?(index)
-              statement = "CREATE INDEX CONCURRENTLY ON #{quote_ident(index[:table])} (#{index[:columns].map { |c| quote_ident(c) }.join(", ")})"
+              statement = String.new("CREATE INDEX CONCURRENTLY ON #{quote_ident(index[:table])} (#{index[:columns].map { |c| quote_ident(c) }.join(", ")})")
+              statement << " TABLESPACE #{quote_ident(@tablespace)}" if @tablespace
               log "Creating index: #{statement}"
               started_at = Time.now
               begin

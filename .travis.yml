@@ -14,8 +14,6 @@ jobs:
           packages:
             - postgresql-13
             - postgresql-server-dev-13
-      env:
-        - PGPORT=5433
     - name: "Postgres 12"
       rvm: 2.7
       dist: focal
@@ -25,6 +23,8 @@ jobs:
           packages:
             - postgresql-12
             - postgresql-server-dev-12
+      env:
+        - PGPORT=5433
     - name: "Postgres 11"
       rvm: 2.6
       addons:

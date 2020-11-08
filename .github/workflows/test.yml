@@ -1,0 +1,37 @@
+name: Test
+on: [push, pull_request]
+jobs:
+  test:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - postgres: 13
+        - postgres: 12
+        # - postgres: 11
+        # - postgres: 10
+        # - postgres: 9.6
+    runs-on: ubuntu-latest
+    env:
+      PG_CONFIG=/usr/lib/postgresql/${{ matrix.postgres }}/bin/pg_config
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.7
+        bundler-cache: true
+    - run: sudo pg_dropcluster 13 main
+      if: ${{ matrix.postgres != 13 }}
+    - run: |
+        sudo apt-get install postgresql-${{ matrix.postgres }}
+        sudo systemctl start postgresql@${{ matrix.postgres }}-main
+        sudo -u postgres createuser -s $USER
+    - run: |
+        git clone https://github.com/HypoPG/hypopg.git
+        cd hypopg
+        git checkout 1.1.4
+        make
+        sudo make install
+        createdb pghero_test
+    - run: bundle exec rake test

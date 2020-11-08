@@ -24,6 +24,7 @@ jobs:
             - postgresql-12
             - postgresql-server-dev-12
       env:
+        - PG_CONFIG=/usr/lib/postgresql/12/bin/pg_config
         - PGPORT=5433
     - name: "Postgres 11"
       rvm: 2.6

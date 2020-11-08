@@ -33,5 +33,5 @@ jobs:
         git checkout 1.1.4
         make
         sudo make install
-        createdb pghero_test
+        createdb dexter_test
     - run: bundle exec rake test

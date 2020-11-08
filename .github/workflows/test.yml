@@ -11,12 +11,12 @@ jobs:
           ruby: 2.7
         - postgres: 12
           ruby: 2.6
-        - postgres: 11
-          ruby: 2.5
-        - postgres: 10
-          ruby: 2.4
-        - postgres: 9.6
-          ruby: 2.3
+        # - postgres: 11
+        #   ruby: 2.5
+        # - postgres: 10
+        #   ruby: 2.4
+        # - postgres: 9.6
+        #   ruby: 2.3
     runs-on: ubuntu-latest
     env:
       PG_CONFIG: /usr/lib/postgresql/${{ matrix.postgres }}/bin/pg_config
@@ -32,6 +32,7 @@ jobs:
         sudo apt-get install postgresql-${{ matrix.postgres }} postgresql-server-dev-${{ matrix.postgres }}
         sudo systemctl start postgresql@${{ matrix.postgres }}-main
         sudo -u postgres createuser -s $USER
+    - run: /usr/lib/postgresql/${{ matrix.postgres }}/bin/pg_config
     - run: |
         git clone https://github.com/HypoPG/hypopg.git
         cd hypopg

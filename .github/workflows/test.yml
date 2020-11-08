@@ -14,7 +14,7 @@ jobs:
         # - postgres: 9.6
     runs-on: ubuntu-latest
     env:
-      PG_CONFIG=/usr/lib/postgresql/${{ matrix.postgres }}/bin/pg_config
+      PG_CONFIG: /usr/lib/postgresql/${{ matrix.postgres }}/bin/pg_config
     steps:
     - uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1

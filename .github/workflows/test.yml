@@ -32,7 +32,6 @@ jobs:
         sudo apt-get install postgresql-${{ matrix.postgres }} postgresql-server-dev-${{ matrix.postgres }}
         sudo systemctl start postgresql@${{ matrix.postgres }}-main
         sudo -u postgres createuser -s $USER
-    - run: /usr/lib/postgresql/${{ matrix.postgres }}/bin/pg_config
     - run: |
         git clone https://github.com/HypoPG/hypopg.git
         cd hypopg

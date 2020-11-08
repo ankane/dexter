@@ -38,6 +38,6 @@ jobs:
         cd hypopg
         git checkout 1.1.4
         make
-        sudo make install
+        sudo --preserve-env=PG_CONFIG make install
         createdb dexter_test
     - run: bundle exec rake test

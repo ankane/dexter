@@ -4,7 +4,7 @@ The automatic indexer for Postgres
 
 [Read about how it works](https://ankane.org/introducing-dexter)
 
-![test](https://github.com/ankane/dexter/workflows/test/badge.svg)
+![build](https://github.com/ankane/dexter/workflows/build/badge.svg)
 
 ## Installation
 

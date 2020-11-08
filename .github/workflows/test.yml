@@ -8,10 +8,15 @@ jobs:
       matrix:
         include:
         - postgres: 13
+          ruby: 2.7
         - postgres: 12
-        # - postgres: 11
-        # - postgres: 10
-        # - postgres: 9.6
+          ruby: 2.6
+        - postgres: 11
+          ruby: 2.5
+        - postgres: 10
+          ruby: 2.4
+        - postgres: 9.6
+          ruby: 2.3
     runs-on: ubuntu-latest
     env:
       PG_CONFIG: /usr/lib/postgresql/${{ matrix.postgres }}/bin/pg_config
@@ -19,7 +24,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.7
+        ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
     - run: sudo pg_dropcluster 13 main
       if: ${{ matrix.postgres != 13 }}

@@ -24,7 +24,7 @@ jobs:
     - run: sudo pg_dropcluster 13 main
       if: ${{ matrix.postgres != 13 }}
     - run: |
-        sudo apt-get install postgresql-server-dev-${{ matrix.postgres }}
+        sudo apt-get install postgresql-${{ matrix.postgres }} postgresql-server-dev-${{ matrix.postgres }}
         sudo systemctl start postgresql@${{ matrix.postgres }}-main
         sudo -u postgres createuser -s $USER
     - run: |

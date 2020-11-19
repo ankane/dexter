@@ -1,0 +1,39 @@
+name: build
+on: [push, pull_request]
+jobs:
+  build:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - postgres: 13
+          ruby: 2.7
+        - postgres: 12
+          ruby: 2.6
+        - postgres: 11
+          ruby: 2.5
+        - postgres: 10
+          ruby: 2.4
+        - postgres: 9.6
+          ruby: 2.3
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
+    - uses: ankane/setup-postgres@v1
+      with:
+        postgres-version: ${{ matrix.postgres }}
+    - run: |
+        sudo apt-get install postgresql-server-dev-${{ matrix.postgres }}
+        git clone https://github.com/HypoPG/hypopg.git
+        cd hypopg
+        git checkout 1.1.4
+        make
+        export PG_CONFIG=`which pg_config`
+        sudo --preserve-env=PG_CONFIG make install
+        createdb dexter_test
+    - run: bundle exec rake test

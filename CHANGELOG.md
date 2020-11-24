@@ -1,4 +1,4 @@
-## 0.3.9 (unreleased)
+## 0.3.9 (2020-11-23)
 
 - Added `--tablespace` option
 

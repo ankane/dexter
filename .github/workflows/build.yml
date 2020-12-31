@@ -9,15 +9,15 @@ jobs:
       matrix:
         include:
         - postgres: 13
-          ruby: 2.7
+          ruby: 3.0
         - postgres: 12
-          ruby: 2.6
+          ruby: 2.7
         - postgres: 11
-          ruby: 2.5
+          ruby: 2.6
         - postgres: 10
-          ruby: 2.4
+          ruby: 2.5
         - postgres: 9.6
-          ruby: 2.3
+          ruby: 2.4
     steps:
     - uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1

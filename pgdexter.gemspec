@@ -20,5 +20,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "slop", ">= 4.8.2"
   spec.add_dependency "pg", ">= 0.18.2"
-  spec.add_dependency "pg_query"
+  spec.add_dependency "pg_query", "< 2"
 end

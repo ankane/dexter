@@ -1,3 +1,7 @@
+## 0.3.10 (unreleased)
+
+- Require pg_query < 2
+
 ## 0.3.9 (2020-11-23)
 
 - Added `--tablespace` option

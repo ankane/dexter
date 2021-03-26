@@ -1,4 +1,4 @@
-## 0.3.10 (unreleased)
+## 0.3.10 (2021-03-25)
 
 - Require pg_query < 2
 

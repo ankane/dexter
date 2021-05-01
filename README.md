@@ -194,6 +194,7 @@ Some hosted providers like Amazon RDS and Heroku do not support the HypoPG exten
 
 - Amazon RDS - follow the instructions on [this page](https://aws.amazon.com/rds/postgresql/faqs/)
 - Google Cloud SQL - star the [feature request](https://issuetracker.google.com/issues/69250435)
+- DigitalOcean - follow the instructions on [this page](https://docs.digitalocean.com/products/databases/postgresql/resources/supported-extensions/#supported-extensions)
 
 ## Future Work
 

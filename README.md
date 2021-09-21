@@ -32,7 +32,7 @@ And install the command line tool with:
 gem install pgdexter
 ```
 
-The command line tool is also available as a [Linux package](guides/Linux.md).
+The command line tool is also available with [Homebrew](#homebrew) or as a [Linux package](guides/Linux.md).
 
 ## How to Use
 
@@ -195,6 +195,14 @@ Some hosted providers like Amazon RDS and Heroku do not support the HypoPG exten
 - Amazon RDS - follow the instructions on [this page](https://aws.amazon.com/rds/postgresql/faqs/)
 - Google Cloud SQL - star the [feature request](https://issuetracker.google.com/issues/69250435)
 - DigitalOcean Managed Databases - follow the instructions on [this page](https://docs.digitalocean.com/products/databases/postgresql/resources/supported-extensions/#supported-extensions)
+
+## Homebrew
+
+On Mac, you can use:
+
+```sh
+brew install ankane/brew/dexter
+```
 
 ## Future Work
 

@@ -62,7 +62,7 @@ module Dexter
     end
 
     def process_queries_without_lock
-      now = Time.now
+      now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       min_checked_at = now - 3600 # don't recheck for an hour
       queries = []
       @collector.fetch_queries.each do |query|

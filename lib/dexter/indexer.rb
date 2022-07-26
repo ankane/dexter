@@ -483,10 +483,10 @@ module Dexter
               statement = String.new("CREATE INDEX CONCURRENTLY ON #{quote_ident(index[:table])} (#{index[:columns].map { |c| quote_ident(c) }.join(", ")})")
               statement << " TABLESPACE #{quote_ident(@tablespace)}" if @tablespace
               log "Creating index: #{statement}"
-              started_at = Time.now
+              started_at = monotonic_time
               begin
                 execute(statement)
-                log "Index created: #{((Time.now - started_at) * 1000).to_i} ms"
+                log "Index created: #{((monotonic_time - started_at) * 1000).to_i} ms"
               rescue PG::LockNotAvailable
                 log "Could not acquire lock: #{index[:table]}"
               end
@@ -496,6 +496,10 @@ module Dexter
       end
 
       new_indexes
+    end
+
+    def monotonic_time
+      Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
 
     def conn

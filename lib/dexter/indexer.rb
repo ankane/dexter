@@ -248,20 +248,24 @@ module Dexter
     end
 
     def find_by_key(plan, key)
-      indexes = []
-      case plan
-      when Hash
-        plan.each do |k, v|
-          if k == key
-            indexes << v
-          else
-            indexes.concat(find_by_key(v, key))
+      result = []
+      queue = [plan]
+      while queue.any?
+        node = queue.pop
+        case node
+        when Hash
+          node.each do |k, v|
+            if k == key
+              result << v
+            elsif !v.nil?
+              queue << v
+            end
           end
+        when Array
+          queue.concat(node)
         end
-      when Array
-        indexes.concat(plan.flat_map { |v| find_by_key(v, key) })
       end
-      indexes
+      result
     end
 
     def hypo_indexes_from_plan(index_name_to_columns, plan, index_set)

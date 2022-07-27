@@ -1,6 +1,7 @@
-## 0.3.11 (unreleased)
+## 0.4.0 (unreleased)
 
 - Use monotonic time
+- Dropped support for Ruby < 2.5
 
 ## 0.3.10 (2021-03-25)
 

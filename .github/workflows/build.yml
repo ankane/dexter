@@ -17,8 +17,6 @@ jobs:
           ruby: 2.6
         - postgres: 10
           ruby: 2.5
-        - postgres: 10
-          ruby: 2.4
     steps:
     - uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1

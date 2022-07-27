@@ -111,13 +111,13 @@ class DexterTest < Minitest::Test
   def test_create
     assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--create"
   ensure
-    $conn.exec("DROP INDEX posts_id_idx")
+    execute("DROP INDEX posts_id_idx")
   end
 
   def test_tablespace
     assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--create --tablespace pg_default"
   ensure
-    $conn.exec("DROP INDEX posts_id_idx")
+    execute("DROP INDEX posts_id_idx")
   end
 
   private
@@ -150,6 +150,10 @@ class DexterTest < Minitest::Test
   end
 
   def server_version
-    $conn.exec("SHOW server_version_num").first["server_version_num"].to_i / 10000
+    execute("SHOW server_version_num").first["server_version_num"].to_i / 10000
+  end
+
+  def execute(statement)
+    $conn.exec(statement)
   end
 end

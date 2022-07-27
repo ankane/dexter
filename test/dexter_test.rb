@@ -33,6 +33,20 @@ class DexterTest < Minitest::Test
     assert_index "WITH cte AS (SELECT * FROM posts WHERE id = 1) SELECT * FROM cte", "public.posts (id)"
   end
 
+  def test_cte_fence
+    if server_version >= 12
+      assert_index "WITH cte AS (SELECT * FROM posts) SELECT * FROM cte WHERE id = 1", "public.posts (id)"
+    else
+      assert_no_index "WITH cte AS (SELECT * FROM posts) SELECT * FROM cte WHERE id = 1"
+    end
+  end
+
+  def test_materialized_cte
+    skip if server_version < 12
+
+    assert_no_index "WITH MATERIALIZED cte AS (SELECT * FROM posts) SELECT * FROM cte WHERE id = 1"
+  end
+
   def test_order
     assert_index "SELECT * FROM posts ORDER BY user_id DESC LIMIT 10", "public.posts (user_id)"
   end
@@ -133,5 +147,9 @@ class DexterTest < Minitest::Test
     stdout, _ = capture_io { dexter.perform }
     puts stdout if ENV["VERBOSE"]
     assert_match "No new indexes found", stdout
+  end
+
+  def server_version
+    $conn.exec("SHOW server_version_num").first["server_version_num"].to_i / 10000
   end
 end

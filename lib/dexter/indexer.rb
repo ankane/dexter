@@ -240,6 +240,7 @@ module Dexter
     end
 
     def find_columns(plan)
+      plan = JSON.parse(plan.to_json)
       find_by_key(plan, "ColumnRef")
     end
 

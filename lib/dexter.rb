@@ -4,6 +4,7 @@ require "pg_query"
 require "slop"
 
 # stdlib
+require "json"
 require "set"
 require "time"
 

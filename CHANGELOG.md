@@ -1,7 +1,7 @@
 ## 0.4.0 (unreleased)
 
 - Added support for pg_query 2
-- Use monotonic time
+- Switched to monotonic time
 - Dropped support for Ruby < 2.5
 
 ## 0.3.10 (2021-03-25)

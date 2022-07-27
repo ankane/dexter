@@ -29,6 +29,10 @@ class DexterTest < Minitest::Test
     assert_index "SELECT * FROM posts_materialized WHERE id = 1", "public.posts_materialized (id)"
   end
 
+  def test_cte
+    assert_index "WITH cte AS (SELECT * FROM posts WHERE id = 1) SELECT * FROM cte", "public.posts (id)"
+  end
+
   def test_order
     assert_index "SELECT * FROM posts ORDER BY user_id DESC LIMIT 10", "public.posts (user_id)"
   end

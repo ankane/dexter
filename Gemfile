@@ -4,4 +4,4 @@ gemspec
 
 gem "rake"
 gem "minitest", ">= 5"
-gem "benchmark-ips"
+gem "benchmark-ips", require: false

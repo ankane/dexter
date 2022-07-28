@@ -104,6 +104,10 @@ class DexterTest < Minitest::Test
     assert_index_file "queries.csv", "csv"
   end
 
+  def test_input_format_sql
+    assert_index_file "queries.sql", "sql"
+  end
+
   def test_min_cost_savings
     assert_no_index "SELECT * FROM posts WHERE id = 1", "--min-cost-savings-pct 100"
   end

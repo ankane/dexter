@@ -216,7 +216,7 @@ On Mac and Windows, use `host.docker.internal` as the database hostname for data
 
 ### Homebrew
 
-On Mac, you can use:
+With Homebrew, you can use:
 
 ```sh
 brew install ankane/brew/dexter

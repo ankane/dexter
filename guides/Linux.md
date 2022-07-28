@@ -2,8 +2,6 @@
 
 - [Ubuntu](#ubuntu)
 - [Debian](#debian)
-- [CentOS / RHEL](#centos--rhel)
-- [SUSE Linux Enterprise Server](#suse-linux-enterprise-server)
 
 ### Ubuntu
 
@@ -15,7 +13,7 @@ sudo apt-get update
 sudo apt-get -y install dexter
 ```
 
-Supports Ubuntu 20.04 (Focal), 18.04 (Bionic), and 16.04 (Xenial)
+Supports Ubuntu 22.04 (Jammy), 20.04 (Focal), and 18.04 (Bionic)
 
 ### Debian
 
@@ -28,27 +26,7 @@ sudo apt-get update
 sudo apt-get -y install dexter
 ```
 
-Supports Debian 10 (Buster), 9 (Stretch), and 8 (Jesse)
-
-### CentOS / RHEL
-
-```sh
-sudo wget -O /etc/yum.repos.d/dexter.repo \
-  https://dl.packager.io/srv/pghero/dexter/master/installer/el/$(. /etc/os-release && echo $VERSION_ID).repo
-sudo yum -y install dexter
-```
-
-Supports CentOS / RHEL 8 and 7
-
-### SUSE Linux Enterprise Server
-
-```sh
-sudo wget -O /etc/zypp/repos.d/dexter.repo \
-  https://dl.packager.io/srv/pghero/dexter/master/installer/sles/12.repo
-sudo zypper install dexter
-```
-
-Supports SUSE Linux Enterprise Server 12
+Supports Debian 11 (Bullseye) and Debian 10 (Buster)
 
 ## Credits
 

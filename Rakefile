@@ -9,15 +9,17 @@ end
 
 task default: :test
 
-task :bench do
-  require "benchmark/ips"
-  require "dexter"
+namespace :bench do
+  task :find_columns do
+    require "benchmark/ips"
+    require "dexter"
 
-  indexer = Dexter::Indexer.new({})
-  query = Dexter::Query.new("SELECT * FROM posts WHERE user_id = 1 ORDER BY blog_id LIMIT 1000")
-  Benchmark.ips do |x|
-    x.report("find_columns") do
-      indexer.send(:find_columns, query.tree)
+    indexer = Dexter::Indexer.new({})
+    query = Dexter::Query.new("SELECT * FROM posts WHERE user_id = 1 ORDER BY blog_id LIMIT 1000")
+    Benchmark.ips do |x|
+      x.report("find_columns") do
+        indexer.send(:find_columns, query.tree)
+      end
     end
   end
 end

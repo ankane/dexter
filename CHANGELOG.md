@@ -1,4 +1,4 @@
-## 0.4.0 (unreleased)
+## 0.4.0 (2022-07-27)
 
 - Added support for pg_query 2
 - Switched to monotonic time

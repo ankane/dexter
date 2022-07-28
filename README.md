@@ -2,7 +2,7 @@
 
 The automatic indexer for Postgres
 
-[Read about how it works](https://ankane.org/introducing-dexter)
+[Read about how it works](https://ankane.org/introducing-dexter) or [watch the talk](https://www.youtube.com/watch?v=Mni_1yTaNbE)
 
 [![Build Status](https://github.com/ankane/dexter/workflows/build/badge.svg?branch=master)](https://github.com/ankane/dexter/actions)
 

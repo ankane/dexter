@@ -32,7 +32,7 @@ And install the command line tool with:
 gem install pgdexter
 ```
 
-The command line tool is also available with [Homebrew](#homebrew) or as a [Linux package](guides/Linux.md).
+The command line tool is also available with [Docker](#docker), [Homebrew](#homebrew), or as a [Linux package](guides/Linux.md).
 
 ## How to Use
 
@@ -196,7 +196,25 @@ Some hosted providers like Amazon RDS and Heroku do not support the HypoPG exten
 - Google Cloud SQL - star the [feature request](https://issuetracker.google.com/issues/69250435)
 - DigitalOcean Managed Databases - follow the instructions on [this page](https://docs.digitalocean.com/products/databases/postgresql/details/supported-extensions/#supported-extensions)
 
-## Homebrew
+## Additional Installation Methods
+
+### Docker
+
+Get the [Docker image](https://hub.docker.com/r/ankane/dexter) with:
+
+```sh
+docker pull ankane/dexter
+```
+
+And run it with:
+
+```sh
+docker run -ti ankane/dexter <connection-options>
+```
+
+On Mac and Windows, use `host.docker.internal` as the database hostname for databases on your local machine.
+
+### Homebrew
 
 On Mac, you can use:
 

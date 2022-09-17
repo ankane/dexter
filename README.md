@@ -212,7 +212,7 @@ And run it with:
 docker run -ti ankane/dexter <connection-options>
 ```
 
-On Mac and Windows, use `host.docker.internal` as the database hostname for databases on your local machine.
+For databases on the host machine, use `host.docker.internal` as the hostname (on Linux, this requires Docker 20.04 and `--add-host=host.docker.internal:host-gateway`).
 
 ### Homebrew
 

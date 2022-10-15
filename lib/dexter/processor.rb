@@ -13,6 +13,8 @@ module Dexter
           PgStatActivityParser.new(@indexer, @collector)
         elsif options[:input_format] == "csv"
           CsvLogParser.new(logfile, @collector)
+        elsif options[:input_format] == "json"
+          JsonLogParser.new(logfile, @collector)
         elsif options[:input_format] == "sql"
           SqlLogParser.new(logfile, @collector)
         else

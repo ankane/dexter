@@ -1,3 +1,7 @@
+## 0.4.1 (unreleased)
+
+- Added support for `json` format
+
 ## 0.4.0 (2022-07-27)
 
 - Added support for pg_query 2

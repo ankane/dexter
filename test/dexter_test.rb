@@ -104,6 +104,10 @@ class DexterTest < Minitest::Test
     assert_index_file "queries.csv", "csv"
   end
 
+  def test_input_format_json
+    assert_index_file "queries.json", "json"
+  end
+
   def test_input_format_sql
     assert_index_file "queries.sql", "sql"
   end

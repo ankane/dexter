@@ -1,4 +1,4 @@
-## 0.4.1 (unreleased)
+## 0.4.1 (2022-10-15)
 
 - Added support for `json` format
 

@@ -1,3 +1,7 @@
+## 0.4.2 (unreleased)
+
+- Fixed `--pg-stat-statements` option for Postgres 13+
+
 ## 0.4.1 (2022-10-15)
 
 - Added support for `json` format

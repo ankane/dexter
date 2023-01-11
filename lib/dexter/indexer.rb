@@ -620,6 +620,7 @@ module Dexter
     end
 
     def stat_statements
+      total_time = server_version_num >= 130000 ? "(total_plan_time + total_exec_time)" : "total_time"
       result = execute <<-SQL
         SELECT
           DISTINCT query
@@ -629,7 +630,7 @@ module Dexter
           pg_database ON pg_database.oid = pg_stat_statements.dbid
         WHERE
           datname = current_database()
-          AND total_time >= #{@min_time * 60000}
+          AND #{total_time} >= #{@min_time * 60000}
           AND calls >= #{@min_calls}
         ORDER BY
           1

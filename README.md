@@ -190,11 +190,16 @@ dexter --log-sql --log-level debug2
 
 ## Hosted Postgres
 
-Some hosted providers like Amazon RDS and Heroku do not support the HypoPG extension, which Dexter needs to run. See [how to use Dexter](guides/Hosted-Postgres.md) in these cases. To request the extension:
+The `hypopg` extension, which Dexter needs to run, is available on:
+
+- Azure Database
+- Crunchy Bridge
+
+For other providers, see [this guide](guides/Hosted-Postgres.md). To request a new extension:
 
 - Amazon RDS - follow the instructions on [this page](https://aws.amazon.com/rds/postgresql/faqs/)
-- Google Cloud SQL - star the [feature request](https://issuetracker.google.com/issues/69250435)
-- DigitalOcean Managed Databases - follow the instructions on [this page](https://docs.digitalocean.com/products/databases/postgresql/details/supported-extensions/#supported-extensions)
+- Google Cloud SQL - vote or comment on [this page](https://issuetracker.google.com/issues/69250435)
+- DigitalOcean Managed Databases - vote or comment on [this page](https://ideas.digitalocean.com/app-framework-services/p/support-hypopg-for-postgres)
 
 ## Additional Installation Methods
 

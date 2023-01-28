@@ -190,10 +190,7 @@ dexter --log-sql --log-level debug2
 
 ## Hosted Postgres
 
-The `hypopg` extension, which Dexter needs to run, is available on:
-
-- Azure Database
-- Crunchy Bridge
+The `hypopg` extension, which Dexter needs to run, is available on [these providers](https://github.com/ankane/dexter/issues/44).
 
 For other providers, see [this guide](guides/Hosted-Postgres.md). To request a new extension:
 

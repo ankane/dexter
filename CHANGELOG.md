@@ -1,4 +1,4 @@
-## 0.4.2 (unreleased)
+## 0.4.2 (2023-01-29)
 
 - Fixed `--pg-stat-statements` option for Postgres 13+
 

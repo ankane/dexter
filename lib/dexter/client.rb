@@ -42,25 +42,45 @@ module Dexter
         o.banner = %(Usage:
     dexter [options])
         o.separator ""
-        o.separator "Options:"
+
+        o.separator "Input options:"
+        o.string "--input-format", "input format", default: "stderr"
+        o.string "--log-table", "log table"
+        o.boolean "--pg-stat-activity", "use pg_stat_activity", default: false, help: false
+        o.boolean "--pg-stat-statements", "use pg_stat_statements", default: false, help: false
+        o.string "-s", "--statement", "process a single statement"
+        o.separator ""
+
+        o.separator "Connection options:"
+        o.string "-d", "--dbname", "database name"
+        o.string "-h", "--host", "database host"
+        o.integer "-p", "--port", "database port"
+        o.string "-U", "--username", "database user"
+        o.separator ""
+
+        o.separator "Processing options:"
+        o.integer "--interval", "time to wait between processing queries, in seconds", default: 60
+        o.float "--min-calls", "only process queries that have been called a certain number of times", default: 0
+        o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
+        o.separator ""
+
+        o.separator "Indexing options:"
         o.boolean "--analyze", "analyze tables that haven't been analyzed in the past hour", default: false
         o.boolean "--create", "create indexes", default: false
         o.array "--exclude", "prevent specific tables from being indexed"
         o.string "--include", "only include specific tables"
-        o.string "--input-format", "input format", default: "stderr"
-        o.integer "--interval", "time to wait between processing queries, in seconds", default: 60
+        o.integer "--min-cost-savings-pct", default: 50, help: false
+        o.boolean "--once", "run once", default: false, help: false
+        o.string "--tablespace", "tablespace to create indexes"
+        o.separator ""
+
+        o.separator "Logging options:"
         o.boolean "--log-explain", "log explain", default: false, help: false
         o.string "--log-level", "log level", default: "info"
         o.boolean "--log-sql", "log sql", default: false
-        o.string "--log-table", "log table"
-        o.float "--min-calls", "only process queries that have been called a certain number of times", default: 0
-        o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
-        o.integer "--min-cost-savings-pct", default: 50, help: false
-        o.boolean "--once", "run once", default: false, help: false
-        o.boolean "--pg-stat-activity", "use pg_stat_activity", default: false, help: false
-        o.boolean "--pg-stat-statements", "use pg_stat_statements", default: false, help: false
-        o.string "-s", "--statement", "process a single statement"
-        o.string "--tablespace", "tablespace to create indexes"
+        o.separator ""
+
+        o.separator "Other options:"
         o.on "-v", "--version", "print the version" do
           log Dexter::VERSION
           exit
@@ -69,12 +89,6 @@ module Dexter
           log o
           exit
         end
-        o.separator ""
-        o.separator "Connection options:"
-        o.string "-d", "--dbname", "database name"
-        o.string "-h", "--host", "database host"
-        o.integer "-p", "--port", "database port"
-        o.string "-U", "--username", "database user"
       end
 
       arguments = opts.arguments

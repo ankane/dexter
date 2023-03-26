@@ -11,6 +11,8 @@ module Dexter
       @log_parser =
         if @logfile == :pg_stat_activity
           PgStatActivityParser.new(@indexer, @collector)
+        elsif @logfile == :log_table
+          LogTableParser.new(@indexer, @collector)
         elsif options[:input_format] == "csv"
           CsvLogParser.new(logfile, @collector)
         elsif options[:input_format] == "json"
@@ -23,6 +25,7 @@ module Dexter
 
       @starting_interval = 3
       @interval = options[:interval]
+      @log_parser.once = options[:once]
 
       @mutex = Mutex.new
       @last_checked_at = {}
@@ -31,7 +34,7 @@ module Dexter
     end
 
     def perform
-      if [STDIN, :pg_stat_activity].include?(@logfile)
+      if [STDIN, :pg_stat_activity, :log_table].include?(@logfile) && !@once
         Thread.abort_on_exception = true
         Thread.new do
           sleep(@starting_interval)

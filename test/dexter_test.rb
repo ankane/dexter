@@ -128,6 +128,45 @@ class DexterTest < Minitest::Test
     execute("DROP INDEX posts_id_idx")
   end
 
+  def test_log_table
+    path = File.expand_path("support/queries14.csv", __dir__)
+    execute("CREATE EXTENSION IF NOT EXISTS file_fdw")
+    execute("CREATE SERVER IF NOT EXISTS pglog FOREIGN DATA WRAPPER file_fdw")
+    execute("DROP FOREIGN TABLE IF EXISTS pglog")
+    execute <<~SQL
+      CREATE FOREIGN TABLE pglog (
+        log_time timestamp(3) with time zone,
+        user_name text,
+        database_name text,
+        process_id integer,
+        connection_from text,
+        session_id text,
+        session_line_num bigint,
+        command_tag text,
+        session_start_time timestamp with time zone,
+        virtual_transaction_id text,
+        transaction_id bigint,
+        error_severity text,
+        sql_state_code text,
+        message text,
+        detail text,
+        hint text,
+        internal_query text,
+        internal_query_pos integer,
+        context text,
+        query text,
+        query_pos integer,
+        location text,
+        application_name text,
+        backend_type text,
+        leader_pid integer,
+        query_id bigint
+      ) SERVER pglog
+      OPTIONS ( filename #{$conn.escape_literal(path)}, format 'csv' )
+    SQL
+    assert_dexter_output "Index found: public.posts (id)", ["--log-table", "pglog", "--once"]
+  end
+
   private
 
   def assert_index(statement, index, options = nil)

@@ -1,5 +1,6 @@
 ## 0.4.3 (unreleased)
 
+- Added `--log-table` option
 - Require pg_query < 4
 
 ## 0.4.2 (2023-01-29)

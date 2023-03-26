@@ -27,6 +27,8 @@ module Dexter
         Indexer.new(options).process_stat_statements
       elsif options[:pg_stat_activity]
         Processor.new(:pg_stat_activity, options).perform
+      elsif options[:log_table]
+        Processor.new(:log_table, options).perform
       elsif arguments.any?
         ARGV.replace(arguments)
         Processor.new(ARGF, options).perform
@@ -50,9 +52,11 @@ module Dexter
         o.boolean "--log-explain", "log explain", default: false, help: false
         o.string "--log-level", "log level", default: "info"
         o.boolean "--log-sql", "log sql", default: false
+        o.string "--log-table", "log table"
         o.float "--min-calls", "only process queries that have been called a certain number of times", default: 0
         o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
         o.integer "--min-cost-savings-pct", default: 50, help: false
+        o.boolean "--once", "run once", default: false, help: false
         o.boolean "--pg-stat-activity", "use pg_stat_activity", default: false, help: false
         o.boolean "--pg-stat-statements", "use pg_stat_statements", default: false, help: false
         o.string "-s", "--statement", "process a single statement"

@@ -44,6 +44,19 @@ module Dexter
       SQL
     end
 
+    def log_activity(last_log_time)
+      execute <<-SQL
+        SELECT
+          log_time,
+          message,
+          detail
+        FROM
+          #{conn.quote_ident(@options[:log_table])}
+        WHERE
+          log_time >= #{conn.escape_literal(last_log_time)}
+      SQL
+    end
+
     def process_queries(queries)
       # reset hypothetical indexes
       reset_hypothetical_indexes

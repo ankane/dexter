@@ -6,6 +6,8 @@ module Dexter
     LINE_SEPERATOR = ":  ".freeze
     DETAIL_LINE = "DETAIL:  ".freeze
 
+    attr_accessor :once
+
     def initialize(logfile, collector)
       @logfile = logfile
       @collector = collector

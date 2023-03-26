@@ -37,4 +37,5 @@ jobs:
           make
           export PG_CONFIG=`which pg_config`
           sudo --preserve-env=PG_CONFIG make install
+      - run: chmod o+rx /home/runner
       - run: bundle exec rake test

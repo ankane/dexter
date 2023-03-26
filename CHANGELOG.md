@@ -1,3 +1,7 @@
+## 0.4.3 (unreleased)
+
+- Require pg_query < 4
+
 ## 0.4.2 (2023-01-29)
 
 - Fixed `--pg-stat-statements` option for Postgres 13+

@@ -18,6 +18,8 @@ module Dexter
 
         queries = new_queries
 
+        break if once
+
         sleep(1)
       end
     end

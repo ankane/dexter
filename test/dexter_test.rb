@@ -128,6 +128,18 @@ class DexterTest < Minitest::Test
     execute("DROP INDEX posts_id_idx")
   end
 
+  # TODO improve
+  def test_pg_stat_activity
+    assert_dexter_output "Processing 0 new query fingerprints", ["--pg-stat-activity", "--once"]
+  end
+
+  # TODO improve
+  def test_pg_stat_statements
+    execute("CREATE EXTENSION IF NOT EXISTS pg_stat_statements")
+    execute("SELECT pg_stat_statements_reset()")
+    assert_dexter_output "No new indexes found", ["--pg-stat-statements"]
+  end
+
   def test_log_table
     path = File.expand_path("support/queries14.csv", __dir__)
     execute("CREATE EXTENSION IF NOT EXISTS file_fdw")

@@ -44,6 +44,9 @@ module Dexter
       SQL
     end
 
+    # works with
+    # file_fdw: https://www.postgresql.org/docs/current/file-fdw.html
+    # log_fdw (csvlog): https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.Extensions.foreign-data-wrappers.html
     def log_activity(last_log_time)
       query = <<~SQL
         SELECT

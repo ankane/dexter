@@ -138,7 +138,7 @@ dexter --interval 60 # seconds
 
 ## Examples
 
-Postgres 14 on Ubuntu
+Postgres package on Ubuntu 22.04
 
 ```sh
 tail -F -n +1 /var/log/postgresql/postgresql-14-main.log | sudo -u postgres dexter dbname

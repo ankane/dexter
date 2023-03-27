@@ -62,6 +62,7 @@ module Dexter
         o.integer "--interval", "time to wait between processing queries, in seconds", default: 60
         o.float "--min-calls", "only process queries that have been called a certain number of times", default: 0
         o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
+        o.boolean "--once", "run once", default: false, help: false
         o.separator ""
 
         o.separator "Indexing options:"
@@ -70,7 +71,6 @@ module Dexter
         o.array "--exclude", "prevent specific tables from being indexed"
         o.string "--include", "only include specific tables"
         o.integer "--min-cost-savings-pct", default: 50, help: false
-        o.boolean "--once", "run once", default: false, help: false
         o.string "--tablespace", "tablespace to create indexes"
         o.separator ""
 

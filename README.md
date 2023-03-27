@@ -224,7 +224,7 @@ brew install ankane/brew/dexter
 
 ## Future Work
 
-[Here are some ideas](https://github.com/ankane/dexter/issues/1)
+[Here are some ideas](https://github.com/ankane/dexter/issues/45)
 
 ## Upgrading
 

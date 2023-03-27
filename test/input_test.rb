@@ -22,7 +22,7 @@ class InputTest < Minitest::Test
     assert_dexter_output "Processing 0 new query fingerprints", ["--pg-stat-activity", "--once"]
   end
 
-  # TODO improve
+  # TODO remove in 0.5.0
   def test_pg_stat_statements
     execute("CREATE EXTENSION IF NOT EXISTS pg_stat_statements")
     execute("SELECT pg_stat_statements_reset()")

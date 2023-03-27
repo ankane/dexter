@@ -45,7 +45,7 @@ module Dexter
     end
 
     def log_activity(last_log_time)
-      execute <<-SQL
+      query = <<~SQL
         SELECT
           log_time,
           message,
@@ -53,8 +53,9 @@ module Dexter
         FROM
           #{conn.quote_ident(@options[:log_table])}
         WHERE
-          log_time >= #{conn.escape_literal(last_log_time)}
+          log_time >= \$1
       SQL
+      execute(query, params: [last_log_time])
     end
 
     def process_queries(queries)
@@ -542,7 +543,7 @@ module Dexter
       raise Dexter::Abort, e.message
     end
 
-    def execute(query, pretty: true)
+    def execute(query, pretty: true, params: [])
       # use exec_params instead of exec for security
       #
       # Unlike PQexec, PQexecParams allows at most one SQL command in the given string.
@@ -554,7 +555,7 @@ module Dexter
       log colorize("[sql] #{query}", :cyan) if @log_sql
 
       @mutex.synchronize do
-        conn.exec_params(query, []).to_a
+        conn.exec_params(query, params).to_a
       end
     end
 

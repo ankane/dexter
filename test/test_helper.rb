@@ -28,3 +28,28 @@ CREATE TABLE "Bar"."Foo"("Id" int);
 INSERT INTO "Bar"."Foo" SELECT * FROM generate_series(1, 100000);
 ANALYZE "Bar"."Foo";
 SQL
+
+class Minitest::Test
+  def assert_index(statement, index, options = nil)
+    assert_dexter_output "Index found: #{index}", ["-s", statement] + options.to_s.split(" ")
+  end
+
+  def assert_no_index(statement, options = nil)
+    assert_dexter_output "No new indexes found", ["-s", statement] + options.to_s.split(" ")
+  end
+
+  def assert_dexter_output(output, options)
+    dexter = Dexter::Client.new(["dexter_test"] + options + ["--log-level", "debug2", "--log-sql"])
+    stdout, _ = capture_io { dexter.perform }
+    puts stdout if ENV["VERBOSE"]
+    assert_match output, stdout
+  end
+
+  def server_version
+    execute("SHOW server_version_num").first["server_version_num"].to_i / 10000
+  end
+
+  def execute(statement)
+    $conn.exec(statement)
+  end
+end

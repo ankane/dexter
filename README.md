@@ -144,10 +144,16 @@ Ubuntu with PostgreSQL 12
 tail -F -n +1 /var/log/postgresql/postgresql-12-main.log | sudo -u postgres dexter dbname
 ```
 
-Homebrew on Mac
+Homebrew on Mac ARM
 
 ```sh
-tail -F -n +1 /usr/local/var/postgres/server.log | dexter dbname
+tail -F -n +1 /opt/homebrew/var/log/postgresql@14.log | dexter dbname
+```
+
+Homebrew on Mac x86-64
+
+```sh
+tail -F -n +1 /usr/local/var/log/postgresql@14.log | dexter dbname
 ```
 
 ## Analyze

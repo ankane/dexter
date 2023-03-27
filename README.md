@@ -138,19 +138,19 @@ dexter --interval 60 # seconds
 
 ## Examples
 
-Ubuntu with PostgreSQL 15
+Postgres 14 on Ubuntu
 
 ```sh
-tail -F -n +1 /var/log/postgresql/postgresql-15-main.log | sudo -u postgres dexter dbname
+tail -F -n +1 /var/log/postgresql/postgresql-14-main.log | sudo -u postgres dexter dbname
 ```
 
-Homebrew on Mac ARM
+Homebrew Postgres on Mac ARM
 
 ```sh
 tail -F -n +1 /opt/homebrew/var/log/postgresql@14.log | dexter dbname
 ```
 
-Homebrew on Mac x86-64
+Homebrew Postgres on Mac x86-64
 
 ```sh
 tail -F -n +1 /usr/local/var/log/postgresql@14.log | dexter dbname

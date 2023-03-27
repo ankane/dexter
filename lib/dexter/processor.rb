@@ -34,7 +34,7 @@ module Dexter
     end
 
     def perform
-      if [STDIN, :pg_stat_activity, :log_table].include?(@logfile) && !@once
+      if [STDIN, :pg_stat_activity, :log_table].include?(@logfile) && !@log_parser.once
         Thread.abort_on_exception = true
         Thread.new do
           sleep(@starting_interval)

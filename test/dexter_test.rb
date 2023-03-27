@@ -147,6 +147,7 @@ class DexterTest < Minitest::Test
     execute("CREATE EXTENSION IF NOT EXISTS file_fdw")
     execute("CREATE SERVER IF NOT EXISTS pglog FOREIGN DATA WRAPPER file_fdw")
     execute("DROP FOREIGN TABLE IF EXISTS pglog")
+    # https://www.postgresql.org/docs/current/file-fdw.html
     execute <<~SQL
       CREATE FOREIGN TABLE pglog (
         log_time timestamp(3) with time zone,

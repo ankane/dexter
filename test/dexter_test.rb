@@ -80,22 +80,6 @@ class DexterTest < Minitest::Test
     assert_index "SELECT * FROM \"Bar\".\"Foo\" WHERE \"Id\" = 10000", "Bar.Foo (Id)"
   end
 
-  def test_connection_flag
-    assert_connection ["-d", "dexter_test"]
-  end
-
-  def test_connection_string
-    assert_connection ["dbname=dexter_test"]
-  end
-
-  def test_connection_url_postgres
-    assert_connection ["postgres:///dexter_test"]
-  end
-
-  def test_connection_url_postgresql
-    assert_connection ["postgresql:///dexter_test"]
-  end
-
   def test_input_format_stderr
     assert_index_file "queries.log", "stderr"
   end
@@ -202,13 +186,6 @@ class DexterTest < Minitest::Test
     stdout, _ = capture_io { dexter.perform }
     puts stdout if ENV["VERBOSE"]
     assert_match output, stdout
-  end
-
-  def assert_connection(flags)
-    dexter = Dexter::Client.new(flags + ["-s", "SELECT 1"])
-    stdout, _ = capture_io { dexter.perform }
-    puts stdout if ENV["VERBOSE"]
-    assert_match "No new indexes found", stdout
   end
 
   def server_version

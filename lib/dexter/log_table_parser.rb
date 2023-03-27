@@ -19,9 +19,11 @@ module Dexter
           last_log_time = row["log_time"]
         end
 
-        break if once
+        break
 
-        sleep(1)
+        # possibly enable later
+        # break if once
+        # sleep(1)
       end
     end
   end

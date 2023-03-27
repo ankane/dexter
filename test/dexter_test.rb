@@ -178,7 +178,7 @@ class DexterTest < Minitest::Test
       ) SERVER pglog
       OPTIONS ( filename #{$conn.escape_literal(path)}, format 'csv' )
     SQL
-    assert_dexter_output "Index found: public.posts (id)", ["--log-table", "pglog", "--once"]
+    assert_dexter_output "Index found: public.posts (id)", ["--log-table", "pglog"]
   end
 
   private

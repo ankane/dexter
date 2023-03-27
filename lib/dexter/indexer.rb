@@ -28,7 +28,7 @@ module Dexter
     end
 
     def stat_activity
-      execute <<-SQL
+      execute <<~SQL
         SELECT
           pid || ':' || COALESCE(query_start, xact_start) AS id,
           query,
@@ -155,7 +155,7 @@ module Dexter
     def analyze_tables(tables)
       tables = tables.to_a.sort
 
-      analyze_stats = execute <<-SQL
+      analyze_stats = execute <<~SQL
         SELECT
           schemaname || '.' || relname AS table,
           last_analyze,
@@ -579,7 +579,7 @@ module Dexter
     end
 
     def database_tables
-      result = execute <<-SQL
+      result = execute <<~SQL
         SELECT
           table_schema || '.' || table_name AS table_name
         FROM
@@ -592,7 +592,7 @@ module Dexter
 
     def materialized_views
       if server_version_num >= 90300
-        result = execute <<-SQL
+        result = execute <<~SQL
           SELECT
             schemaname || '.' || matviewname AS table_name
           FROM
@@ -609,7 +609,7 @@ module Dexter
     end
 
     def database_view_tables
-      result = execute <<-SQL
+      result = execute <<~SQL
         SELECT
           schemaname || '.' || viewname AS table_name,
           definition
@@ -635,7 +635,7 @@ module Dexter
 
     def stat_statements
       total_time = server_version_num >= 130000 ? "(total_plan_time + total_exec_time)" : "total_time"
-      result = execute <<-SQL
+      result = execute <<~SQL
         SELECT
           DISTINCT query
         FROM
@@ -681,7 +681,7 @@ module Dexter
     end
 
     def columns(tables)
-      columns = execute <<-SQL
+      columns = execute <<~SQL
         SELECT
           s.nspname || '.' || t.relname AS table_name,
           a.attname AS column_name,
@@ -700,7 +700,7 @@ module Dexter
     end
 
     def indexes(tables)
-      execute(<<-SQL
+      query = <<~SQL
         SELECT
           schemaname || '.' || t.relname AS table,
           ix.relname AS name,
@@ -722,7 +722,7 @@ module Dexter
         ORDER BY
           1, 2
       SQL
-      ).map { |v| v["columns"] = v["columns"].sub(") WHERE (", " WHERE ").split(", ").map { |c| unquote(c) }; v }
+      execute(query).map { |v| v["columns"] = v["columns"].sub(") WHERE (", " WHERE ").split(", ").map { |c| unquote(c) }; v }
     end
 
     def search_path

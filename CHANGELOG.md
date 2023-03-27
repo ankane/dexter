@@ -1,4 +1,4 @@
-## 0.4.3 (unreleased)
+## 0.4.3 (2023-03-26)
 
 - Added experimental `--log-table` option
 - Improved help

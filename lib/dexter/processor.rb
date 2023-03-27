@@ -20,7 +20,7 @@ module Dexter
         elsif options[:input_format] == "sql"
           SqlLogParser.new(logfile, @collector)
         else
-          LogParser.new(logfile, @collector)
+          StderrLogParser.new(logfile, @collector)
         end
 
       @starting_interval = 3

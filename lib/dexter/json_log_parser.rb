@@ -1,5 +1,3 @@
-require "json"
-
 module Dexter
   class JsonLogParser < LogParser
     FIRST_LINE_REGEX = /\A.+/

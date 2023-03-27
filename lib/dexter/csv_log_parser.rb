@@ -1,5 +1,3 @@
-require "csv"
-
 module Dexter
   class CsvLogParser < LogParser
     FIRST_LINE_REGEX = /\A.+/

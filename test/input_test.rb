@@ -31,14 +31,28 @@ class InputTest < Minitest::Test
     assert_dexter_output "No new indexes found", ["--pg-stat-statements"]
   end
 
-  def test_log_table
+  def test_log_table_stderr
+    path = File.expand_path("support/queries.log", __dir__)
+    execute("CREATE EXTENSION IF NOT EXISTS file_fdw")
+    execute("CREATE SERVER IF NOT EXISTS pglog FOREIGN DATA WRAPPER file_fdw")
+    execute("DROP FOREIGN TABLE IF EXISTS pglog_stderr")
+    execute <<~SQL
+      CREATE FOREIGN TABLE pglog_stderr (
+        log_entry text
+      ) SERVER pglog
+      OPTIONS ( filename #{$conn.escape_literal(path)}, format 'text' )
+    SQL
+    assert_dexter_output "Index found: public.posts (id)", ["--log-table", "pglog_stderr"]
+  end
+
+  def test_log_table_csv
     path = File.expand_path("support/queries14.csv", __dir__)
     execute("CREATE EXTENSION IF NOT EXISTS file_fdw")
     execute("CREATE SERVER IF NOT EXISTS pglog FOREIGN DATA WRAPPER file_fdw")
-    execute("DROP FOREIGN TABLE IF EXISTS pglog")
+    execute("DROP FOREIGN TABLE IF EXISTS pglog_csv")
     # https://www.postgresql.org/docs/current/file-fdw.html
     execute <<~SQL
-      CREATE FOREIGN TABLE pglog (
+      CREATE FOREIGN TABLE pglog_csv (
         log_time timestamp(3) with time zone,
         user_name text,
         database_name text,
@@ -68,7 +82,7 @@ class InputTest < Minitest::Test
       ) SERVER pglog
       OPTIONS ( filename #{$conn.escape_literal(path)}, format 'csv' )
     SQL
-    assert_dexter_output "Index found: public.posts (id)", ["--log-table", "pglog"]
+    assert_dexter_output "Index found: public.posts (id)", ["--log-table", "pglog_csv", "--input-format", "csv"]
   end
 
   private

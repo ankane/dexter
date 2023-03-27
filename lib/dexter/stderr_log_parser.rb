@@ -1,10 +1,14 @@
 module Dexter
   class StderrLogParser < LogParser
     def perform
+      process_stderr(@logfile.each_line)
+    end
+
+    def process_stderr(rows)
       active_line = nil
       duration = nil
 
-      @logfile.each_line do |line|
+      rows.each do |line|
         if active_line
           if line.include?(DETAIL_LINE)
             add_parameters(active_line, line.chomp.split(DETAIL_LINE)[1])

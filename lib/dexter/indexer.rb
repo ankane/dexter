@@ -14,6 +14,7 @@ module Dexter
       @min_calls = options[:min_calls] || 0
       @analyze = options[:analyze]
       @min_cost_savings_pct = options[:min_cost_savings_pct].to_i
+      @log_table = options[:log_table]
       @options = options
       @mutex = Mutex.new
 
@@ -47,18 +48,28 @@ module Dexter
     # works with
     # file_fdw: https://www.postgresql.org/docs/current/file-fdw.html
     # log_fdw (csvlog): https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.Extensions.foreign-data-wrappers.html
-    def log_activity(last_log_time)
+    def csvlog_activity(last_log_time)
       query = <<~SQL
         SELECT
           log_time,
           message,
           detail
         FROM
-          #{conn.quote_ident(@options[:log_table])}
+          #{conn.quote_ident(@log_table)}
         WHERE
           log_time >= \$1
       SQL
       execute(query, params: [last_log_time])
+    end
+
+    def stderr_activity
+      query = <<~SQL
+        SELECT
+          log_entry
+        FROM
+          #{conn.quote_ident(@log_table)}
+      SQL
+      execute(query)
     end
 
     def process_queries(queries)

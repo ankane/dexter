@@ -1,10 +1,10 @@
 module Dexter
-  class LogTableParser < CsvLogParser
+  class CsvLogTableParser < CsvLogParser
     def perform
       last_log_time = Time.at(0).iso8601(3)
 
       loop do
-        @logfile.log_activity(last_log_time).each do |row|
+        @logfile.csvlog_activity(last_log_time).each do |row|
           process_csv_row(row["message"], row["detail"])
           last_log_time = row["log_time"]
         end

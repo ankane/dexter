@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-class DexterTest < Minitest::Test
+class StatementTest < Minitest::Test
   def test_basic_index
     assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)"
   end

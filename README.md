@@ -110,6 +110,12 @@ or collect running queries with:
 dexter <connection-options> --pg-stat-activity
 ```
 
+or pass a log table created with [file_fdw](https://www.postgresql.org/docs/current/file-fdw.html#id-1.11.7.25.14) with: (experimental)
+
+```sh
+dexter <connection-options> --log-table pglog --input-format csv
+```
+
 ### Collection Options
 
 To prevent one-off queries from being indexed, specify a minimum number of calls before a query is considered for indexing

@@ -1,5 +1,8 @@
 module Dexter
   class StderrLogParser < LogParser
+    LINE_SEPERATOR = ":  ".freeze
+    DETAIL_LINE = "DETAIL:  ".freeze
+
     def perform
       process_stderr(@logfile.each_line)
     end

@@ -46,7 +46,7 @@ module Dexter
         o.separator "Input options:"
         o.string "--input-format", "input format", default: "stderr"
         o.string "--log-table", "log table (experimental)"
-        o.boolean "--pg-stat-activity", "use pg_stat_activity", default: false, help: false
+        o.boolean "--pg-stat-activity", "use pg_stat_activity", default: false
         o.boolean "--pg-stat-statements", "use pg_stat_statements", default: false, help: false
         o.string "-s", "--statement", "process a single statement"
         o.separator ""

@@ -1,3 +1,7 @@
+## 0.4.4 (unreleased)
+
+- Improved output when HypoPG not installed
+
 ## 0.4.3 (2023-03-26)
 
 - Added experimental `--log-table` option

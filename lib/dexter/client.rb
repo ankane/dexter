@@ -7,7 +7,7 @@ module Dexter
 
     def self.start
       Dexter::Client.new(ARGV).perform
-    rescue Dexter::Abort, PG::UndefinedFile => e
+    rescue Dexter::Abort, PG::UndefinedFile, PG::FeatureNotSupported => e
       abort colorize(e.message.strip, :red)
     end
 

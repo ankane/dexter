@@ -95,25 +95,25 @@ tail -F -n +1 <log-file> | dexter <connection-options>
 Pass a single statement with:
 
 ```sh
-dexter <connection-options> -s "SELECT * FROM ..."
+dexter -s "SELECT * FROM ..." <connection-options>
 ```
 
 or pass files:
 
 ```sh
-dexter <connection-options> <file1> <file2>
+dexter file1.log file2.log <connection-options>
 ```
 
 or collect running queries with:
 
 ```sh
-dexter <connection-options> --pg-stat-activity
+dexter --pg-stat-activity <connection-options>
 ```
 
 or use the [pg_stat_monitor](https://github.com/percona/pg_stat_monitor) extension: (unreleased, experimental)
 
 ```sh
-dexter <connection-options> --pg-stat-monitor
+dexter --pg-stat-monitor <connection-options>
 ```
 
 > Note: `pg_stat_monitor.pgsm_normalized_query` must be off (the default) to use this
@@ -121,7 +121,7 @@ dexter <connection-options> --pg-stat-monitor
 or pass a log table created with [file_fdw](https://www.postgresql.org/docs/current/file-fdw.html#id-1.11.7.25.14) with: (experimental)
 
 ```sh
-dexter <connection-options> --log-table pglog --input-format csv
+dexter --log-table pglog --input-format csv <connection-options>
 ```
 
 ### Collection Options

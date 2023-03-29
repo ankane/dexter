@@ -1,0 +1,3 @@
+﻿"error_severity","event_message","id","timestamp"
+"LOG","connection authenticated: identity="postgres" method=scram-sha-256 (/etc/postgresql/pg_hba.conf:89)","e27c071a-fced-4ab2-8ea9-7e823e3ce54e","1680046966566000"
+"LOG","AUDIT: SESSION,1,1,READ,SELECT,,,SELECT * FROM posts WHERE id = 1;,<not logged>","53100ceb-a1bc-4841-9c2e-25d8c66e6fe2","1680044862481000"

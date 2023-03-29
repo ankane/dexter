@@ -1,5 +1,6 @@
 ## 0.4.4 (unreleased)
 
+- Added experimental support for Supabase logs
 - Improved output when HypoPG not installed
 
 ## 0.4.3 (2023-03-26)

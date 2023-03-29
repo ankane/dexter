@@ -116,6 +116,12 @@ or pass a log table created with [file_fdw](https://www.postgresql.org/docs/curr
 dexter <connection-options> --log-table pglog --input-format csv
 ```
 
+or pass a [Supabase log file](https://supabase.com/docs/guides/platform/logs#logging-postgres-queries) with: (unreleased, experimental)
+
+```sh
+dexter <connection-options> supabase_logs.csv --input-format supabase
+```
+
 ### Collection Options
 
 To prevent one-off queries from being indexed, specify a minimum number of calls before a query is considered for indexing

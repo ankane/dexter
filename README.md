@@ -80,7 +80,7 @@ host=localhost port=5432 dbname=mydb
 
 ## Collecting Queries
 
-Dexter supports collecting queries from a number of sources.
+Dexter can collect queries from a number of sources.
 
 - [Log files](#log-file)
 - [SQL files](#sql-files)

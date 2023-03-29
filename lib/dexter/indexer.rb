@@ -588,17 +588,27 @@ module Dexter
 
       # try to EXPLAIN normalized queries
       # https://dev.to/yugabyte/explain-from-pgstatstatements-normalized-queries-how-to-always-get-the-generic-plan-in--5cfi
-      explain_normalized = query.include?("$1") && server_version_num >= 120000
+      explain_normalized = query.include?("$1")
       if explain_normalized
         prepared_name = "dexter_prepared"
         execute("PREPARE #{prepared_name} AS #{safe_statement(query)}", pretty: false)
         prepared = true
         params = execute("SELECT array_length(parameter_types, 1) AS params FROM pg_prepared_statements WHERE name = $1", params: [prepared_name]).first["params"].to_i
+        query = "EXECUTE #{prepared_name}(#{params.times.map { "NULL" }.join(", ")})"
 
         execute("BEGIN")
         transaction = true
-        execute("SET LOCAL plan_cache_mode = force_generic_plan")
-        query = "EXECUTE #{prepared_name}(#{params.times.map { "NULL" }.join(", ")})"
+
+        if server_version_num >= 120000
+          execute("SET LOCAL plan_cache_mode = force_generic_plan")
+        else
+          execute("SET LOCAL cpu_operator_cost = 1e42")
+          5.times do
+            execute("EXPLAIN (FORMAT JSON) #{safe_statement(query)}", pretty: false)
+          end
+          execute("ROLLBACK")
+          execute("BEGIN")
+        end
       end
 
       # strip semi-colons as another measure of defense

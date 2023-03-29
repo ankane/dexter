@@ -225,7 +225,7 @@ For databases on the host machine, use `host.docker.internal` as the hostname (o
 With Homebrew, you can use:
 
 ```sh
-brew install ankane/brew/dexter
+brew install dexter
 ```
 
 ## Future Work

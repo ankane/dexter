@@ -255,7 +255,7 @@ module Dexter
           find_columns(query.tree).each do |col|
             last_col = col["fields"].last
             if last_col["String"]
-              possible_columns << last_col["String"]["str"]
+              possible_columns << last_col["String"]["sval"]
             end
           end
         end

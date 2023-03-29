@@ -40,8 +40,16 @@ class Minitest::Test
 
   def assert_dexter_output(output, options)
     dexter = Dexter::Client.new(["dexter_test"] + options + ["--log-level", "debug2", "--log-sql"])
-    stdout, _ = capture_io { dexter.perform }
+    ex = nil
+    stdout, _ = capture_io do
+      begin
+        dexter.perform
+      rescue => e
+        ex = e
+      end
+    end
     puts stdout if ENV["VERBOSE"]
+    raise ex if ex
     assert_match output, stdout
   end
 

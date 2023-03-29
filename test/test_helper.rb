@@ -38,7 +38,7 @@ class Minitest::Test
     assert_dexter_output "No new indexes found", ["-s", statement] + options.to_s.split(" ")
   end
 
-  def assert_dexter_output(output, options)
+  def dexter_run(options)
     dexter = Dexter::Client.new(["dexter_test"] + options + ["--log-level", "debug2", "--log-sql"])
     ex = nil
     stdout, _ = capture_io do
@@ -50,7 +50,18 @@ class Minitest::Test
     end
     puts stdout if ENV["VERBOSE"]
     raise ex if ex
-    assert_match output, stdout
+    stdout
+  end
+
+  def assert_dexter_output(expected, options)
+    assert_match expected, dexter_run(options)
+  end
+
+  def assert_dexter_error(expected, options)
+    error = assert_raises do
+      dexter_run(options)
+    end
+    assert_match expected, error.message
   end
 
   def server_version

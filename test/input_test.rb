@@ -92,6 +92,10 @@ class InputTest < Minitest::Test
     assert_dexter_output "Index found: public.posts (id)", ["--log-table", "pglog_csv", "--input-format", "csv"]
   end
 
+  def test_log_table_missing
+    assert_dexter_error 'relation "missing" does not exist', ["--log-table", "missing"]
+  end
+
   private
 
   def assert_index_file(file, input_format)

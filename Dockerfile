@@ -1,4 +1,4 @@
-FROM ruby:3.1.3-alpine3.16
+FROM ruby:3.2.1-alpine3.17
 
 MAINTAINER Andrew Kane <andrew@ankane.org>
 

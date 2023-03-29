@@ -222,10 +222,6 @@ module Dexter
         end
         begin
           query.plans << plan(query.statement)
-          if @log_explain
-            # Pass format to prevent ANALYZE
-            puts execute("EXPLAIN (FORMAT TEXT) #{safe_statement(query.statement)}", pretty: false).map { |r| r["QUERY PLAN"] }.join("\n")
-          end
         rescue PG::Error, JSON::NestingError => e
           if @log_explain
             log e.message
@@ -587,8 +583,38 @@ module Dexter
     end
 
     def plan(query)
+      prepared = false
+      transaction = false
+
+      # try to EXPLAIN normalized queries
+      # https://dev.to/yugabyte/explain-from-pgstatstatements-normalized-queries-how-to-always-get-the-generic-plan-in--5cfi
+      explain_normalized = query.include?("$1") && server_version_num >= 120000
+      if explain_normalized
+        prepared_name = "dexter_prepared"
+        execute("PREPARE #{prepared_name} AS #{safe_statement(query)}", pretty: false)
+        prepared = true
+        params = execute("SELECT array_length(parameter_types, 1) AS params FROM pg_prepared_statements WHERE name = $1", params: [prepared_name]).first["params"].to_i
+
+        execute("BEGIN")
+        transaction = true
+        execute("SET LOCAL plan_cache_mode = force_generic_plan")
+        query = "EXECUTE #{prepared_name}(#{params.times.map { "NULL" }.join(", ")})"
+      end
+
       # strip semi-colons as another measure of defense
-      JSON.parse(execute("EXPLAIN (FORMAT JSON) #{safe_statement(query)}", pretty: false).first["QUERY PLAN"], max_nesting: 1000).first["Plan"]
+      plan = JSON.parse(execute("EXPLAIN (FORMAT JSON) #{safe_statement(query)}", pretty: false).first["QUERY PLAN"], max_nesting: 1000).first["Plan"]
+
+      if @log_explain
+        # Pass format to prevent ANALYZE
+        puts execute("EXPLAIN (FORMAT TEXT) #{safe_statement(query)}", pretty: false).map { |r| r["QUERY PLAN"] }.join("\n")
+      end
+
+      plan
+    ensure
+      if explain_normalized
+        execute("ROLLBACK") if transaction
+        execute("DEALLOCATE #{prepared_name}") if prepared
+      end
     end
 
     # TODO for multicolumn indexes, use ordering

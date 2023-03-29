@@ -29,13 +29,11 @@ class InputTest < Minitest::Test
     assert_dexter_output "Index found: public.posts (id)", ["--pg-stat-monitor"]
   end
 
-  # TODO remove in 0.5.0
   def test_pg_stat_statements
     execute("CREATE EXTENSION IF NOT EXISTS pg_stat_statements")
     execute("SELECT pg_stat_statements_reset()")
     execute("SELECT * FROM posts WHERE id = 1")
-    assert_dexter_output "Could not run explain", ["--pg-stat-statements"]
-    assert_dexter_output "No new indexes found", ["--pg-stat-statements"]
+    assert_dexter_output "Index found: public.posts (id)", ["--pg-stat-statements"]
   end
 
   def test_log_table_stderr

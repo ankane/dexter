@@ -47,7 +47,6 @@ Index found: public.movies (title)
 Index found: public.ratings (movie_id)
 Index found: public.ratings (rating)
 Index found: public.ratings (user_id)
-Processing 12 new query fingerprints
 ```
 
 To be safe, Dexter will not create indexes unless you pass the `--create` flag. In this case, you’ll see:

@@ -20,12 +20,6 @@ make install # may need sudo
 
 > Note: If you have issues, make sure `postgresql-server-dev-*` is installed.
 
-Enable logging for slow queries in your Postgres config file.
-
-```ini
-log_min_duration_statement = 10 # ms
-```
-
 And install the command line tool with:
 
 ```sh
@@ -36,10 +30,10 @@ The command line tool is also available with [Docker](#docker), [Homebrew](#home
 
 ## How to Use
 
-Dexter needs a connection to your database and a log file to process.
+Dexter needs a connection to your database and a source of queries (like a log file) to process.
 
 ```sh
-tail -F -n +1 <log-file> | dexter <connection-options>
+dexter -d dbname path/to/postgresql.log
 ```
 
 This finds slow queries and generates output like:
@@ -86,45 +80,93 @@ host=localhost port=5432 dbname=mydb
 
 ## Collecting Queries
 
-There are many ways to collect queries. For real-time indexing, pipe your logfile:
+Dexter supports collecting queries from a number of sources.
 
-```sh
-tail -F -n +1 <log-file> | dexter <connection-options>
+- [Log files](#log-file)
+- [SQL files](#sql-files)
+- [Live queries](#live-queries)
+- [Log tables](#log-table) (experimental)
+- [pg_stat_monitor](#pg-stat-monitor) (unreleased, experimental)
+
+### Log Files
+
+Enable logging for slow queries in your Postgres config file.
+
+```ini
+log_min_duration_statement = 10 # ms
 ```
 
-Pass a single statement with:
+And use:
+
+```sh
+dexter <connection-options> postgresql.log
+```
+
+For a `csvlog` destination, use:
+
+```sh
+dexter <connection-options> postgresql.csv --input-format csv
+```
+
+For a `jsonlog` destination, use:
+
+```sh
+dexter <connection-options> postgresql.json --input-format json
+```
+
+For real-time indexing, pipe your logfile:
+
+```sh
+tail -F -n +1 postgresql.log | dexter <connection-options>
+```
+
+### SQL Files
+
+Pass a SQL file with:
+
+```sh
+dexter <connection-options> queries.sql --input-format sql
+```
+
+Pass a single query with:
 
 ```sh
 dexter <connection-options> -s "SELECT * FROM ..."
 ```
 
-or pass files:
+### Live Queries
 
-```sh
-dexter <connection-options> <file1> <file2>
-```
-
-or collect running queries with:
+Collect live queries with:
 
 ```sh
 dexter <connection-options> --pg-stat-activity
 ```
 
-or use the [pg_stat_monitor](https://github.com/percona/pg_stat_monitor) extension: (unreleased, experimental)
+### Log Tables
 
-```sh
-dexter <connection-options> --pg-stat-monitor
+Enable logging for slow queries in your Postgres config file.
+
+```ini
+log_min_duration_statement = 10 # ms
 ```
 
-> Note: `pg_stat_monitor.pgsm_normalized_query` must be off (the default) to use this
-
-or pass a log table created with [file_fdw](https://www.postgresql.org/docs/current/file-fdw.html#id-1.11.7.25.14) with: (experimental)
+And pass a log table created with [file_fdw](https://www.postgresql.org/docs/current/file-fdw.html#id-1.11.7.25.14):
 
 ```sh
 dexter <connection-options> --log-table pglog --input-format csv
 ```
 
-### Collection Options
+### pg_stat_monitor
+
+Install the [pg_stat_monitor](https://github.com/percona/pg_stat_monitor) extension and use:
+
+```sh
+dexter <connection-options> --pg-stat-monitor
+```
+
+> Note: `pg_stat_monitor.pgsm_normalized_query` must be off (the default) to use this.
+
+## Collection Options
 
 To prevent one-off queries from being indexed, specify a minimum number of calls before a query is considered for indexing
 
@@ -138,12 +180,6 @@ You can do the same for total time a query has run
 dexter --min-time 10 # minutes
 ```
 
-Specify the format
-
-```sh
-dexter --input-format csv
-```
-
 When streaming logs, specify the time to wait between processing queries
 
 ```sh
@@ -155,19 +191,19 @@ dexter --interval 60 # seconds
 Postgres package on Ubuntu 22.04
 
 ```sh
-tail -F -n +1 /var/log/postgresql/postgresql-14-main.log | sudo -u postgres dexter dbname
+sudo -u postgres dexter -d dbname /var/log/postgresql/postgresql-14-main.log
 ```
 
 Homebrew Postgres on Mac ARM
 
 ```sh
-tail -F -n +1 /opt/homebrew/var/log/postgresql@14.log | dexter dbname
+dexter -d dbname /opt/homebrew/var/log/postgresql@14.log
 ```
 
 Homebrew Postgres on Mac x86-64
 
 ```sh
-tail -F -n +1 /usr/local/var/log/postgresql@14.log | dexter dbname
+dexter -d dbname /usr/local/var/log/postgresql@14.log
 ```
 
 ## Analyze

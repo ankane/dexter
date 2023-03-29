@@ -77,6 +77,8 @@ and connection strings:
 host=localhost port=5432 dbname=mydb
 ```
 
+Always make sure your [connection is secure](https://ankane.org/postgres-sslmode-explained) when connecting to a database over a network you don’t fully trust.
+
 ## Collecting Queries
 
 Dexter can collect queries from a number of sources.

@@ -4,16 +4,16 @@ Some hosted providers like Amazon RDS and Heroku do not support the HypoPG exten
 
 ### Install Postgres and Ruby
 
-Linux
+Ubuntu 22.04
 
 ```sh
-sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-sudo apt-get install -y wget ca-certificates
-wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get install -y curl ca-certificates gnupg
+curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg >/dev/null
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 sudo apt-get update
-sudo apt-get install -y postgresql-9.6 postgresql-server-dev-9.6
+sudo apt-get install -y postgresql-15 postgresql-server-dev-15
 sudo -u postgres createuser $(whoami) -s
-sudo apt-get install -y ruby2.2 ruby2.2-dev
+sudo apt-get install -y ruby3.0 ruby3.0-dev
 ```
 
 Mac
@@ -29,8 +29,8 @@ HypoPG
 
 ```sh
 cd /tmp
-curl -L https://github.com/dalibo/hypopg/archive/1.0.0.tar.gz | tar xz
-cd hypopg-1.0.0
+curl -L https://github.com/HypoPG/hypopg/archive/1.3.1.tar.gz | tar xz
+cd hypopg-1.3.1
 make
 make install # may need sudo
 ```

@@ -1,6 +1,6 @@
 ## 0.5.0 (unreleased)
 
-- Added support for explaining normalized queries
+- Added support for normalized queries
 - Added support for `pg_stat_monitor`
 - Improved output when HypoPG not installed
 - Dropped support for Ruby < 2.7

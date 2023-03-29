@@ -23,8 +23,6 @@ class InputTest < Minitest::Test
   end
 
   def test_pg_stat_monitor
-    skip if server_version < 11
-
     execute("CREATE EXTENSION IF NOT EXISTS pg_stat_monitor")
     execute("SELECT pg_stat_monitor_reset()")
     execute("SELECT * FROM posts WHERE id = 1")

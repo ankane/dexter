@@ -3,6 +3,7 @@
 - Added experimental support for `pg_stat_monitor`
 - Improved output when HypoPG not installed
 - Dropped support for Ruby < 2.7
+- Dropped support for Postgres < 10
 
 ## 0.4.3 (2023-03-26)
 

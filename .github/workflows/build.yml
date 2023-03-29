@@ -17,8 +17,6 @@ jobs:
             ruby: 2.7
           - postgres: 11
             ruby: 2.7
-          - postgres: 10
-            ruby: 2.7
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
@@ -39,8 +37,7 @@ jobs:
           make
           export PG_CONFIG=`which pg_config`
           sudo --preserve-env=PG_CONFIG make install
-      - if: ${{ matrix.postgres >= 11 }}
-        run: |
+      - run: |
           cd /tmp
           curl -L https://github.com/percona/pg_stat_monitor/archive/1.1.1.tar.gz | tar xz
           cd pg_stat_monitor-1.1.1

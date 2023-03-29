@@ -18,6 +18,10 @@ module Dexter
       @options = options
       @mutex = Mutex.new
 
+      if server_version_num < 110000
+        raise Dexter::Abort, "This version of Dexter requires Postgres 11+"
+      end
+
       create_extension unless extension_exists?
       execute("SET lock_timeout = '5s'")
     end
@@ -614,17 +618,13 @@ module Dexter
     end
 
     def materialized_views
-      if server_version_num >= 90300
-        result = execute <<~SQL
-          SELECT
-            schemaname || '.' || matviewname AS table_name
-          FROM
-            pg_matviews
-        SQL
-        result.map { |r| r["table_name"] }
-      else
-        []
-      end
+      result = execute <<~SQL
+        SELECT
+          schemaname || '.' || matviewname AS table_name
+        FROM
+          pg_matviews
+      SQL
+      result.map { |r| r["table_name"] }
     end
 
     def server_version_num

@@ -39,7 +39,7 @@ jobs:
           make
           export PG_CONFIG=`which pg_config`
           sudo --preserve-env=PG_CONFIG make install
-      - run:
+      - run: |
           cd /tmp
           curl -L https://github.com/percona/pg_stat_monitor/archive/1.1.1.tar.gz | tar xz
           cd pg_stat_monitor-1.1.1

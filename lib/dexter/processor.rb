@@ -23,8 +23,6 @@ module Dexter
           JsonLogParser.new(logfile, @collector)
         elsif options[:input_format] == "sql"
           SqlLogParser.new(logfile, @collector)
-        elsif options[:input_format] == "supabase"
-          SupabaseLogParser.new(logfile, @collector)
         else
           StderrLogParser.new(logfile, @collector)
         end

@@ -27,7 +27,6 @@ require_relative "dexter/pg_stat_activity_parser"
 require_relative "dexter/sql_log_parser"
 require_relative "dexter/stderr_log_parser"
 require_relative "dexter/stderr_log_table_parser"
-require_relative "dexter/supabase_log_parser"
 
 module Dexter
   class Abort < StandardError; end

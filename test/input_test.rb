@@ -17,10 +17,6 @@ class InputTest < Minitest::Test
     assert_index_file "queries.sql", "sql"
   end
 
-  def test_input_format_supabase
-    assert_index_file "supabase.csv", "supabase"
-  end
-
   # TODO improve
   def test_pg_stat_activity
     assert_dexter_output "Processing 0 new query fingerprints", ["--pg-stat-activity", "--once"]

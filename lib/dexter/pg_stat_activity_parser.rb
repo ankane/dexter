@@ -6,7 +6,11 @@ module Dexter
       loop do
         new_queries = {}
         @logfile.stat_activity.each do |row|
-          new_queries[row["id"]] = row
+          if row["state"] == "active"
+            new_queries[row["id"]] = row
+          else
+            process_entry(row["query"], row["duration_ms"].to_f)
+          end
         end
 
         # store queries after they complete

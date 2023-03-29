@@ -43,12 +43,12 @@ module Dexter
         SELECT
           pid || ':' || COALESCE(query_start, xact_start) AS id,
           query,
+          state,
           EXTRACT(EPOCH FROM NOW() - COALESCE(query_start, xact_start)) * 1000.0 AS duration_ms
         FROM
           pg_stat_activity
         WHERE
           datname = current_database()
-          AND state = 'active'
           AND pid != pg_backend_pid()
         ORDER BY
           1

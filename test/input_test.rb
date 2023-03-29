@@ -17,9 +17,9 @@ class InputTest < Minitest::Test
     assert_index_file "queries.sql", "sql"
   end
 
-  # TODO improve
   def test_pg_stat_activity
-    assert_dexter_output "Processing 0 new query fingerprints", ["--pg-stat-activity", "--once"]
+    execute("SELECT * FROM posts WHERE id = 1")
+    assert_dexter_output "Index found: public.posts (id)", ["--pg-stat-activity", "--once"]
   end
 
   def test_pg_stat_monitor

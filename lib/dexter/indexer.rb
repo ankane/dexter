@@ -652,7 +652,7 @@ module Dexter
 
     def stat_statements
       total_time = server_version_num >= 130000 ? "(total_plan_time + total_exec_time)" : "total_time"
-      result = execute <<~SQL
+      sql = <<~SQL
         SELECT
           DISTINCT query
         FROM
@@ -661,18 +661,18 @@ module Dexter
           pg_database ON pg_database.oid = pg_stat_statements.dbid
         WHERE
           datname = current_database()
-          AND #{total_time} >= #{@min_time * 60000}
-          AND calls >= #{@min_calls}
+          AND #{total_time} >= \$1
+          AND calls >= \$2
         ORDER BY
           1
       SQL
-      result.map { |q| q["query"] }
+      execute(sql, params: [@min_time * 60000, @min_calls]).map { |q| q["query"] }
     end
 
     def with_advisory_lock
       lock_id = 123456
       first_time = true
-      while execute("SELECT pg_try_advisory_lock(#{lock_id})").first["pg_try_advisory_lock"] != "t"
+      while execute("SELECT pg_try_advisory_lock($1)", params: [lock_id]).first["pg_try_advisory_lock"] != "t"
         if first_time
           log "Waiting for lock..."
           first_time = false
@@ -682,7 +682,7 @@ module Dexter
       yield
     ensure
       with_min_messages("error") do
-        execute("SELECT pg_advisory_unlock(#{lock_id})")
+        execute("SELECT pg_advisory_unlock($1)", params: [lock_id])
       end
     end
 

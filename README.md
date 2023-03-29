@@ -136,7 +136,7 @@ dexter <connection-options> -s "SELECT * FROM ..."
 
 ### Live Queries
 
-Collect live queries with:
+Get live queries from [pg_stat_activity](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW) with:
 
 ```sh
 dexter <connection-options> --pg-stat-activity

@@ -1,6 +1,6 @@
 ## 0.5.0 (unreleased)
 
-- Added experimental support for `pg_stat_monitor`
+- Added support for `pg_stat_monitor`
 - Improved output when HypoPG not installed
 - Dropped support for Ruby < 2.7
 - Dropped support for Postgres < 10

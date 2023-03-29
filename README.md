@@ -86,7 +86,7 @@ Dexter can collect queries from a number of sources.
 - [SQL files](#sql-files)
 - [Live queries](#live-queries)
 - [Log tables](#log-table) (experimental)
-- [pg_stat_monitor](#pg-stat-monitor) (unreleased, experimental)
+- [pg_stat_monitor](#pg-stat-monitor) (unreleased)
 
 ### Log Files
 

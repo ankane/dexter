@@ -116,6 +116,8 @@ or use the [pg_stat_monitor](https://github.com/percona/pg_stat_monitor) extensi
 dexter <connection-options> --pg-stat-monitor
 ```
 
+> Note: `pg_stat_monitor.pgsm_normalized_query` must be off (the default) to use this
+
 or pass a log table created with [file_fdw](https://www.postgresql.org/docs/current/file-fdw.html#id-1.11.7.25.14) with: (experimental)
 
 ```sh

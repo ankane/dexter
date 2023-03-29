@@ -25,6 +25,9 @@ module Dexter
       elsif options[:pg_stat_statements]
         # TODO support streaming option
         Indexer.new(options).process_stat_statements
+      elsif options[:pg_stat_monitor]
+        # TODO support streaming option
+        Indexer.new(options).process_stat_monitor
       elsif options[:pg_stat_activity]
         Processor.new(:pg_stat_activity, options).perform
       elsif options[:log_table]
@@ -47,6 +50,7 @@ module Dexter
         o.string "--input-format", "input format", default: "stderr"
         o.string "--log-table", "log table (experimental)"
         o.boolean "--pg-stat-activity", "use pg_stat_activity", default: false
+        o.boolean "--pg-stat-monitor", "use pg_stat_monitor", default: false
         o.boolean "--pg-stat-statements", "use pg_stat_statements", default: false, help: false
         o.string "-s", "--statement", "process a single statement"
         o.separator ""

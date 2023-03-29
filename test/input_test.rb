@@ -22,6 +22,13 @@ class InputTest < Minitest::Test
     assert_dexter_output "Processing 0 new query fingerprints", ["--pg-stat-activity", "--once"]
   end
 
+  def test_pg_stat_monitor
+    execute("CREATE EXTENSION IF NOT EXISTS pg_stat_monitor")
+    execute("SELECT pg_stat_monitor_reset()")
+    execute("SELECT * FROM posts WHERE id = 1")
+    assert_dexter_output "Index found: public.posts (id)", ["--pg-stat-monitor"]
+  end
+
   # TODO remove in 0.5.0
   def test_pg_stat_statements
     execute("CREATE EXTENSION IF NOT EXISTS pg_stat_statements")

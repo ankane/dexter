@@ -1,5 +1,6 @@
 ## 0.4.4 (unreleased)
 
+- Added experimental support for `pg_stat_monitor`
 - Improved output when HypoPG not installed
 
 ## 0.4.3 (2023-03-26)

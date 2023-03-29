@@ -39,5 +39,14 @@ jobs:
           make
           export PG_CONFIG=`which pg_config`
           sudo --preserve-env=PG_CONFIG make install
+      - run:
+          cd /tmp
+          curl -L https://github.com/percona/pg_stat_monitor/archive/1.1.1.tar.gz | tar xz
+          cd pg_stat_monitor-1.1.1
+          make USE_PGXS=1
+          export PG_CONFIG=`which pg_config`
+          sudo --preserve-env=PG_CONFIG make USE_PGXS=1 install
+          psql -d dexter_test -c "ALTER SYSTEM SET shared_preload_libraries = 'pg_stat_statements', 'pg_stat_monitor'"
+          sudo systemctl restart postgresql
       - run: chmod o+rx /home/runner
       - run: bundle exec rake test

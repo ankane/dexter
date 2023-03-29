@@ -23,8 +23,14 @@ class InputTest < Minitest::Test
   end
 
   def test_pg_stat_monitor
-    execute("CREATE EXTENSION IF NOT EXISTS pg_stat_monitor")
-    execute("SELECT pg_stat_monitor_reset()")
+    setup_pg_stat_monitor
+    execute("SELECT * FROM posts WHERE id = 1")
+    assert_dexter_output "Index found: public.posts (id)", ["--pg-stat-monitor"]
+  end
+
+  def test_pg_stat_monitor_normalized
+    setup_pg_stat_monitor
+    execute("SET pg_stat_monitor.pgsm_normalized_query = on")
     execute("SELECT * FROM posts WHERE id = 1")
     assert_dexter_output "Index found: public.posts (id)", ["--pg-stat-monitor"]
   end
@@ -99,5 +105,10 @@ class InputTest < Minitest::Test
   def assert_index_file(file, input_format)
     file = File.expand_path("../support/#{file}", __FILE__)
     assert_dexter_output "Index found: public.posts (id)", [file, "--input-format", input_format]
+  end
+
+  def setup_pg_stat_monitor
+    execute("CREATE EXTENSION IF NOT EXISTS pg_stat_monitor")
+    execute("SELECT pg_stat_monitor_reset()")
   end
 end

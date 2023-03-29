@@ -165,8 +165,6 @@ Install the [pg_stat_monitor](https://github.com/percona/pg_stat_monitor) extens
 dexter <connection-options> --pg-stat-monitor
 ```
 
-> Note: `pg_stat_monitor.pgsm_normalized_query` must be off (the default) to use this.
-
 ## Collection Options
 
 To prevent one-off queries from being indexed, specify a minimum number of calls before a query is considered for indexing

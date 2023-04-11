@@ -33,7 +33,7 @@ The command line tool is also available with [Docker](#docker), [Homebrew](#home
 Dexter needs a connection to your database and a source of queries (like a log file) to process.
 
 ```sh
-dexter -d dbname path/to/postgresql.log
+dexter -d dbname postgresql.log
 ```
 
 This finds slow queries and generates output like:

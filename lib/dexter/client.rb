@@ -70,7 +70,6 @@ module Dexter
         o.integer "--interval", "time to wait between processing queries, in seconds", default: 60
         o.float "--min-calls", "only process queries that have been called a certain number of times", default: 0
         o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
-        o.boolean "--once", "run once", default: false, help: false
         o.separator ""
 
         o.separator "Indexing options:"

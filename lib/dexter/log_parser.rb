@@ -4,8 +4,6 @@ module Dexter
 
     REGEX = /duration: (\d+\.\d+) ms  (statement|execute [^:]+): (.+)/
 
-    attr_accessor :once
-
     def initialize(logfile, collector)
       @logfile = logfile
       @collector = collector

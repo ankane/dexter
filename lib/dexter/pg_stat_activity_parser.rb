@@ -3,28 +3,28 @@ module Dexter
     def perform
       queries = {}
 
-      loop do
+      10.times do
         new_queries = {}
+        processed_queries = {}
         @logfile.stat_activity.each do |row|
           if row["state"] == "active"
             new_queries[row["id"]] = row
           else
             process_entry(row["query"], row["duration_ms"].to_f)
+            processed_queries[row["id"]] = true
           end
         end
 
         # store queries after they complete
         queries.each do |id, row|
-          unless new_queries[id]
+          if !new_queries[id] && !processed_queries[id]
             process_entry(row["query"], row["duration_ms"].to_f)
           end
         end
 
         queries = new_queries
 
-        break if once
-
-        sleep(1)
+        sleep(0.1)
       end
     end
   end

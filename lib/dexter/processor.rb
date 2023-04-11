@@ -29,7 +29,6 @@ module Dexter
 
       @starting_interval = 3
       @interval = options[:interval]
-      @log_parser.once = options[:once]
 
       @mutex = Mutex.new
       @last_checked_at = {}
@@ -38,7 +37,7 @@ module Dexter
     end
 
     def perform
-      if [STDIN, :pg_stat_activity, :log_table].include?(@logfile) && !@log_parser.once
+      if [STDIN].include?(@logfile)
         Thread.abort_on_exception = true
         Thread.new do
           sleep(@starting_interval)

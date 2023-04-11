@@ -34,6 +34,10 @@ module Dexter
         Processor.new(:log_table, options).perform
       elsif arguments.any?
         ARGV.replace(arguments)
+        if !options[:input_format]
+          ext = ARGV.map { |v| File.extname(v) }.uniq
+          options[:input_format] = ext.first[1..-1] if ext.size == 1
+        end
         Processor.new(ARGF, options).perform
       else
         Processor.new(STDIN, options).perform
@@ -47,7 +51,7 @@ module Dexter
         o.separator ""
 
         o.separator "Input options:"
-        o.string "--input-format", "input format", default: "stderr"
+        o.string "--input-format", "input format"
         o.string "--log-table", "log table (experimental)"
         o.boolean "--pg-stat-activity", "use pg_stat_activity", default: false
         o.boolean "--pg-stat-monitor", "use pg_stat_monitor", default: false

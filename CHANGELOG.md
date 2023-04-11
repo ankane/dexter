@@ -3,6 +3,7 @@
 - Added support for normalized queries
 - Added support for `pg_stat_monitor`
 - Improved output when HypoPG not installed
+- Detect input format based on file extension
 - Dropped support for Ruby < 2.7
 - Dropped support for Postgres < 11
 

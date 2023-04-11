@@ -1,14 +1,15 @@
 module Dexter
   class PgStatActivityParser < LogParser
     def perform
-      queries = {}
+      previous_queries = {}
 
       10.times do
-        new_queries = {}
+        active_queries = {}
         processed_queries = {}
+
         @logfile.stat_activity.each do |row|
           if row["state"] == "active"
-            new_queries[row["id"]] = row
+            active_queries[row["id"]] = row
           else
             process_entry(row["query"], row["duration_ms"].to_f)
             processed_queries[row["id"]] = true
@@ -16,13 +17,13 @@ module Dexter
         end
 
         # store queries after they complete
-        queries.each do |id, row|
-          if !new_queries[id] && !processed_queries[id]
+        previous_queries.each do |id, row|
+          if !active_queries[id] && !processed_queries[id]
             process_entry(row["query"], row["duration_ms"].to_f)
           end
         end
 
-        queries = new_queries
+        previous_queries = active_queries
 
         sleep(0.1)
       end

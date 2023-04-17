@@ -86,7 +86,6 @@ Dexter can collect queries from a number of sources.
 - [Log files](#log-file)
 - [SQL files](#sql-files)
 - [Live queries](#live-queries)
-- [pg_stat_monitor](#pg-stat-monitor) (unreleased)
 
 ### Log Files
 
@@ -140,14 +139,6 @@ Get live queries from the [pg_stat_activity](https://www.postgresql.org/docs/cur
 
 ```sh
 dexter <connection-options> --pg-stat-activity
-```
-
-### pg_stat_monitor
-
-Install the [pg_stat_monitor](https://github.com/percona/pg_stat_monitor) extension and use:
-
-```sh
-dexter <connection-options> --pg-stat-monitor
 ```
 
 ## Collection Options

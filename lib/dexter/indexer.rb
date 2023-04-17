@@ -25,12 +25,6 @@ module Dexter
       execute("SET lock_timeout = '5s'")
     end
 
-    def process_stat_monitor
-      queries = stat_monitor.map { |q| Query.new(q) }.sort_by(&:fingerprint).group_by(&:fingerprint).map { |_, v| v.first }
-      log "Processing #{queries.size} new query fingerprints"
-      process_queries(queries)
-    end
-
     def process_stat_statements
       queries = stat_statements.map { |q| Query.new(q) }.sort_by(&:fingerprint).group_by(&:fingerprint).map { |_, v| v.first }
       log "Processing #{queries.size} new query fingerprints"
@@ -657,26 +651,6 @@ module Dexter
           datname = current_database()
           AND #{total_time} >= \$1
           AND calls >= \$2
-        ORDER BY
-          1
-      SQL
-      execute(sql, params: [@min_time * 60000, @min_calls]).map { |q| q["query"] }
-    end
-
-    def stat_monitor
-      total_time = server_version_num >= 130000 ? "total_plan_time + total_exec_time" : "total_time"
-      sql = <<~SQL
-        SELECT
-          query
-        FROM
-          pg_stat_monitor
-        WHERE
-          datname = current_database()
-        GROUP BY
-          query
-        HAVING
-          SUM(#{total_time}) >= \$1
-          AND SUM(calls) >= \$2
         ORDER BY
           1
       SQL

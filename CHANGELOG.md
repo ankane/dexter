@@ -5,6 +5,7 @@
 - Changed `--pg-stat-activity` to run for one second
 - Detect input format based on file extension
 - Dropped support for experimental `--log-table` option
+- Dropped support for Linux packages for Ubuntu 18.04 and Debian 10
 - Dropped support for Ruby < 2.7
 - Dropped support for Postgres < 11
 

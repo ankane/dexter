@@ -128,7 +128,7 @@ module Dexter
     def analyze_tables(tables)
       tables = tables.to_a.sort
 
-      analyze_stats = execute <<~SQL
+      query = <<~SQL
         SELECT
           schemaname || '.' || relname AS table,
           last_analyze,
@@ -136,8 +136,9 @@ module Dexter
         FROM
           pg_stat_user_tables
         WHERE
-          schemaname || '.' || relname IN (#{tables.map { |t| quote(t) }.join(", ")})
+          schemaname || '.' || relname IN (#{tables.size.times.map { |i| "$#{i + 1}" }.join(", ")})
       SQL
+      analyze_stats = execute(query, params: tables.to_a)
 
       last_analyzed = {}
       analyze_stats.each do |stats|
@@ -521,10 +522,10 @@ module Dexter
       # as an extra defense against SQL-injection attacks.
       # https://www.postgresql.org/docs/current/static/libpq-exec.html
       query = squish(query) if pretty
-      log colorize("[sql] #{query}", :cyan) if @log_sql
+      log colorize("[sql] #{query}#{params.any? ? " /*#{params.to_json}*/" : ""}", :cyan) if @log_sql
 
       @mutex.synchronize do
-        conn.exec_params(query, params).to_a
+        conn.exec_params("#{query} /*dexter*/", params).to_a
       end
     end
 
@@ -689,7 +690,7 @@ module Dexter
     end
 
     def columns(tables)
-      columns = execute <<~SQL
+      query = <<~SQL
         SELECT
           s.nspname || '.' || t.relname AS table_name,
           a.attname AS column_name,
@@ -699,11 +700,11 @@ module Dexter
           JOIN pg_namespace s on t.relnamespace = s.oid
         WHERE a.attnum > 0
           AND NOT a.attisdropped
-          AND s.nspname || '.' || t.relname IN (#{tables.map { |t| quote(t) }.join(", ")})
+          AND s.nspname || '.' || t.relname IN (#{tables.size.times.map { |i| "$#{i + 1}" }.join(", ")})
         ORDER BY
           1, 2
       SQL
-
+      columns = execute(query, params: tables.to_a)
       columns.map { |v| {table: v["table_name"], column: v["column_name"], type: v["data_type"]} }
     end
 
@@ -723,14 +724,14 @@ module Dexter
         LEFT JOIN
           pg_stat_user_indexes ui ON ui.indexrelid = i.indexrelid
         WHERE
-          schemaname || '.' || t.relname IN (#{tables.map { |t| quote(t) }.join(", ")}) AND
+          schemaname || '.' || t.relname IN (#{tables.size.times.map { |i| "$#{i + 1}" }.join(", ")}) AND
           indisvalid = 't' AND
           indexprs IS NULL AND
           indpred IS NULL
         ORDER BY
           1, 2
       SQL
-      execute(query).map { |v| v["columns"] = v["columns"].sub(") WHERE (", " WHERE ").split(", ").map { |c| unquote(c) }; v }
+      execute(query, params: tables.to_a).map { |v| v["columns"] = v["columns"].sub(") WHERE (", " WHERE ").split(", ").map { |c| unquote(c) }; v }
     end
 
     def search_path
@@ -747,19 +748,6 @@ module Dexter
 
     def quote_ident(value)
       value.split(".").map { |v| conn.quote_ident(v) }.join(".")
-    end
-
-    def quote(value)
-      if value.is_a?(String)
-        "'#{quote_string(value)}'"
-      else
-        value
-      end
-    end
-
-    # from activerecord
-    def quote_string(s)
-      s.gsub(/\\/, '\&\&').gsub(/'/, "''")
     end
 
     # from activesupport

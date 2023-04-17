@@ -14,7 +14,6 @@ module Dexter
       @min_calls = options[:min_calls] || 0
       @analyze = options[:analyze]
       @min_cost_savings_pct = options[:min_cost_savings_pct].to_i
-      @log_table = options[:log_table]
       @options = options
       @mutex = Mutex.new
 
@@ -36,36 +35,6 @@ module Dexter
       queries = stat_statements.map { |q| Query.new(q) }.sort_by(&:fingerprint).group_by(&:fingerprint).map { |_, v| v.first }
       log "Processing #{queries.size} new query fingerprints"
       process_queries(queries)
-    end
-
-    # works with
-    # file_fdw: https://www.postgresql.org/docs/current/file-fdw.html
-    # log_fdw: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.Extensions.foreign-data-wrappers.html
-    def csvlog_activity(last_log_time)
-      query = <<~SQL
-        SELECT
-          log_time,
-          message,
-          detail
-        FROM
-          #{conn.quote_ident(@log_table)}
-        WHERE
-          log_time >= \$1
-      SQL
-      execute(query, params: [last_log_time])
-    end
-
-    # works with
-    # file_fdw: https://www.postgresql.org/docs/current/file-fdw.html
-    # log_fdw: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.Extensions.foreign-data-wrappers.html
-    def stderr_activity
-      query = <<~SQL
-        SELECT
-          log_entry
-        FROM
-          #{conn.quote_ident(@log_table)}
-      SQL
-      execute(query)
     end
 
     def process_queries(queries)

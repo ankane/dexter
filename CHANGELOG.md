@@ -5,6 +5,7 @@
 - Improved output when HypoPG not installed
 - Changed `--pg-stat-activity` to run for one second
 - Detect input format based on file extension
+- Dropped support for experimental `--log-table` option
 - Dropped support for Ruby < 2.7
 - Dropped support for Postgres < 11
 

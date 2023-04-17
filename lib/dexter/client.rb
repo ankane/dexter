@@ -30,8 +30,6 @@ module Dexter
         Indexer.new(options).process_stat_monitor
       elsif options[:pg_stat_activity]
         Processor.new(:pg_stat_activity, options).perform
-      elsif options[:log_table]
-        Processor.new(:log_table, options).perform
       elsif arguments.any?
         ARGV.replace(arguments)
         if !options[:input_format]
@@ -52,7 +50,6 @@ module Dexter
 
         o.separator "Input options:"
         o.string "--input-format", "input format"
-        o.string "--log-table", "log table (experimental)"
         o.boolean "--pg-stat-activity", "use pg_stat_activity", default: false
         o.boolean "--pg-stat-monitor", "use pg_stat_monitor", default: false
         o.boolean "--pg-stat-statements", "use pg_stat_statements", default: false, help: false

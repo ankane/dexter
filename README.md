@@ -86,7 +86,6 @@ Dexter can collect queries from a number of sources.
 - [Log files](#log-file)
 - [SQL files](#sql-files)
 - [Live queries](#live-queries)
-- [Log tables](#log-table) (experimental)
 - [pg_stat_monitor](#pg-stat-monitor) (unreleased)
 
 ### Log Files
@@ -141,20 +140,6 @@ Get live queries from the [pg_stat_activity](https://www.postgresql.org/docs/cur
 
 ```sh
 dexter <connection-options> --pg-stat-activity
-```
-
-### Log Tables
-
-Enable logging for slow queries in your Postgres config file.
-
-```ini
-log_min_duration_statement = 10 # ms
-```
-
-And pass a log table created with [file_fdw](https://www.postgresql.org/docs/current/file-fdw.html#id-1.11.7.25.14):
-
-```sh
-dexter <connection-options> --log-table pglog --input-format csv
 ```
 
 ### pg_stat_monitor

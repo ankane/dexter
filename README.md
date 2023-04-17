@@ -18,7 +18,7 @@ make
 make install # may need sudo
 ```
 
-> Note: If you have issues, make sure `postgresql-server-dev-*` is installed.
+See the [HypoPG installation notes](#hypopg-installation-notes) if you run into issues.
 
 And install the command line tool with:
 
@@ -220,6 +220,30 @@ For other providers, see [this guide](guides/Hosted-Postgres.md). To request a n
 - Amazon RDS - follow the instructions on [this page](https://aws.amazon.com/rds/postgresql/faqs/)
 - Google Cloud SQL - vote or comment on [this page](https://issuetracker.google.com/issues/69250435)
 - DigitalOcean Managed Databases - vote or comment on [this page](https://ideas.digitalocean.com/app-framework-services/p/support-hypopg-for-postgres)
+
+## HypoPG Installation Notes
+
+### Postgres Location
+
+If your machine has multiple Postgres installations, specify the path to [pg_config](https://www.postgresql.org/docs/current/app-pgconfig.html) with:
+
+```sh
+export PG_CONFIG=/Applications/Postgres.app/Contents/Versions/latest/bin/pg_config
+```
+
+Then re-run the installation instructions (run `make clean` before `make` if needed)
+
+### Missing Header
+
+If compilation fails with `fatal error: postgres.h: No such file or directory`, make sure Postgres development files are installed on the server.
+
+For Ubuntu and Debian, use:
+
+```sh
+sudo apt-get install postgresql-server-dev-15
+```
+
+Note: Replace `15` with your Postgres server version
 
 ## Additional Installation Methods
 

@@ -669,16 +669,19 @@ module Dexter
       end
       yield
     ensure
-      with_min_messages("error") do
+      suppress_messages do
         execute("SELECT pg_advisory_unlock($1)", params: [lock_id])
       end
     end
 
-    def with_min_messages(value)
-      execute("SET client_min_messages = #{quote(value)}")
+    def suppress_messages
+      conn.set_notice_processor do |message|
+        # do nothing
+      end
       yield
     ensure
-      execute("SET client_min_messages = warning")
+      # clear notice processor
+      conn.set_notice_processor
     end
 
     def index_exists?(index)

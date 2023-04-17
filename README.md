@@ -18,7 +18,7 @@ make
 make install # may need sudo
 ```
 
-See the [HypoPG installation notes](#hypopg-installation-notes) if you run into issues.
+See the [installation notes](#hypopg-installation-notes) if you run into issues.
 
 And install the command line tool with:
 

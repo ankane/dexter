@@ -38,23 +38,6 @@ module Dexter
       process_queries(queries)
     end
 
-    def stat_activity
-      execute <<~SQL
-        SELECT
-          pid || ':' || COALESCE(query_start, xact_start) AS id,
-          query,
-          state,
-          EXTRACT(EPOCH FROM NOW() - COALESCE(query_start, xact_start)) * 1000.0 AS duration_ms
-        FROM
-          pg_stat_activity
-        WHERE
-          datname = current_database()
-          AND pid != pg_backend_pid()
-        ORDER BY
-          1
-      SQL
-    end
-
     # works with
     # file_fdw: https://www.postgresql.org/docs/current/file-fdw.html
     # log_fdw: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.Extensions.foreign-data-wrappers.html

@@ -7,7 +7,7 @@ module Dexter
         active_queries = {}
         processed_queries = {}
 
-        @logfile.stat_activity.each do |row|
+        stat_activity.each do |row|
           if row["state"] == "active"
             active_queries[row["id"]] = row
           else
@@ -27,6 +27,24 @@ module Dexter
 
         sleep(0.1)
       end
+    end
+
+    def stat_activity
+      sql = <<~SQL
+        SELECT
+          pid || ':' || COALESCE(query_start, xact_start) AS id,
+          query,
+          state,
+          EXTRACT(EPOCH FROM NOW() - COALESCE(query_start, xact_start)) * 1000.0 AS duration_ms
+        FROM
+          pg_stat_activity
+        WHERE
+          datname = current_database()
+          AND pid != pg_backend_pid()
+        ORDER BY
+          1
+      SQL
+      @logfile.send(:execute, sql)
     end
   end
 end

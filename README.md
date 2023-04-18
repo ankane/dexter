@@ -130,22 +130,12 @@ And use:
 dexter <connection-options> postgresql.log
 ```
 
-For a `csvlog` destination, use:
-
-```sh
-dexter <connection-options> postgresql.csv --input-format csv
-```
-
-For a `jsonlog` destination, use:
-
-```sh
-dexter <connection-options> postgresql.json --input-format json
-```
+Supports `stderr`, `csvlog`, and `jsonlog` formats.
 
 For real-time indexing, pipe your logfile:
 
 ```sh
-tail -F -n +1 postgresql.log | dexter <connection-options>
+tail -F -n +1 postgresql.log | dexter <connection-options> --input-format stderr
 ```
 
 ### SQL Files
@@ -153,7 +143,7 @@ tail -F -n +1 postgresql.log | dexter <connection-options>
 Pass a SQL file with:
 
 ```sh
-dexter <connection-options> queries.sql --input-format sql
+dexter <connection-options> queries.sql
 ```
 
 Pass a single query with:

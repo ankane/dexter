@@ -18,9 +18,15 @@ make
 make install # may need sudo
 ```
 
+And enable it in databases where you want to use Dexter:
+
+```sql
+CREATE EXTENSION hypopg;
+```
+
 See the [installation notes](#hypopg-installation-notes) if you run into issues.
 
-And install the command line tool with:
+Then install the command line tool with:
 
 ```sh
 gem install pgdexter

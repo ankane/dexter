@@ -21,7 +21,8 @@ module Dexter
         raise Dexter::Abort, "This version of Dexter requires Postgres 11+"
       end
 
-      create_extension unless extension_exists?
+      check_extension
+
       execute("SET lock_timeout = '5s'")
     end
 
@@ -106,19 +107,24 @@ module Dexter
 
     private
 
-    def create_extension
-      execute("SET client_min_messages = warning")
-      begin
-        execute("CREATE EXTENSION IF NOT EXISTS hypopg")
-      rescue PG::UndefinedFile
+    def check_extension
+      extension = execute("SELECT installed_version FROM pg_available_extensions WHERE name = 'hypopg'").first
+
+      if extension.nil?
         raise Dexter::Abort, "Install HypoPG first: https://github.com/ankane/dexter#installation"
-      rescue PG::InsufficientPrivilege
-        raise Dexter::Abort, "Use a superuser to run: CREATE EXTENSION hypopg"
+      end
+
+      if extension["installed_version"].nil?
+        create_extension
       end
     end
 
-    def extension_exists?
-      execute("SELECT * FROM pg_available_extensions WHERE name = 'hypopg' AND installed_version IS NOT NULL").any?
+    def create_extension
+      suppress_messages do
+        execute("CREATE EXTENSION hypopg")
+      end
+    rescue PG::InsufficientPrivilege
+      raise Dexter::Abort, "Use a superuser to run: CREATE EXTENSION hypopg"
     end
 
     def reset_hypothetical_indexes

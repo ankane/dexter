@@ -1,4 +1,4 @@
-## 0.5.0 (unreleased)
+## 0.5.0 (2023-04-18)
 
 - Added support for normalized queries
 - Added `--stdin` option (now required to read from stdin)

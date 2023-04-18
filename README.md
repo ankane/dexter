@@ -89,9 +89,32 @@ Always make sure your [connection is secure](https://ankane.org/postgres-sslmode
 
 Dexter can collect queries from a number of sources.
 
+- [Query stats](#query-stats)
+- [Live queries](#live-queries)
 - [Log files](#log-file)
 - [SQL files](#sql-files)
-- [Live queries](#live-queries)
+
+### Query Stats
+
+Enable [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) in your database.
+
+```psql
+CREATE EXTENSION pg_stat_statements;
+```
+
+And use:
+
+```sh
+dexter <connection-options> --pg-stat-statements
+```
+
+### Live Queries
+
+Get live queries from the [pg_stat_activity](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW) view with:
+
+```sh
+dexter <connection-options> --pg-stat-activity
+```
 
 ### Log Files
 
@@ -137,14 +160,6 @@ Pass a single query with:
 
 ```sh
 dexter <connection-options> -s "SELECT * FROM ..."
-```
-
-### Live Queries
-
-Get live queries from the [pg_stat_activity](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW) view with:
-
-```sh
-dexter <connection-options> --pg-stat-activity
 ```
 
 ## Collection Options

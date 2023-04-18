@@ -23,8 +23,7 @@ module Dexter
         query = Query.new(options[:statement])
         Indexer.new(options).process_queries([query])
       elsif options[:pg_stat_statements]
-        # TODO support streaming option
-        Indexer.new(options).process_stat_statements
+        Processor.new(:pg_stat_statements, options).perform
       elsif options[:pg_stat_activity]
         Processor.new(:pg_stat_activity, options).perform
       elsif arguments.any?

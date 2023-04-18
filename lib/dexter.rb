@@ -23,7 +23,6 @@ require_relative "dexter/log_parser"
 require_relative "dexter/csv_log_parser"
 require_relative "dexter/json_log_parser"
 require_relative "dexter/pg_stat_activity_parser"
-require_relative "dexter/pg_stat_statements_parser"
 require_relative "dexter/sql_log_parser"
 require_relative "dexter/stderr_log_parser"
 

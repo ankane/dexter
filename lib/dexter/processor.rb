@@ -11,8 +11,6 @@ module Dexter
       @log_parser =
         if @logfile == :pg_stat_activity
           PgStatActivityParser.new(@indexer, @collector)
-        elsif @logfile == :pg_stat_statements
-          PgStatStatementsParser.new(@indexer, @collector)
         elsif options[:input_format] == "csv"
           CsvLogParser.new(logfile, @collector)
         elsif options[:input_format] == "json"

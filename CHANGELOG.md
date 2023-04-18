@@ -4,7 +4,7 @@
 - Added `--stdin` option
 - Added `--enable-hypopg` option
 - Improved output when HypoPG not installed
-- Changed `--pg-stat-activity` to run for one second
+- Changed `--pg-stat-activity` to sample 10 times and exit
 - Detect input format based on file extension
 - Dropped support for experimental `--log-table` option
 - Dropped support for Linux packages for Ubuntu 18.04 and Debian 10

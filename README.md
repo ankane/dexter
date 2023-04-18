@@ -135,8 +135,10 @@ Supports `stderr`, `csvlog`, and `jsonlog` formats.
 For real-time indexing, pipe your logfile:
 
 ```sh
-tail -F -n +1 postgresql.log | dexter <connection-options> --input-format stderr
+tail -F -n +1 postgresql.log | dexter <connection-options> --stdin
 ```
+
+And pass `--input-format csvlog` or `--input-format jsonlog` if needed.
 
 ### SQL Files
 
@@ -299,6 +301,16 @@ To use master, run:
 ```sh
 gem install specific_install
 gem specific_install https://github.com/ankane/dexter.git
+```
+
+## Upgrade Notes
+
+### 0.5.0
+
+The `--stdin` option is now required to read queries from stdin.
+
+```sh
+tail -F -n +1 postgresql.log | dexter <connection-options> --stdin
 ```
 
 ## Thanks

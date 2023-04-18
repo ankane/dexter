@@ -315,7 +315,7 @@ tail -F -n +1 postgresql.log | dexter <connection-options> --stdin
 
 ## Thanks
 
-This software wouldn’t be possible without [HypoPG](https://github.com/HypoPG/hypopg), which allows you to create hypothetical indexes, and [pg_query](https://github.com/lfittl/pg_query), which allows you to parse and fingerprint queries. A big thanks to Dalibo and Lukas Fittl respectively.
+This software wouldn’t be possible without [HypoPG](https://github.com/HypoPG/hypopg), which allows you to create hypothetical indexes, and [pg_query](https://github.com/lfittl/pg_query), which allows you to parse and fingerprint queries. A big thanks to Dalibo and Lukas Fittl respectively. Also, thanks to YugabyteDB for [this article](https://dev.to/yugabyte/explain-from-pgstatstatements-normalized-queries-how-to-always-get-the-generic-plan-in--5cfi) on how to explain normalized queries.
 
 ## Research
 

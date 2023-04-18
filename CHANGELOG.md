@@ -1,8 +1,8 @@
 ## 0.5.0 (unreleased)
 
 - Added support for normalized queries
-- Added `--stdin` option
-- Added `--enable-hypopg` option
+- Added `--stdin` option (now required to read from stdin)
+- Added `--enable-hypopg` option (now required to enable HypoPG)
 - Improved output when HypoPG not installed
 - Changed `--pg-stat-activity` to sample 10 times and exit
 - Detect input format based on file extension

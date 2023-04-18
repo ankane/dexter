@@ -29,6 +29,10 @@ class InputTest < Minitest::Test
     assert_dexter_output "Index found: public.posts (id)", ["--pg-stat-statements"]
   end
 
+  def test_no_source
+    assert_dexter_error("Specify a source of queries", [])
+  end
+
   private
 
   def assert_index_file(file)

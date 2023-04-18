@@ -34,8 +34,10 @@ module Dexter
           options[:input_format] = ext.first[1..-1] if ext.size == 1
         end
         Processor.new(ARGF, options).perform
-      else
+      elsif options[:stdin]
         Processor.new(STDIN, options).perform
+      else
+        raise Dexter::Abort, "Specify a source of queries: --pg-stat-statements, --pg-stat-activity, --stdin, or a path"
       end
     end
 
@@ -49,6 +51,7 @@ module Dexter
         o.string "--input-format", "input format"
         o.boolean "--pg-stat-activity", "use pg_stat_activity", default: false
         o.boolean "--pg-stat-statements", "use pg_stat_statements", default: false, help: false
+        o.boolean "--stdin", "use stdin", default: false
         o.string "-s", "--statement", "process a single statement"
         o.separator ""
 

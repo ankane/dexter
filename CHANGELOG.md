@@ -1,6 +1,7 @@
 ## 0.5.0 (unreleased)
 
 - Added support for normalized queries
+- Added `--enable-hypopg` option
 - Improved output when HypoPG not installed
 - Changed `--pg-stat-activity` to run for one second
 - Detect input format based on file extension

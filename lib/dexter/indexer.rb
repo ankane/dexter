@@ -115,16 +115,12 @@ module Dexter
       end
 
       if extension["installed_version"].nil?
-        create_extension
+        if @options[:enable_hypopg]
+          execute("CREATE EXTENSION hypopg")
+        else
+          raise Dexter::Abort, "Run `CREATE EXTENSION hypopg` or pass --enable-hypopg"
+        end
       end
-    end
-
-    def create_extension
-      suppress_messages do
-        execute("CREATE EXTENSION hypopg")
-      end
-    rescue PG::InsufficientPrivilege
-      raise Dexter::Abort, "Use a superuser to run: CREATE EXTENSION hypopg"
     end
 
     def reset_hypothetical_indexes

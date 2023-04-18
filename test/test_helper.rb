@@ -8,6 +8,7 @@ $conn = PG::Connection.open(dbname: "dexter_test")
 $conn.exec <<-SQL
 SET client_min_messages = warning;
 CREATE EXTENSION IF NOT EXISTS hstore;
+CREATE EXTENSION IF NOT EXISTS hypopg;
 DROP TABLE IF EXISTS posts CASCADE;
 CREATE TABLE posts (
   id int,

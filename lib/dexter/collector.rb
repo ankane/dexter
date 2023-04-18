@@ -8,7 +8,7 @@ module Dexter
       @min_calls = options[:min_calls]
     end
 
-    def add(query, duration)
+    def add(query, total_time, calls = 1)
       fingerprint =
         begin
           PgQuery.fingerprint(query)
@@ -19,8 +19,8 @@ module Dexter
       return unless fingerprint
 
       @top_queries[fingerprint] ||= {calls: 0, total_time: 0}
-      @top_queries[fingerprint][:calls] += 1
-      @top_queries[fingerprint][:total_time] += duration
+      @top_queries[fingerprint][:calls] += calls
+      @top_queries[fingerprint][:total_time] += total_time
       @top_queries[fingerprint][:query] = query
       @mutex.synchronize do
         @new_queries << fingerprint

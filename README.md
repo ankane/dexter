@@ -174,26 +174,6 @@ When streaming logs, specify the time to wait between processing queries
 dexter --interval 60 # seconds
 ```
 
-## Examples
-
-Postgres package on Ubuntu 22.04
-
-```sh
-sudo -u postgres dexter -d dbname /var/log/postgresql/postgresql-14-main.log
-```
-
-Homebrew Postgres on Mac ARM
-
-```sh
-dexter -d dbname /opt/homebrew/var/log/postgresql@14.log
-```
-
-Homebrew Postgres on Mac x86-64
-
-```sh
-dexter -d dbname /usr/local/var/log/postgresql@14.log
-```
-
 ## Analyze
 
 For best results, make sure your tables have been recently analyzed so statistics are up-to-date. You can ask Dexter to analyze tables it comes across that haven’t been analyzed in the past hour with:

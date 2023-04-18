@@ -36,10 +36,10 @@ The command line tool is also available with [Docker](#docker), [Homebrew](#home
 
 ## How to Use
 
-Dexter needs a connection to your database and a source of queries (like a log file) to process.
+Dexter needs a connection to your database and a source of queries (like [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html)) to process.
 
 ```sh
-dexter -d dbname postgresql.log
+dexter -d dbname --pg-stat-statements
 ```
 
 This finds slow queries and generates output like:

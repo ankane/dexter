@@ -1,3 +1,7 @@
+## 0.5.1 (unreleased)
+
+- Fixed `JSON::NestingError`
+
 ## 0.5.0 (2023-04-18)
 
 - Added support for normalized queries

@@ -29,8 +29,8 @@ HypoPG
 
 ```sh
 cd /tmp
-curl -L https://github.com/HypoPG/hypopg/archive/1.3.1.tar.gz | tar xz
-cd hypopg-1.3.1
+curl -L https://github.com/HypoPG/hypopg/archive/1.4.0.tar.gz | tar xz
+cd hypopg-1.4.0
 make
 make install # may need sudo
 ```

@@ -212,7 +212,7 @@ For other providers, see [this guide](guides/Hosted-Postgres.md). To request a n
 
 - Amazon RDS - follow the instructions on [this page](https://aws.amazon.com/rds/postgresql/faqs/)
 - Google Cloud SQL - vote or comment on [this page](https://issuetracker.google.com/issues/69250435)
-- DigitalOcean Managed Databases - vote or comment on [this page](https://ideas.digitalocean.com/app-framework-services/p/support-hypopg-for-postgres)
+- DigitalOcean Managed Databases - vote or comment on [this page](https://ideas.digitalocean.com/managed-database/p/support-hypopg-for-postgres)
 
 ## HypoPG Installation Notes
 

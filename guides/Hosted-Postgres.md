@@ -1,6 +1,6 @@
 # Hosted Postgres
 
-Some hosted providers like Amazon RDS and Heroku do not support the HypoPG extension, which Dexter needs to run. Hopefully this will change with time. For now, we can spin up a separate database instance to run Dexter. It’s not super convenient, but can be useful to do from time to time.
+Some hosted providers like Heroku do not support the HypoPG extension, which Dexter needs to run. Hopefully this will change with time. For now, we can spin up a separate database instance to run Dexter. It’s not super convenient, but can be useful to do from time to time.
 
 ### Install Postgres and Ruby
 
@@ -42,33 +42,6 @@ gem install pgdexter # may need sudo
 ```
 
 ### Download logs
-
-#### Amazon RDS
-
-Create an IAM user with the policy below:
-
-```
-{
-  "Statement": [
-    {
-      "Action": [
-        "rds:DescribeDBLogFiles",
-        "rds:DownloadDBLogFilePortion"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    }
-  ]
-}
-```
-
-And run:
-
-```sh
-aws configure
-gem install pghero_logs # may need sudo
-pghero_logs download <instance-id>
-```
 
 #### Heroku
 

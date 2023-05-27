@@ -13,8 +13,12 @@ namespace :docker do
   task :release do
     require_relative "lib/dexter/version"
 
-    system "docker buildx build --push --pull --no-cache --platform linux/amd64,linux/arm64 -t ankane/dexter:latest .", exception: true
-    system "docker buildx build --push --platform linux/amd64,linux/arm64 -t ankane/dexter:v#{Dexter::VERSION} .", exception: true
+    system "docker build --pull --no-cache --platform linux/amd64 -t ankane/dexter:latest .", exception: true
+    system "docker build --platform linux/amd64 -t ankane/dexter:v#{Dexter::VERSION} .", exception: true
+
+    # TODO solve error with google-protobuf
+    # system "docker buildx build --push --pull --no-cache --platform linux/amd64,linux/arm64 -t ankane/dexter:latest .", exception: true
+    # system "docker buildx build --push --platform linux/amd64,linux/arm64 -t ankane/dexter:v#{Dexter::VERSION} .", exception: true
   end
 end
 

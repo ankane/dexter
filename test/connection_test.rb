@@ -1,6 +1,11 @@
 require_relative "test_helper"
 
 class ConnectionTest < Minitest::Test
+  def setup
+    skip if ENV["DEXTER_URL"]
+    super
+  end
+
   def test_flag
     assert_connection ["-d", "dexter_test"]
   end

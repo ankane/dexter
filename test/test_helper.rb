@@ -4,7 +4,8 @@ require "minitest/autorun"
 require "minitest/pride"
 require "dexter"
 
-$conn = PG::Connection.open(dbname: "dexter_test")
+$url = ENV["DEXTER_URL"] || "postgres:///dexter_test"
+$conn = PG::Connection.new($url)
 $conn.exec <<-SQL
 SET client_min_messages = warning;
 CREATE EXTENSION IF NOT EXISTS hstore;
@@ -40,7 +41,7 @@ class Minitest::Test
   end
 
   def dexter_run(options)
-    dexter = Dexter::Client.new(["dexter_test"] + options + ["--log-level", "debug2", "--log-sql"])
+    dexter = Dexter::Client.new([$url] + options + ["--log-level", "debug2", "--log-sql"])
     ex = nil
     stdout, _ = capture_io do
       begin

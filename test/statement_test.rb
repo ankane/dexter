@@ -63,4 +63,8 @@ class StatementTest < Minitest::Test
   def test_schema
     assert_index "SELECT * FROM \"Bar\".\"Foo\" WHERE \"Id\" = 10000", "Bar.Foo (Id)"
   end
+
+  def test_normalized
+    assert_index "SELECT * FROM posts WHERE id = $1", "public.posts (id)"
+  end
 end

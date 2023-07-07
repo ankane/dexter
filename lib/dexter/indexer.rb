@@ -521,8 +521,8 @@ module Dexter
       raise Dexter::Abort, e.message
     end
 
-    def execute(query, pretty: true, params: [])
-      # use exec_params instead of exec for security
+    def execute(query, pretty: true, params: [], use_exec: false)
+      # use exec_params instead of exec when possible for security
       #
       # Unlike PQexec, PQexecParams allows at most one SQL command in the given string.
       # (There can be semicolons in it, but not more than one nonempty command.)
@@ -533,7 +533,11 @@ module Dexter
       log colorize("[sql] #{query}#{params.any? ? " /*#{params.to_json}*/" : ""}", :cyan) if @log_sql
 
       @mutex.synchronize do
-        conn.exec_params("#{query} /*dexter*/", params).to_a
+        if use_exec
+          conn.exec("#{query} /*dexter*/").to_a
+        else
+          conn.exec_params("#{query} /*dexter*/", params).to_a
+        end
       end
     end
 
@@ -543,7 +547,9 @@ module Dexter
 
       # try to EXPLAIN normalized queries
       # https://dev.to/yugabyte/explain-from-pgstatstatements-normalized-queries-how-to-always-get-the-generic-plan-in--5cfi
-      explain_normalized = query.include?("$1")
+      normalized = query.include?("$1")
+      generic_plan = normalized && server_version_num >= 160000
+      explain_normalized = normalized && !generic_plan
       if explain_normalized
         prepared_name = "dexter_prepared"
         execute("PREPARE #{prepared_name} AS #{safe_statement(query)}", pretty: false)
@@ -566,12 +572,14 @@ module Dexter
         end
       end
 
+      explain_prefix = generic_plan ? "GENERIC_PLAN, " : ""
+
       # strip semi-colons as another measure of defense
-      plan = JSON.parse(execute("EXPLAIN (FORMAT JSON) #{safe_statement(query)}", pretty: false).first["QUERY PLAN"], max_nesting: 1000).first["Plan"]
+      plan = JSON.parse(execute("EXPLAIN (#{explain_prefix}FORMAT JSON) #{safe_statement(query)}", pretty: false, use_exec: generic_plan).first["QUERY PLAN"], max_nesting: 1000).first["Plan"]
 
       if @log_explain
         # Pass format to prevent ANALYZE
-        puts execute("EXPLAIN (FORMAT TEXT) #{safe_statement(query)}", pretty: false).map { |r| r["QUERY PLAN"] }.join("\n")
+        puts execute("EXPLAIN (#{explain_prefix}FORMAT TEXT) #{safe_statement(query)}", pretty: false, use_exec: generic_plan).map { |r| r["QUERY PLAN"] }.join("\n")
       end
 
       plan

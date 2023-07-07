@@ -1,3 +1,7 @@
+## 0.5.2 (unreleased)
+
+- Use `GENERIC_PLAN` for Postgres 16
+
 ## 0.5.1 (2023-05-27)
 
 - Fixed `JSON::NestingError`

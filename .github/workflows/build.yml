@@ -8,7 +8,7 @@ jobs:
       matrix:
         include:
           - postgres: 16
-            ruby: 3.2
+            ruby: 3.3
           - postgres: 15
             ruby: 3.2
           - postgres: 14
@@ -20,7 +20,7 @@ jobs:
           - postgres: 11
             ruby: 2.7
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}

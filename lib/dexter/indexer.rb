@@ -185,7 +185,7 @@ module Dexter
 
       # get initial costs for queries
       calculate_plan(queries)
-      explainable_queries = queries.select { |q| q.explainable? && q.high_cost? }
+      explainable_queries = queries.select { |q| q.plans.any? && q.high_cost? }
 
       # filter tables for performance
       tables = Set.new(explainable_queries.flat_map(&:tables))

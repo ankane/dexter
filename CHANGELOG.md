@@ -1,6 +1,7 @@
 ## 0.5.2 (unreleased)
 
 - Switched to `GENERIC_PLAN` for Postgres 16
+- Fixed error with `auto_explain`
 - Fixed warning with Ruby 3.3
 
 ## 0.5.1 (2023-05-27)

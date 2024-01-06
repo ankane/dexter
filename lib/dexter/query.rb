@@ -31,7 +31,7 @@ module Dexter
     end
 
     def explainable?
-      plans.any?
+      plans.size >= 3
     end
 
     def costs

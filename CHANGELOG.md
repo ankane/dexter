@@ -1,5 +1,6 @@
 ## 0.5.2 (unreleased)
 
+- Added Docker image for `linux/arm64`
 - Switched to `GENERIC_PLAN` for Postgres 16
 - Fixed error with `auto_explain`
 - Fixed warning with Ruby 3.3

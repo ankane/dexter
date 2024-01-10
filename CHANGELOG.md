@@ -1,4 +1,4 @@
-## 0.5.2 (unreleased)
+## 0.5.2 (2024-01-10)
 
 - Added Docker image for `linux/arm64`
 - Switched to `GENERIC_PLAN` for Postgres 16

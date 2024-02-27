@@ -96,10 +96,16 @@ module Dexter
       analyze_tables(tables) if tables.any? && (@analyze || @log_level == "debug2")
 
       # create hypothetical indexes and explain queries
-      candidates = tables.any? ? create_hypothetical_indexes(queries.select(&:candidate_tables)) : {}
+      if tables.any?
+        # process in batches to prevent "hypopg: not more oid available" error
+        # https://hypopg.readthedocs.io/en/rel1_stable/usage.html#configuration
+        queries.select(&:candidate_tables).each_slice(500) do |batch|
+          create_hypothetical_indexes(batch)
+        end
+      end
 
       # see if new indexes were used and meet bar
-      new_indexes = determine_indexes(queries, candidates, tables)
+      new_indexes = determine_indexes(queries, tables)
 
       # display and create new indexes
       show_and_create_indexes(new_indexes, queries)
@@ -228,7 +234,9 @@ module Dexter
         calculate_plan(explainable_queries)
       end
 
-      candidates
+      queries.each do |query|
+        query.candidates = candidates
+      end
     end
 
     def find_columns(plan)
@@ -282,7 +290,7 @@ module Dexter
       query_indexes
     end
 
-    def determine_indexes(queries, index_name_to_columns, tables)
+    def determine_indexes(queries, tables)
       new_indexes = {}
 
       # filter out existing indexes
@@ -312,11 +320,11 @@ module Dexter
           cost_savings2 = new_cost > 100 && new_cost2 < new_cost * savings_ratio
 
           key = cost_savings2 ? 2 : 1
-          query_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[key], index_set)
+          query_indexes = hypo_indexes_from_plan(query.candidates, query.plans[key], index_set)
 
           # likely a bad suggestion, so try single column
           if cost_savings2 && query_indexes.size > 1
-            query_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[1], index_set)
+            query_indexes = hypo_indexes_from_plan(query.candidates, query.plans[1], index_set)
             cost_savings2 = false
           end
 
@@ -389,8 +397,8 @@ module Dexter
 
           # TODO optimize
           if @log_level.start_with?("debug")
-            query.pass1_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[1], index_set)
-            query.pass2_indexes = hypo_indexes_from_plan(index_name_to_columns, query.plans[2], index_set)
+            query.pass1_indexes = hypo_indexes_from_plan(query.candidates, query.plans[1], index_set)
+            query.pass2_indexes = hypo_indexes_from_plan(query.candidates, query.plans[2], index_set)
           end
         end
       end

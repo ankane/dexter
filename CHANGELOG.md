@@ -1,5 +1,6 @@
 ## 0.5.3 (unreleased)
 
+- Fixed error with hypothetical index limit
 - Fixed error with foreign tables
 
 ## 0.5.2 (2024-01-10)

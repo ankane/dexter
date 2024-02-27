@@ -1,3 +1,7 @@
+## 0.5.3 (unreleased)
+
+- Fixed error with foreign tables
+
 ## 0.5.2 (2024-01-10)
 
 - Added Docker image for `linux/arm64`

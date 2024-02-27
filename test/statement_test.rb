@@ -29,6 +29,10 @@ class StatementTest < Minitest::Test
     assert_index "SELECT * FROM posts_materialized WHERE id = 1", "public.posts_materialized (id)"
   end
 
+  def test_foreign_table
+    assert_no_index "SELECT * FROM comments WHERE post_id = 1"
+  end
+
   def test_cte
     assert_index "WITH cte AS (SELECT * FROM posts WHERE id = 1) SELECT * FROM cte", "public.posts (id)"
   end

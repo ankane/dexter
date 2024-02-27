@@ -612,6 +612,7 @@ module Dexter
           information_schema.tables
         WHERE
           table_catalog = current_database()
+          AND table_type IN ('BASE TABLE', 'VIEW')
       SQL
       result.map { |r| r["table_name"] }
     end

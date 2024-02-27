@@ -29,6 +29,11 @@ CREATE SCHEMA "Bar";
 CREATE TABLE "Bar"."Foo"("Id" int);
 INSERT INTO "Bar"."Foo" SELECT * FROM generate_series(1, 100000);
 ANALYZE "Bar"."Foo";
+
+CREATE EXTENSION IF NOT EXISTS postgres_fdw;
+CREATE SERVER IF NOT EXISTS other FOREIGN DATA WRAPPER postgres_fdw;
+DROP FOREIGN TABLE IF EXISTS comments;
+CREATE FOREIGN TABLE comments (post_id int) SERVER other;
 SQL
 
 class Minitest::Test

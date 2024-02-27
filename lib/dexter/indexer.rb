@@ -282,9 +282,8 @@ module Dexter
       query_indexes
     end
 
-    def determine_indexes(queries, candidates, tables)
+    def determine_indexes(queries, index_name_to_columns, tables)
       new_indexes = {}
-      index_name_to_columns = candidates.invert
 
       # filter out existing indexes
       # this must happen at end of process
@@ -595,7 +594,8 @@ module Dexter
       columns_by_table.each do |table, cols|
         # no reason to use btree index for json columns
         cols.reject { |c| ["json", "jsonb"].include?(c[:type]) }.permutation(n) do |col_set|
-          candidates[col_set] = create_hypothetical_index(table, col_set)
+          index_name = create_hypothetical_index(table, col_set)
+          candidates[index_name] = col_set
         end
       end
     end

@@ -1,4 +1,4 @@
-## 0.5.3 (unreleased)
+## 0.5.3 (2024-03-05)
 
 - Fixed error with hypothetical index limit
 - Fixed error with foreign tables

@@ -189,6 +189,8 @@ module Dexter
     def create_hypothetical_indexes(queries)
       candidates = {}
 
+      reset_hypothetical_indexes
+
       # get initial costs for queries
       calculate_plan(queries)
       explainable_queries = queries.select { |q| q.plans.any? && q.high_cost? }

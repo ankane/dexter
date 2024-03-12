@@ -1,3 +1,7 @@
+## 0.5.4 (unreleased)
+
+- Fixed issue with processing over 500 query fingerprints (introduced in 0.5.3)
+
 ## 0.5.3 (2024-03-05)
 
 - Fixed error with hypothetical index limit

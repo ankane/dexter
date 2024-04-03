@@ -1,4 +1,4 @@
-## 0.5.4 (unreleased)
+## 0.5.4 (2024-04-03)
 
 - Fixed issue with processing over 500 query fingerprints (introduced in 0.5.3)
 - Require google-protobuf < 4

@@ -682,7 +682,7 @@ module Dexter
         ORDER BY
           1
       SQL
-      execute(sql, params: [@min_time * 60000, @min_calls]).map { |q| q["query"] }
+      execute(sql, params: [@min_time * 60000, @min_calls.to_i]).map { |q| q["query"] }
     end
 
     def with_advisory_lock

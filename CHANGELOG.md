@@ -1,3 +1,7 @@
+## 0.5.5 (unreleased)
+
+- Fixed error with `--pg-stat-statements` and `--min-calls`
+
 ## 0.5.4 (2024-04-03)
 
 - Fixed issue with processing over 500 query fingerprints (introduced in 0.5.3)

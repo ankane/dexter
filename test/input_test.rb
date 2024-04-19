@@ -27,6 +27,7 @@ class InputTest < Minitest::Test
     execute("SELECT pg_stat_statements_reset()")
     execute("SELECT * FROM posts WHERE id = 1")
     assert_dexter_output "Index found: public.posts (id)", ["--pg-stat-statements"]
+    assert_dexter_output "Index found: public.posts (id)", ["--pg-stat-statements", "--min-calls", "1"]
   end
 
   def test_no_source

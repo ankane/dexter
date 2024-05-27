@@ -21,6 +21,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "csv"
   spec.add_dependency "google-protobuf", "< 4"
   spec.add_dependency "pg", ">= 0.18.2"
-  spec.add_dependency "pg_query", "~> 4"
+  spec.add_dependency "pg_query", "~> 5"
   spec.add_dependency "slop", ">= 4.10.1"
 end

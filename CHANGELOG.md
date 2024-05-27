@@ -1,5 +1,6 @@
 ## 0.5.5 (unreleased)
 
+- Updated pg_query to 5.1+ to fix installation on Windows
 - Fixed error with `--pg-stat-statements` and `--min-calls`
 
 ## 0.5.4 (2024-04-03)

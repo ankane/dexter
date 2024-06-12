@@ -1,3 +1,7 @@
+## 0.5.6 (unreleased)
+
+- Fixed Docker image for `linux/arm64`
+
 ## 0.5.5 (2024-06-02)
 
 - Updated pg_query to 5.1+ to fix installation on Windows

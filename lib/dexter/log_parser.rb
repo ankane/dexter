@@ -20,7 +20,7 @@ module Dexter
         params = Hash[details[12..-1].split(", ").map { |s| s.split(" = ", 2) }]
 
         # make sure parsing was successful
-        unless params.values.include?(nil)
+        unless params.value?(nil)
           params.each do |k, v|
             active_line.sub!(k, v)
           end

@@ -86,7 +86,7 @@ module Dexter
       end
 
       # remove system tables
-      tables.delete_if { |t| t.start_with?("information_schema.") || t.start_with?("pg_catalog.") }
+      tables.delete_if { |t| t.start_with?("information_schema.", "pg_catalog.") }
 
       queries.each do |query|
         query.candidate_tables = !query.missing_tables && query.tables.any? { |t| tables.include?(t) }
@@ -513,7 +513,7 @@ module Dexter
         # set connect timeout if none set
         ENV["PGCONNECT_TIMEOUT"] ||= "3"
 
-        if @options[:dbname] =~ /\Apostgres(ql)?:\/\//
+        if @options[:dbname].start_with?("postgres://", "postgresql://")
           config = @options[:dbname]
         else
           config = {

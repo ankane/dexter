@@ -1,5 +1,6 @@
 ## 0.5.6 (unreleased)
 
+- Updated pg_query
 - Fixed Docker image for `linux/arm64`
 
 ## 0.5.5 (2024-06-02)

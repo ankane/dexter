@@ -73,6 +73,7 @@ module Dexter
         o.boolean "--analyze", "analyze tables that haven't been analyzed in the past hour", default: false
         o.boolean "--create", "create indexes", default: false
         o.boolean "--enable-hypopg", "enable the HypoPG extension", default: false
+        o.boolean "--enable-hypopg-use-real-oids", "enable the HypoPG hypopg.use_real_oids -configuration", default: false
         o.array "--exclude", "prevent specific tables from being indexed"
         o.string "--include", "only include specific tables"
         o.integer "--min-cost-savings-pct", default: 50, help: false

@@ -103,15 +103,14 @@ module Dexter
         candidate_queries.select! { |q| q.initial_cost && q.high_cost? }
 
         # find columns
-        # TODO resolve possible tables
-        # TODO calculate all possible indexes for query
         candidate_queries.each do |query|
           log "Finding columns: #{query.statement}" if @log_level == "debug3"
+          columns = Set.new
           begin
             find_columns(query.tree).each do |col|
               last_col = col["fields"].last
               if last_col["String"]
-                query.columns << last_col["String"]["sval"]
+                columns << last_col["String"]["sval"]
               end
             end
           rescue JSON::NestingError
@@ -119,7 +118,12 @@ module Dexter
               log colorize("ERROR: Cannot get columns", :red)
             end
           end
+
+          # TODO resolve possible tables
+          # TODO calculate all possible indexes for query
+          query.columns = columns.to_a
         end
+        candidate_queries.select! { |q| q.columns.any? }
 
         # TODO sort batches
         # TODO limit batches to certain number of hypothetical indexes

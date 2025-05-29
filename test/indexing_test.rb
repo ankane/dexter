@@ -30,6 +30,6 @@ class IndexingTest < Minitest::Test
   end
 
   def test_min_cost_savings
-    assert_no_index "SELECT * FROM posts WHERE id = 1", "--min-cost-savings-pct 100", reason: "Need 100\% cost savings to suggest index"
+    assert_no_index "SELECT * FROM posts WHERE id = 1", "--min-cost-savings-pct 100", reason: "Need 100% cost savings to suggest index"
   end
 end

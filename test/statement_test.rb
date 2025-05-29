@@ -69,4 +69,12 @@ class StatementTest < Minitest::Test
   def test_normalized
     assert_index "SELECT * FROM posts WHERE id = $1", "public.posts (id)"
   end
+
+  def test_no_tables
+    assert_no_index "SELECT 1", reason: "No tables"
+  end
+
+  def test_parse_error
+    assert_no_index "SELECT +", reason: "Could not parse query"
+  end
 end

@@ -457,7 +457,7 @@ module Dexter
             log "Tables not present in current database"
           elsif query.candidate_tables.empty?
             log "No candidate tables for indexes"
-          elsif query.plans.any? && !query.high_cost?
+          elsif query.initial_cost && !query.high_cost?
             log "Low initial cost: #{query.initial_cost}"
           elsif query.explainable?
             query_indexes = query.indexes || []

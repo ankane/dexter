@@ -29,6 +29,10 @@ class StatementTest < Minitest::Test
     assert_index "SELECT * FROM posts_materialized WHERE id = 1", "public.posts_materialized (id)"
   end
 
+  def test_missing_table
+    assert_no_index "SELECT * FROM missing", reason: "Tables not present in current database"
+  end
+
   def test_foreign_table
     assert_no_index "SELECT * FROM comments WHERE post_id = 1", reason: "Tables not present in current database"
   end
@@ -72,6 +76,14 @@ class StatementTest < Minitest::Test
 
   def test_no_tables
     assert_no_index "SELECT 1", reason: "No tables"
+  end
+
+  def test_information_schema
+    assert_no_index "SELECT * FROM information_schema.tables", reason: "No candidate tables for indexes"
+  end
+
+  def test_pg_catalog
+    assert_no_index "SELECT * FROM pg_catalog.pg_index", reason: "No candidate tables for indexes"
   end
 
   def test_parse_error

@@ -77,4 +77,8 @@ class StatementTest < Minitest::Test
   def test_parse_error
     assert_no_index "SELECT +", reason: "Could not parse query"
   end
+
+  def test_indexed
+    assert_no_index "SELECT * FROM posts WHERE indexed = 1", reason: "Low initial cost"
+  end
 end

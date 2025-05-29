@@ -17,9 +17,11 @@ CREATE TABLE posts (
   user_id int,
   json json,
   jsonb jsonb,
-  hstore hstore
+  hstore hstore,
+  indexed int
 );
-INSERT INTO posts (SELECT n AS id, n % 1000 AS blog_id, n % 10 AS user_id FROM generate_series(1, 100000) n);
+INSERT INTO posts (id, blog_id, user_id, indexed) SELECT n, n % 1000, n % 10, n FROM generate_series(1, 100000) n;
+CREATE INDEX ON posts (indexed);
 CREATE VIEW posts_view AS SELECT id AS view_id FROM posts;
 CREATE MATERIALIZED VIEW posts_materialized AS SELECT * FROM posts;
 ANALYZE posts;

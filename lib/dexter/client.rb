@@ -64,8 +64,7 @@ module Dexter
 
         o.separator "Processing options:"
         o.integer "--interval", "time to wait between processing queries, in seconds", default: 60
-        # TODO change to integer in 0.6.0
-        o.float "--min-calls", "only process queries that have been called a certain number of times", default: 0
+        o.integer "--min-calls", "only process queries that have been called a certain number of times", default: 0
         o.float "--min-time", "only process queries that have consumed a certain amount of DB time, in minutes", default: 0
         o.separator ""
 

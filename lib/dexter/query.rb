@@ -13,6 +13,7 @@ module Dexter
       @plans = []
       @tables_from_views = []
       @candidate_tables = []
+      @columns = []
     end
 
     def tables

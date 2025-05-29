@@ -57,6 +57,19 @@ class StatementTest < Minitest::Test
     assert_index "SELECT * FROM posts ORDER BY user_id DESC LIMIT 10", "public.posts (user_id)"
   end
 
+  def test_order_column_number
+    assert_index "SELECT user_id FROM posts ORDER BY 1 DESC LIMIT 10", "public.posts (user_id)"
+  end
+
+  def test_order_column_number_star
+    # not ideal
+    assert_no_index "SELECT * FROM posts ORDER BY 1 DESC LIMIT 10", reason: "No candidate columns for indexes"
+  end
+
+  def test_order_column_alias
+    assert_index "SELECT user_id AS u FROM posts ORDER BY u DESC LIMIT 10", "public.posts (user_id)"
+  end
+
   def test_order_multiple
     assert_index "SELECT * FROM posts ORDER BY user_id, blog_id LIMIT 10", "public.posts (user_id, blog_id)"
   end

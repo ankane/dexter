@@ -463,6 +463,8 @@ module Dexter
             log "No candidate tables for indexes"
           elsif query.initial_cost && !query.high_cost?
             log "Low initial cost: #{query.initial_cost}"
+          elsif query.columns.empty?
+            log "No candidate columns for indexes"
           elsif query.fully_analyzed?
             query_indexes = query.indexes || []
             log "Start: #{query.costs[0]}"

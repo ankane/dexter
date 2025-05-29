@@ -38,16 +38,10 @@ class StatementTest < Minitest::Test
   end
 
   def test_cte_fence
-    if server_version >= 12
-      assert_index "WITH cte AS (SELECT * FROM posts) SELECT * FROM cte WHERE id = 1", "public.posts (id)"
-    else
-      assert_no_index "WITH cte AS (SELECT * FROM posts) SELECT * FROM cte WHERE id = 1"
-    end
+    assert_index "WITH cte AS (SELECT * FROM posts) SELECT * FROM cte WHERE id = 1", "public.posts (id)"
   end
 
   def test_materialized_cte
-    skip if server_version < 12
-
     assert_no_index "WITH MATERIALIZED cte AS (SELECT * FROM posts) SELECT * FROM cte WHERE id = 1"
   end
 

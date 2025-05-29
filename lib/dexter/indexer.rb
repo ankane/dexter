@@ -98,12 +98,13 @@ module Dexter
 
         # get initial costs for queries
         calculate_plan(queries.select(&:candidate_tables))
-        explainable_queries = queries.select { |q| q.plans.any? && q.high_cost? }
+        explainable_queries = queries.select { |q| q.plans.any? }
+        high_cost_queries = explainable_queries.select { |q| q.high_cost? }
 
         # find columns
         # TODO resolve possible tables
         # TODO calculate all possible indexes for query
-        explainable_queries.each do |query|
+        high_cost_queries.each do |query|
           log "Finding columns: #{query.statement}" if @log_level == "debug3"
           begin
             find_columns(query.tree).each do |col|
@@ -124,7 +125,7 @@ module Dexter
         # create hypothetical indexes and explain queries
         # process in batches to prevent "hypopg: not more oid available" error
         # https://hypopg.readthedocs.io/en/rel1_stable/usage.html#configuration
-        explainable_queries.each_slice(500) do |batch|
+        high_cost_queries.each_slice(500) do |batch|
           create_hypothetical_indexes(batch)
         end
       end
@@ -211,15 +212,15 @@ module Dexter
       end
     end
 
-    def create_hypothetical_indexes(explainable_queries)
+    def create_hypothetical_indexes(queries)
       candidates = {}
 
       reset_hypothetical_indexes
 
       # filter tables for performance
-      tables = Set.new(explainable_queries.flat_map(&:tables))
-      tables_from_views = Set.new(explainable_queries.flat_map(&:tables_from_views))
-      possible_columns = Set.new(explainable_queries.flat_map(&:columns))
+      tables = Set.new(queries.flat_map(&:tables))
+      tables_from_views = Set.new(queries.flat_map(&:tables_from_views))
+      possible_columns = Set.new(queries.flat_map(&:columns))
 
       # create hypothetical indexes
       # use all columns in tables from views
@@ -229,15 +230,15 @@ module Dexter
       create_hypothetical_indexes_helper(columns_by_table, 1, candidates)
 
       # get next round of costs
-      calculate_plan(explainable_queries)
+      calculate_plan(queries)
 
       # create multicolumn indexes
       create_hypothetical_indexes_helper(columns_by_table, 2, candidates)
 
       # get next round of costs
-      calculate_plan(explainable_queries)
+      calculate_plan(queries)
 
-      explainable_queries.each do |query|
+      queries.each do |query|
         query.candidates = candidates
       end
     end

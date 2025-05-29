@@ -41,8 +41,10 @@ class Minitest::Test
     assert_dexter_output "Index found: #{index}", ["-s", statement] + options.to_s.split(" ")
   end
 
-  def assert_no_index(statement, options = nil)
-    assert_dexter_output "No new indexes found", ["-s", statement] + options.to_s.split(" ")
+  def assert_no_index(statement, options = nil, reason: nil)
+    output = dexter_run(["-s", statement] + options.to_s.split(" "))
+    assert_match "No new indexes found", output
+    assert_match reason, output if reason
   end
 
   def dexter_run(options)

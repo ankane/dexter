@@ -14,7 +14,7 @@ class IndexingTest < Minitest::Test
   end
 
   def test_exclude
-    assert_no_index "SELECT * FROM posts WHERE id = 1", "--exclude posts"
+    assert_no_index "SELECT * FROM posts WHERE id = 1", "--exclude posts", reason: "No candidate tables for indexes"
   end
 
   def test_exclude_other
@@ -26,10 +26,10 @@ class IndexingTest < Minitest::Test
   end
 
   def test_include_other
-    assert_no_index "SELECT * FROM posts WHERE id = 1", "--include other"
+    assert_no_index "SELECT * FROM posts WHERE id = 1", "--include other", reason: "No candidate tables for indexes"
   end
 
   def test_min_cost_savings
-    assert_no_index "SELECT * FROM posts WHERE id = 1", "--min-cost-savings-pct 100"
+    assert_no_index "SELECT * FROM posts WHERE id = 1", "--min-cost-savings-pct 100", reason: "Need 100\% cost savings to suggest index"
   end
 end

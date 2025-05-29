@@ -30,7 +30,7 @@ class StatementTest < Minitest::Test
   end
 
   def test_foreign_table
-    assert_no_index "SELECT * FROM comments WHERE post_id = 1"
+    assert_no_index "SELECT * FROM comments WHERE post_id = 1", reason: "Tables not present in current database"
   end
 
   def test_cte

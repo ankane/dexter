@@ -86,6 +86,10 @@ class StatementTest < Minitest::Test
     assert_no_index "SELECT * FROM pg_catalog.pg_index", reason: "No candidate tables for indexes"
   end
 
+  def test_pg_index
+    assert_no_index "SELECT * FROM pg_index", reason: "No candidate tables for indexes"
+  end
+
   def test_parse_error
     assert_no_index "SELECT +", reason: "Could not parse query"
   end

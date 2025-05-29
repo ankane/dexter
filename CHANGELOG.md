@@ -1,5 +1,6 @@
 ## 0.6.0 (unreleased)
 
+- Dropped support for Linux package for Ubuntu 20.04
 - Dropped support for Ruby < 3
 
 ## 0.5.6 (2025-02-01)

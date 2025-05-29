@@ -13,7 +13,7 @@ sudo apt-get update
 sudo apt-get -y install dexter
 ```
 
-Supports Ubuntu 22.04 (Jammy) and 20.04 (Focal)
+Supports Ubuntu 22.04 (Jammy)
 
 ### Debian
 

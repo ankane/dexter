@@ -32,7 +32,7 @@ module Dexter
       parse.tree
     end
 
-    def explainable?
+    def fully_analyzed?
       plans.size >= 3
     end
 

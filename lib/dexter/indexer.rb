@@ -100,7 +100,7 @@ module Dexter
 
         # get initial costs for queries
         calculate_plan(candidate_queries)
-        candidate_queries.select! { |q| q.plans.any? && q.high_cost? }
+        candidate_queries.select! { |q| q.initial_cost && q.high_cost? }
 
         # find columns
         # TODO resolve possible tables
@@ -316,7 +316,7 @@ module Dexter
       savings_ratio = (1 - @min_cost_savings_pct / 100.0)
 
       queries.each do |query|
-        if query.explainable? && query.high_cost?
+        if query.fully_analyzed?
           new_cost, new_cost2 = query.costs[1..2]
 
           cost_savings = new_cost < query.initial_cost * savings_ratio
@@ -459,7 +459,7 @@ module Dexter
             log "No candidate tables for indexes"
           elsif query.initial_cost && !query.high_cost?
             log "Low initial cost: #{query.initial_cost}"
-          elsif query.explainable?
+          elsif query.fully_analyzed?
             query_indexes = query.indexes || []
             log "Start: #{query.costs[0]}"
             log "Pass1: #{query.costs[1]} : #{log_indexes(query.pass1_indexes || [])}"

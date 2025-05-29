@@ -50,7 +50,7 @@ class Minitest::Test
   end
 
   def dexter_run(options)
-    dexter = Dexter::Client.new([$url] + options + ["--log-level", "debug2", "--log-sql"])
+    dexter = Dexter::Client.new([$url] + options + ["--log-level", "debug2"])
     ex = nil
     stdout, _ = capture_io do
       begin

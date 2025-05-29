@@ -63,7 +63,10 @@ module Dexter
         set_query_columns(candidate_queries)
         candidate_queries.select! { |q| q.columns.any? }
 
-        # TODO sort batches
+        # sort to improve batching
+        # TODO improve
+        candidate_queries.sort_by! { |q| q.candidate_tables }
+
         # TODO limit batches to certain number of hypothetical indexes
         # create hypothetical indexes and explain queries
         # process in batches to prevent "hypopg: not more oid available" error

@@ -40,23 +40,13 @@ module Dexter
       no_schema_tables = self.no_schema_tables(tables)
       view_tables = self.view_tables(no_schema_tables)
 
-      # filter queries from other databases and system tables
+      set_query_tables(queries, no_schema_tables, view_tables)
       queries.each do |query|
-        # add schema to table if needed
-        query.tables = query.tables.map { |t| no_schema_tables[t] || t }
-
-        # substitute view tables
-        new_tables = query.tables.flat_map { |t| view_tables[t] || [t] }.uniq
-        query.tables_from_views = new_tables - query.tables
-        query.tables = new_tables
-
-        # check for missing tables
         query.missing_tables = !query.tables.all? { |t| tables.include?(t) }
       end
       candidate_queries = queries.reject(&:missing_tables)
 
       tables = determine_tables(candidate_queries)
-
       candidate_queries.each do |query|
         query.candidate_tables = query.tables.select { |t| tables.include?(t) }
       end
@@ -153,6 +143,18 @@ module Dexter
       end
 
       view_tables
+    end
+
+    def set_query_tables(queries, no_schema_tables, view_tables)
+      queries.each do |query|
+        # add schema to table if needed
+        query.tables = query.tables.map { |t| no_schema_tables[t] || t }
+
+        # substitute view tables
+        new_tables = query.tables.flat_map { |t| view_tables[t] || [t] }.uniq
+        query.tables_from_views = new_tables - query.tables
+        query.tables = new_tables
+      end
     end
 
     def determine_tables(candidate_queries)

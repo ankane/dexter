@@ -100,6 +100,27 @@ module Dexter
         calculate_plan(queries.select(&:candidate_tables))
         explainable_queries = queries.select { |q| q.plans.any? && q.high_cost? }
 
+        # find columns
+        # TODO resolve possible tables
+        # TODO calculate all possible indexes for query
+        explainable_queries.each do |query|
+          log "Finding columns: #{query.statement}" if @log_level == "debug3"
+          begin
+            find_columns(query.tree).each do |col|
+              last_col = col["fields"].last
+              if last_col["String"]
+                query.columns << last_col["String"]["sval"]
+              end
+            end
+          rescue JSON::NestingError
+            if @log_level.start_with?("debug")
+              log colorize("ERROR: Cannot get columns", :red)
+            end
+          end
+        end
+
+        # TODO sort batches
+        # TODO limit batches to certain number of hypothetical indexes
         # create hypothetical indexes and explain queries
         # process in batches to prevent "hypopg: not more oid available" error
         # https://hypopg.readthedocs.io/en/rel1_stable/usage.html#configuration
@@ -198,43 +219,23 @@ module Dexter
       # filter tables for performance
       tables = Set.new(explainable_queries.flat_map(&:tables))
       tables_from_views = Set.new(explainable_queries.flat_map(&:tables_from_views))
+      possible_columns = Set.new(explainable_queries.flat_map(&:columns))
 
-      if tables.any?
-        # since every set of multi-column indexes are expensive
-        # try to parse out columns
-        possible_columns = Set.new
-        explainable_queries.each do |query|
-          log "Finding columns: #{query.statement}" if @log_level == "debug3"
-          begin
-            find_columns(query.tree).each do |col|
-              last_col = col["fields"].last
-              if last_col["String"]
-                possible_columns << last_col["String"]["sval"]
-              end
-            end
-          rescue JSON::NestingError
-            if @log_level.start_with?("debug")
-              log colorize("ERROR: Cannot get columns", :red)
-            end
-          end
-        end
+      # create hypothetical indexes
+      # use all columns in tables from views
+      columns_by_table = columns(tables).select { |c| possible_columns.include?(c[:column]) || tables_from_views.include?(c[:table]) }.group_by { |c| c[:table] }
 
-        # create hypothetical indexes
-        # use all columns in tables from views
-        columns_by_table = columns(tables).select { |c| possible_columns.include?(c[:column]) || tables_from_views.include?(c[:table]) }.group_by { |c| c[:table] }
+      # create single column indexes
+      create_hypothetical_indexes_helper(columns_by_table, 1, candidates)
 
-        # create single column indexes
-        create_hypothetical_indexes_helper(columns_by_table, 1, candidates)
+      # get next round of costs
+      calculate_plan(explainable_queries)
 
-        # get next round of costs
-        calculate_plan(explainable_queries)
+      # create multicolumn indexes
+      create_hypothetical_indexes_helper(columns_by_table, 2, candidates)
 
-        # create multicolumn indexes
-        create_hypothetical_indexes_helper(columns_by_table, 2, candidates)
-
-        # get next round of costs
-        calculate_plan(explainable_queries)
-      end
+      # get next round of costs
+      calculate_plan(explainable_queries)
 
       explainable_queries.each do |query|
         query.candidates = candidates

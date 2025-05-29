@@ -1,6 +1,6 @@
 module Dexter
   class Query
-    attr_reader :statement, :fingerprint, :plans
+    attr_reader :statement, :fingerprint, :plans, :columns
     attr_writer :tables
     attr_accessor :missing_tables, :new_cost, :total_time, :calls, :indexes, :suggest_index, :pass1_indexes, :pass2_indexes, :pass3_indexes, :candidate_tables, :tables_from_views, :candidates
 
@@ -12,6 +12,7 @@ module Dexter
       @fingerprint = fingerprint
       @plans = []
       @tables_from_views = []
+      @columns = []
     end
 
     def tables

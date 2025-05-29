@@ -1,6 +1,6 @@
 module Dexter
   class Collector
-    def initialize(options = {})
+    def initialize(**options)
       @top_queries = {}
       @new_queries = Set.new
       @mutex = Mutex.new

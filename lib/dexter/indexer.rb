@@ -2,7 +2,7 @@ module Dexter
   class Indexer
     include Logging
 
-    def initialize(options)
+    def initialize(**options)
       @create = options[:create]
       @tablespace = options[:tablespace]
       @log_level = options[:log_level]

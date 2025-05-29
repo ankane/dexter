@@ -2,11 +2,11 @@ module Dexter
   class Processor
     include Logging
 
-    def initialize(logfile, options)
+    def initialize(logfile, interval: nil, **options)
       @logfile = logfile
 
       @collector = Collector.new(min_time: options[:min_time], min_calls: options[:min_calls])
-      @indexer = Indexer.new(options)
+      @indexer = Indexer.new(**options)
 
       @log_parser =
         if @logfile == :pg_stat_activity
@@ -22,7 +22,7 @@ module Dexter
         end
 
       @starting_interval = 3
-      @interval = options[:interval]
+      @interval = interval
 
       @mutex = Mutex.new
       @last_checked_at = {}

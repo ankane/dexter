@@ -21,21 +21,21 @@ module Dexter
 
       if options[:statement]
         query = Query.new(options[:statement])
-        Indexer.new(options).process_queries([query])
+        Indexer.new(**options).process_queries([query])
       elsif options[:pg_stat_statements]
         # TODO support streaming option
-        Indexer.new(options).process_stat_statements
+        Indexer.new(**options).process_stat_statements
       elsif options[:pg_stat_activity]
-        Processor.new(:pg_stat_activity, options).perform
+        Processor.new(:pg_stat_activity, **options).perform
       elsif arguments.any?
         ARGV.replace(arguments)
         if !options[:input_format]
           ext = ARGV.map { |v| File.extname(v) }.uniq
           options[:input_format] = ext.first[1..-1] if ext.size == 1
         end
-        Processor.new(ARGF, options).perform
+        Processor.new(ARGF, **options).perform
       elsif options[:stdin]
-        Processor.new(STDIN, options).perform
+        Processor.new(STDIN, **options).perform
       else
         raise Dexter::Abort, "Specify a source of queries: --pg-stat-statements, --pg-stat-activity, --stdin, or a path"
       end

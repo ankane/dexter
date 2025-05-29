@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = ["dexter"]
 
-  spec.required_ruby_version = ">= 2.7"
+  spec.required_ruby_version = ">= 3"
 
   spec.add_dependency "csv"
   spec.add_dependency "pg", ">= 0.18.2"

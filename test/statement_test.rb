@@ -45,6 +45,10 @@ class StatementTest < Minitest::Test
     assert_no_index "WITH cte AS MATERIALIZED (SELECT * FROM posts) SELECT * FROM cte WHERE id = 1"
   end
 
+  def test_not_materialized_cte
+    assert_index "WITH cte AS NOT MATERIALIZED (SELECT * FROM posts) SELECT * FROM cte WHERE id = 1", "public.posts (id)"
+  end
+
   def test_order
     assert_index "SELECT * FROM posts ORDER BY user_id DESC LIMIT 10", "public.posts (user_id)"
   end

@@ -17,8 +17,8 @@ module Dexter
       @options = options
       @mutex = Mutex.new
 
-      if server_version_num < 110000
-        raise Dexter::Abort, "This version of Dexter requires Postgres 11+"
+      if server_version_num < 130000
+        raise Dexter::Abort, "This version of Dexter requires Postgres 13+"
       end
 
       check_extension
@@ -569,16 +569,7 @@ module Dexter
         execute("BEGIN")
         transaction = true
 
-        if server_version_num >= 120000
-          execute("SET LOCAL plan_cache_mode = force_generic_plan")
-        else
-          execute("SET LOCAL cpu_operator_cost = 1e42")
-          5.times do
-            execute("EXPLAIN (FORMAT JSON) #{safe_statement(query)}", pretty: false)
-          end
-          execute("ROLLBACK")
-          execute("BEGIN")
-        end
+        execute("SET LOCAL plan_cache_mode = force_generic_plan")
       end
 
       explain_prefix = generic_plan ? "GENERIC_PLAN, " : ""
@@ -667,7 +658,6 @@ module Dexter
     end
 
     def stat_statements
-      total_time = server_version_num >= 130000 ? "(total_plan_time + total_exec_time)" : "total_time"
       sql = <<~SQL
         SELECT
           DISTINCT query
@@ -677,7 +667,7 @@ module Dexter
           pg_database ON pg_database.oid = pg_stat_statements.dbid
         WHERE
           datname = current_database()
-          AND #{total_time} >= \$1
+          AND (total_plan_time + total_exec_time) >= \$1
           AND calls >= \$2
         ORDER BY
           1

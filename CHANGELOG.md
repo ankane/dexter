@@ -2,6 +2,7 @@
 
 - Dropped support for Linux package for Ubuntu 20.04
 - Dropped support for Ruby < 3
+- Dropped support for Postgres < 13
 
 ## 0.5.6 (2025-02-01)
 

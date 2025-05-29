@@ -70,9 +70,10 @@ module Dexter
         # check for missing tables
         query.missing_tables = !query.tables.all? { |t| tables.include?(t) }
       end
+      candidate_queries = queries.reject(&:missing_tables)
 
       # set tables
-      tables = Set.new(queries.reject(&:missing_tables).flat_map(&:tables))
+      tables = Set.new(candidate_queries.flat_map(&:tables))
 
       # must come after missing tables set
       if @include_tables
@@ -88,23 +89,23 @@ module Dexter
       # remove system tables
       tables.delete_if { |t| t.start_with?("information_schema.", "pg_catalog.") }
 
-      queries.each do |query|
-        query.candidate_tables = !query.missing_tables && query.tables.any? { |t| tables.include?(t) }
+      candidate_queries.each do |query|
+        query.candidate_tables = query.tables.select { |t| tables.include?(t) }
       end
+      candidate_queries.select! { |q| q.candidate_tables.any? }
 
       if tables.any?
         # analyze tables if needed
         analyze_tables(tables) if @analyze || @log_level == "debug2"
 
         # get initial costs for queries
-        calculate_plan(queries.select(&:candidate_tables))
-        explainable_queries = queries.select { |q| q.plans.any? }
-        high_cost_queries = explainable_queries.select { |q| q.high_cost? }
+        calculate_plan(candidate_queries)
+        candidate_queries.select! { |q| q.plans.any? && q.high_cost? }
 
         # find columns
         # TODO resolve possible tables
         # TODO calculate all possible indexes for query
-        high_cost_queries.each do |query|
+        candidate_queries.each do |query|
           log "Finding columns: #{query.statement}" if @log_level == "debug3"
           begin
             find_columns(query.tree).each do |col|
@@ -125,7 +126,7 @@ module Dexter
         # create hypothetical indexes and explain queries
         # process in batches to prevent "hypopg: not more oid available" error
         # https://hypopg.readthedocs.io/en/rel1_stable/usage.html#configuration
-        high_cost_queries.each_slice(500) do |batch|
+        candidate_queries.each_slice(500) do |batch|
           create_hypothetical_indexes(batch)
         end
       end
@@ -454,7 +455,7 @@ module Dexter
             log "No tables"
           elsif query.missing_tables
             log "Tables not present in current database"
-          elsif !query.candidate_tables
+          elsif query.candidate_tables.empty?
             log "No candidate tables for indexes"
           elsif query.explainable? && !query.high_cost?
             log "Low initial cost: #{query.initial_cost}"

@@ -72,22 +72,7 @@ module Dexter
       end
       candidate_queries = queries.reject(&:missing_tables)
 
-      # set tables
-      tables = Set.new(candidate_queries.flat_map(&:tables))
-
-      # must come after missing tables set
-      if @include_tables
-        include_set = Set.new(@include_tables)
-        tables.keep_if { |t| include_set.include?(t) || include_set.include?(t.split(".")[-1]) }
-      end
-
-      if @exclude_tables.any?
-        exclude_set = Set.new(@exclude_tables)
-        tables.delete_if { |t| exclude_set.include?(t) || exclude_set.include?(t.split(".")[-1]) }
-      end
-
-      # remove system tables
-      tables.delete_if { |t| t.start_with?("information_schema.", "pg_catalog.") }
+      tables = determine_tables(candidate_queries)
 
       candidate_queries.each do |query|
         query.candidate_tables = query.tables.select { |t| tables.include?(t) }
@@ -162,6 +147,27 @@ module Dexter
 
     def reset_hypothetical_indexes
       execute("SELECT hypopg_reset()")
+    end
+
+    def determine_tables(candidate_queries)
+      # set tables
+      tables = Set.new(candidate_queries.flat_map(&:tables))
+
+      # must come after missing tables set
+      if @include_tables
+        include_set = Set.new(@include_tables)
+        tables.keep_if { |t| include_set.include?(t) || include_set.include?(t.split(".")[-1]) }
+      end
+
+      if @exclude_tables.any?
+        exclude_set = Set.new(@exclude_tables)
+        tables.delete_if { |t| exclude_set.include?(t) || exclude_set.include?(t.split(".")[-1]) }
+      end
+
+      # remove system tables
+      tables.delete_if { |t| t.start_with?("information_schema.", "pg_catalog.") }
+
+      tables
     end
 
     def analyze_tables(tables)

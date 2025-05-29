@@ -1,11 +1,11 @@
 module Dexter
   class Collector
-    def initialize(**options)
+    def initialize(min_time:, min_calls:)
       @top_queries = {}
       @new_queries = Set.new
       @mutex = Mutex.new
-      @min_time = options[:min_time] * 60000 # convert minutes to ms
-      @min_calls = options[:min_calls]
+      @min_time = min_time * 60000 # convert minutes to ms
+      @min_calls = min_calls
     end
 
     def add(query, total_time, calls = 1)

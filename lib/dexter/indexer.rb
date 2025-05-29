@@ -37,25 +37,8 @@ module Dexter
       reset_hypothetical_indexes
 
       tables = Set.new(database_tables + materialized_views)
-
-      # map tables without schema to schema
-      no_schema_tables = {}
-      search_path_index = Hash[search_path.map.with_index.to_a]
-      tables.group_by { |t| t.split(".")[-1] }.each do |group, t2|
-        no_schema_tables[group] = t2.sort_by { |t| [search_path_index[t.split(".")[0]] || 1000000, t] }[0]
-      end
-
-      # add tables from views
-      view_tables = database_view_tables
-      view_tables.each do |v, vt|
-        view_tables[v] = vt.map { |t| no_schema_tables[t] || t }
-      end
-
-      # fully resolve tables
-      # make sure no views in result
-      view_tables.each do |v, vt|
-        view_tables[v] = vt.flat_map { |t| view_tables[t] || [t] }.uniq
-      end
+      no_schema_tables = self.no_schema_tables(tables)
+      view_tables = self.view_tables(no_schema_tables)
 
       # filter queries from other databases and system tables
       queries.each do |query|
@@ -147,6 +130,29 @@ module Dexter
 
     def reset_hypothetical_indexes
       execute("SELECT hypopg_reset()")
+    end
+
+    def no_schema_tables(tables)
+      search_path_index = Hash[search_path.map.with_index.to_a]
+      tables.group_by { |t| t.split(".")[-1] }.to_h do |group, t2|
+        [group, t2.sort_by { |t| [search_path_index[t.split(".")[0]] || 1000000, t] }[0]]
+      end
+    end
+
+    def view_tables(no_schema_tables)
+      # add tables from views
+      view_tables = database_view_tables
+      view_tables.each do |v, vt|
+        view_tables[v] = vt.map { |t| no_schema_tables[t] || t }
+      end
+
+      # fully resolve tables
+      # make sure no views in result
+      view_tables.each do |v, vt|
+        view_tables[v] = vt.flat_map { |t| view_tables[t] || [t] }.uniq
+      end
+
+      view_tables
     end
 
     def determine_tables(candidate_queries)

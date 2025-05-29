@@ -96,10 +96,14 @@ module Dexter
         # analyze tables if needed
         analyze_tables(tables) if @analyze || @log_level == "debug2"
 
+        # get initial costs for queries
+        calculate_plan(queries.select(&:candidate_tables))
+        explainable_queries = queries.select { |q| q.plans.any? && q.high_cost? }
+
         # create hypothetical indexes and explain queries
         # process in batches to prevent "hypopg: not more oid available" error
         # https://hypopg.readthedocs.io/en/rel1_stable/usage.html#configuration
-        queries.select(&:candidate_tables).each_slice(500) do |batch|
+        explainable_queries.each_slice(500) do |batch|
           create_hypothetical_indexes(batch)
         end
       end
@@ -186,14 +190,10 @@ module Dexter
       end
     end
 
-    def create_hypothetical_indexes(queries)
+    def create_hypothetical_indexes(explainable_queries)
       candidates = {}
 
       reset_hypothetical_indexes
-
-      # get initial costs for queries
-      calculate_plan(queries)
-      explainable_queries = queries.select { |q| q.plans.any? && q.high_cost? }
 
       # filter tables for performance
       tables = Set.new(explainable_queries.flat_map(&:tables))
@@ -236,7 +236,7 @@ module Dexter
         calculate_plan(explainable_queries)
       end
 
-      queries.each do |query|
+      explainable_queries.each do |query|
         query.candidates = candidates
       end
     end

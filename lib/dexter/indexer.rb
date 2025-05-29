@@ -92,11 +92,11 @@ module Dexter
         query.candidate_tables = !query.missing_tables && query.tables.any? { |t| tables.include?(t) }
       end
 
-      # analyze tables if needed
-      analyze_tables(tables) if tables.any? && (@analyze || @log_level == "debug2")
-
-      # create hypothetical indexes and explain queries
       if tables.any?
+        # analyze tables if needed
+        analyze_tables(tables) if @analyze || @log_level == "debug2"
+
+        # create hypothetical indexes and explain queries
         # process in batches to prevent "hypopg: not more oid available" error
         # https://hypopg.readthedocs.io/en/rel1_stable/usage.html#configuration
         queries.select(&:candidate_tables).each_slice(500) do |batch|

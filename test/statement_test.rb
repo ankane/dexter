@@ -42,7 +42,7 @@ class StatementTest < Minitest::Test
   end
 
   def test_materialized_cte
-    assert_no_index "WITH MATERIALIZED cte AS (SELECT * FROM posts) SELECT * FROM cte WHERE id = 1"
+    assert_no_index "WITH cte AS MATERIALIZED (SELECT * FROM posts) SELECT * FROM cte WHERE id = 1"
   end
 
   def test_order

@@ -33,7 +33,6 @@ module Dexter
     end
 
     def process_queries(queries)
-      # reset hypothetical indexes
       reset_hypothetical_indexes
 
       tables = Set.new(database_tables + materialized_views)
@@ -61,26 +60,7 @@ module Dexter
         candidate_queries.select! { |q| q.initial_cost && q.high_cost? }
 
         # find columns
-        candidate_queries.each do |query|
-          log "Finding columns: #{query.statement}" if @log_level == "debug3"
-          columns = Set.new
-          begin
-            find_columns(query.tree).each do |col|
-              last_col = col["fields"].last
-              if last_col["String"]
-                columns << last_col["String"]["sval"]
-              end
-            end
-          rescue JSON::NestingError
-            if @log_level.start_with?("debug")
-              log colorize("ERROR: Cannot get columns", :red)
-            end
-          end
-
-          # TODO resolve possible tables
-          # TODO calculate all possible indexes for query
-          query.columns = columns.to_a
-        end
+        set_query_columns(candidate_queries)
         candidate_queries.select! { |q| q.columns.any? }
 
         # TODO sort batches
@@ -228,6 +208,29 @@ module Dexter
           end
         end
         puts if @log_explain
+      end
+    end
+
+    def set_query_columns(candidate_queries)
+      candidate_queries.each do |query|
+        log "Finding columns: #{query.statement}" if @log_level == "debug3"
+        columns = Set.new
+        begin
+          find_columns(query.tree).each do |col|
+            last_col = col["fields"].last
+            if last_col["String"]
+              columns << last_col["String"]["sval"]
+            end
+          end
+        rescue JSON::NestingError
+          if @log_level.start_with?("debug")
+            log colorize("ERROR: Cannot get columns", :red)
+          end
+        end
+
+        # TODO resolve possible tables
+        # TODO calculate all possible indexes for query
+        query.columns = columns.to_a
       end
     end
 

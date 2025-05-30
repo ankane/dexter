@@ -232,7 +232,7 @@ module Dexter
     end
 
     def create_hypothetical_indexes(queries)
-      candidates = {}
+      index_mapping = {}
 
       # filter tables for performance
       # use all columns in tables from views
@@ -242,19 +242,19 @@ module Dexter
       columns_by_table = columns(tables).select { |c| possible_columns.include?(c[:column]) || tables_from_views.include?(c[:table]) }.group_by { |c| c[:table] }
 
       # create single column indexes
-      create_hypothetical_indexes_helper(columns_by_table, 1, candidates)
+      create_hypothetical_indexes_helper(columns_by_table, 1, index_mapping)
 
       # get next round of costs
       calculate_plan(queries)
 
       # create multicolumn indexes
-      create_hypothetical_indexes_helper(columns_by_table, 2, candidates)
+      create_hypothetical_indexes_helper(columns_by_table, 2, index_mapping)
 
       # get next round of costs
       calculate_plan(queries)
 
       queries.each do |query|
-        query.candidates = candidates
+        query.index_mapping = index_mapping
       end
     end
 
@@ -288,16 +288,16 @@ module Dexter
       result
     end
 
-    def hypo_indexes_from_plan(index_name_to_columns, plan, index_set)
+    def hypo_indexes_from_plan(index_mapping, plan, index_set)
       query_indexes = []
 
       find_indexes(plan).uniq.sort.each do |index_name|
-        col_set = index_name_to_columns[index_name]
+        columns = index_mapping[index_name]
 
-        if col_set
+        if columns
           index = {
-            table: col_set[0][:table],
-            columns: col_set.map { |c| c[:column] }
+            table: columns[0][:table],
+            columns: columns.map { |c| c[:column] }
           }
 
           unless index_set.include?([index[:table], index[:columns]])
@@ -339,11 +339,11 @@ module Dexter
           cost_savings2 = new_cost > 100 && new_cost2 < new_cost * savings_ratio
 
           key = cost_savings2 ? 2 : 1
-          query_indexes = hypo_indexes_from_plan(query.candidates, query.plans[key], index_set)
+          query_indexes = hypo_indexes_from_plan(query.index_mapping, query.plans[key], index_set)
 
           # likely a bad suggestion, so try single column
           if cost_savings2 && query_indexes.size > 1
-            query_indexes = hypo_indexes_from_plan(query.candidates, query.plans[1], index_set)
+            query_indexes = hypo_indexes_from_plan(query.index_mapping, query.plans[1], index_set)
             cost_savings2 = false
           end
 
@@ -416,8 +416,8 @@ module Dexter
 
           # TODO optimize
           if @log_level.start_with?("debug")
-            query.pass1_indexes = hypo_indexes_from_plan(query.candidates, query.plans[1], index_set)
-            query.pass2_indexes = hypo_indexes_from_plan(query.candidates, query.plans[2], index_set)
+            query.pass1_indexes = hypo_indexes_from_plan(query.index_mapping, query.plans[1], index_set)
+            query.pass2_indexes = hypo_indexes_from_plan(query.index_mapping, query.plans[2], index_set)
           end
         end
       end
@@ -576,12 +576,12 @@ module Dexter
     end
 
     # TODO for multicolumn indexes, use ordering
-    def create_hypothetical_indexes_helper(columns_by_table, n, candidates)
+    def create_hypothetical_indexes_helper(columns_by_table, n, index_mapping)
       columns_by_table.each do |table, cols|
         # no reason to use btree index for json columns
         cols.reject { |c| ["json", "jsonb"].include?(c[:type]) }.permutation(n) do |col_set|
           index_name = create_hypothetical_index(table, col_set)
-          candidates[index_name] = col_set
+          index_mapping[index_name] = col_set
         end
       end
     end

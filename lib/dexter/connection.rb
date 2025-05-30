@@ -2,8 +2,8 @@ module Dexter
   class Connection
     include Logging
 
-    def initialize(**options)
-      @log_sql = options[:log_sql]
+    def initialize(log_sql: nil, **options)
+      @log_sql = log_sql
       @options = options
       @mutex = Mutex.new
     end

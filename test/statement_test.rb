@@ -13,6 +13,10 @@ class StatementTest < Minitest::Test
     assert_index "SELECT * FROM posts WHERE user_id = 1 AND blog_id = 2", "public.posts (user_id, blog_id)"
   end
 
+  def test_multicolumn_3pass
+    assert_index "SELECT * FROM posts WHERE user_id = 1 AND blog_id < 10", "public.posts (blog_id)"
+  end
+
   def test_multicolumn_order
     assert_index "SELECT * FROM posts WHERE user_id = 1 ORDER BY blog_id LIMIT 1000", "public.posts (user_id, blog_id)"
   end

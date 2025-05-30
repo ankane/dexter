@@ -138,7 +138,7 @@ For real-time indexing, pipe your logfile:
 tail -F -n +1 postgresql.log | dexter <connection-options> --stdin
 ```
 
-And pass `--input-format csvlog` or `--input-format jsonlog` if needed.
+And pass `--input-format csv` or `--input-format json` if needed.
 
 ### SQL Files
 

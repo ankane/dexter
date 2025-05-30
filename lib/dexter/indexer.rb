@@ -586,8 +586,8 @@ module Dexter
       end
     end
 
-    def create_hypothetical_index(table, col_set)
-      execute("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{col_set.map { |c| quote_ident(c[:column])  }.join(", ")})')").first["indexname"]
+    def create_hypothetical_index(table, columns)
+      execute("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{columns.map { |c| quote_ident(c[:column]) }.join(", ")})')").first["indexname"]
     end
 
     def database_tables

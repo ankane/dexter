@@ -2,9 +2,12 @@ module Dexter
   class Connection
     include Logging
 
-    def initialize(log_sql: nil, **options)
+    def initialize(dbname:, host:, port:, username:, log_sql:)
+      @dbname = dbname
+      @host = host
+      @port = port
+      @username = username
       @log_sql = log_sql
-      @options = options
       @mutex = Mutex.new
     end
 
@@ -35,14 +38,14 @@ module Dexter
         # set connect timeout if none set
         ENV["PGCONNECT_TIMEOUT"] ||= "3"
 
-        if @options[:dbname].to_s.start_with?("postgres://", "postgresql://")
-          config = @options[:dbname]
+        if @dbname.to_s.start_with?("postgres://", "postgresql://")
+          config = @dbname
         else
           config = {
-            host: @options[:host],
-            port: @options[:port],
-            dbname: @options[:dbname],
-            user: @options[:username]
+            host: @host,
+            port: @port,
+            dbname: @dbname,
+            user: @username
           }.reject { |_, value| value.to_s.empty? }
           config = config[:dbname] if config.keys == [:dbname] && config[:dbname].include?("=")
         end

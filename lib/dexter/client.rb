@@ -20,7 +20,7 @@ module Dexter
       STDERR.sync = true
 
       # note: connection is lazy
-      connection = Connection.new(**options)
+      connection = Connection.new(**options.slice(:dbname, :host, :port, :username, :log_sql))
 
       source =
         if options[:statement]

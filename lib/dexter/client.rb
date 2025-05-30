@@ -20,8 +20,9 @@ module Dexter
       STDERR.sync = true
 
       if options[:statement]
-        query = Query.new(options[:statement])
-        Indexer.new(**options).process_queries([query])
+        options[:min_calls] = 0
+        options[:min_time] = 0
+        Processor.new(:statement, **options).perform
       elsif options[:pg_stat_statements]
         # TODO support streaming option
         Processor.new(:pg_stat_statements, **options).perform

@@ -463,7 +463,7 @@ module Dexter
         index_queries.each do |query|
           log "-" * 80
           log "Query #{query.fingerprint}"
-          log "Total time: #{(query.total_time / 60000.0).round(1)} min, avg time: #{(query.total_time / query.calls.to_f).round} ms, calls: #{query.calls}" if query.total_time
+          log "Total time: #{(query.total_time / 60000.0).round(1)} min, avg time: #{(query.total_time / query.calls.to_f).round} ms, calls: #{query.calls}" if query.calls > 0
 
           if query.fingerprint == "unknown"
             log "Could not parse query"

@@ -6,9 +6,6 @@ module Dexter
 
     def initialize(statement, fingerprint = nil)
       @statement = statement
-      unless fingerprint
-        fingerprint = PgQuery.fingerprint(statement) rescue "unknown"
-      end
       @fingerprint = fingerprint
       @plans = []
       @tables_from_views = []

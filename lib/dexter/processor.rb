@@ -13,6 +13,8 @@ module Dexter
           PgStatActivityParser.new(@indexer, @collector)
         elsif @logfile == :pg_stat_statements
           PgStatStatementsParser.new(@indexer, @collector)
+        elsif @logfile == :statement
+          StatementParser.new(options[:statement], @collector)
         elsif options[:input_format] == "csv"
           CsvLogParser.new(logfile, @collector)
         elsif options[:input_format] == "json"
@@ -29,7 +31,7 @@ module Dexter
       @mutex = Mutex.new
       @last_checked_at = {}
 
-      log "Started" if @logfile != :pg_stat_statements
+      log "Started" if ![:pg_stat_statements, :statement].include?(@logfile)
     end
 
     def perform
@@ -76,7 +78,7 @@ module Dexter
         end
       end
 
-      log "Processing #{queries.size} new query fingerprints"
+      log "Processing #{queries.size} new query fingerprints" if @logfile != :statement
       @indexer.process_queries(queries) if queries.any?
     end
   end

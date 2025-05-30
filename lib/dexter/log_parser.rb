@@ -11,8 +11,8 @@ module Dexter
 
     private
 
-    def process_entry(query, duration, calls = 1)
-      @collector.add(query, duration, calls)
+    def process_entry(query, duration, calls = 1, keep_all = false)
+      @collector.add(query, duration, calls, keep_all)
     end
 
     def add_parameters(active_line, details)

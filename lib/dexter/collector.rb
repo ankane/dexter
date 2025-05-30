@@ -8,15 +8,15 @@ module Dexter
       @min_calls = min_calls
     end
 
-    def add(query, total_time, calls = 1)
+    def add(query, total_time, calls = 1, keep_all = false)
       fingerprint =
         begin
           PgQuery.fingerprint(query)
         rescue PgQuery::ParseError
-          # do nothing
+          "unknown"
         end
 
-      return unless fingerprint
+      return if fingerprint == "unknown" && !keep_all
 
       @top_queries[fingerprint] ||= {calls: 0, total_time: 0}
       @top_queries[fingerprint][:calls] += calls

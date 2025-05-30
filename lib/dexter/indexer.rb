@@ -534,7 +534,7 @@ module Dexter
         # set connect timeout if none set
         ENV["PGCONNECT_TIMEOUT"] ||= "3"
 
-        if @options[:dbname].start_with?("postgres://", "postgresql://")
+        if @options[:dbname].to_s.start_with?("postgres://", "postgresql://")
           config = @options[:dbname]
         else
           config = {

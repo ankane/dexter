@@ -2,18 +2,17 @@ module Dexter
   class Indexer
     include Logging
 
-    def initialize(**options)
+    def initialize(connection:, **options)
+      @connection = connection
       @create = options[:create]
       @tablespace = options[:tablespace]
       @log_level = options[:log_level]
       @exclude_tables = options[:exclude]
       @include_tables = Array(options[:include].split(",")) if options[:include]
-      @log_sql = options[:log_sql]
       @log_explain = options[:log_explain]
       @analyze = options[:analyze]
       @min_cost_savings_pct = options[:min_cost_savings_pct].to_i
       @options = options
-      @mutex = Mutex.new
 
       if server_version_num < 130000
         raise Dexter::Abort, "This version of Dexter requires Postgres 13+"
@@ -530,45 +529,11 @@ module Dexter
     end
 
     def conn
-      @conn ||= begin
-        # set connect timeout if none set
-        ENV["PGCONNECT_TIMEOUT"] ||= "3"
-
-        if @options[:dbname].to_s.start_with?("postgres://", "postgresql://")
-          config = @options[:dbname]
-        else
-          config = {
-            host: @options[:host],
-            port: @options[:port],
-            dbname: @options[:dbname],
-            user: @options[:username]
-          }.reject { |_, value| value.to_s.empty? }
-          config = config[:dbname] if config.keys == [:dbname] && config[:dbname].include?("=")
-        end
-        PG::Connection.new(config)
-      end
-    rescue PG::ConnectionBad => e
-      raise Dexter::Abort, e.message
+      @connection.send(:conn)
     end
 
-    def execute(query, pretty: true, params: [], use_exec: false)
-      # use exec_params instead of exec when possible for security
-      #
-      # Unlike PQexec, PQexecParams allows at most one SQL command in the given string.
-      # (There can be semicolons in it, but not more than one nonempty command.)
-      # This is a limitation of the underlying protocol, but has some usefulness
-      # as an extra defense against SQL-injection attacks.
-      # https://www.postgresql.org/docs/current/static/libpq-exec.html
-      query = squish(query) if pretty
-      log colorize("[sql] #{query}#{params.any? ? " /*#{params.to_json}*/" : ""}", :cyan) if @log_sql
-
-      @mutex.synchronize do
-        if use_exec
-          conn.exec("#{query} /*dexter*/").to_a
-        else
-          conn.exec_params("#{query} /*dexter*/", params).to_a
-        end
-      end
+    def execute(...)
+      @connection.execute(...)
     end
 
     def plan(query)
@@ -768,11 +733,6 @@ module Dexter
 
     def quote_ident(value)
       value.split(".").map { |v| conn.quote_ident(v) }.join(".")
-    end
-
-    # from activesupport
-    def squish(str)
-      str.to_s.gsub(/\A[[:space:]]+/, "").gsub(/[[:space:]]+\z/, "").gsub(/[[:space:]]+/, " ")
     end
 
     def safe_statement(statement)

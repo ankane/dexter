@@ -6,13 +6,14 @@ module Dexter
       @source = source
 
       @collector = Collector.new(min_time: min_time, min_calls: min_calls)
-      @indexer = Indexer.new(**options)
+      connection = Connection.new(**options)
+      @indexer = Indexer.new(connection: connection, **options)
 
       @source_processor =
         if @source == :pg_stat_activity
-          PgStatActivitySource.new(@indexer, @collector)
+          PgStatActivitySource.new(connection, @collector)
         elsif @source == :pg_stat_statements
-          PgStatStatementsSource.new(@indexer, @collector)
+          PgStatStatementsSource.new(connection, @collector)
         elsif @source == :statement
           StatementSource.new(options[:statement], @collector)
         else

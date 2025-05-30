@@ -1,7 +1,7 @@
 module Dexter
   class PgStatActivitySource
-    def initialize(indexer, collector)
-      @indexer = indexer
+    def initialize(connection, collector)
+      @connection = connection
       @collector = collector
     end
 
@@ -49,7 +49,7 @@ module Dexter
         ORDER BY
           1
       SQL
-      @indexer.send(:execute, sql)
+      @connection.execute(sql)
     end
   end
 end

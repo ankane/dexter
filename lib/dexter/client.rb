@@ -19,27 +19,32 @@ module Dexter
       STDOUT.sync = true
       STDERR.sync = true
 
-      if options[:statement]
-        options[:min_calls] = 0
-        options[:min_time] = 0
-        Processor.new(:statement, **options).perform
-      elsif options[:pg_stat_statements]
-        # TODO support streaming option
-        Processor.new(:pg_stat_statements, **options).perform
-      elsif options[:pg_stat_activity]
-        Processor.new(:pg_stat_activity, **options).perform
-      elsif arguments.any?
-        ARGV.replace(arguments)
-        if !options[:input_format]
-          ext = ARGV.map { |v| File.extname(v) }.uniq
-          options[:input_format] = ext.first[1..-1] if ext.size == 1
+      # note: connection is lazy
+      connection = Connection.new(**options)
+
+      source =
+        if options[:statement]
+          # TODO raise error for --interval, --min-calls, --min-time
+          StatementSource.new(options[:statement])
+        elsif options[:pg_stat_statements]
+          # TODO support streaming option
+          PgStatStatementsSource.new(connection)
+        elsif options[:pg_stat_activity]
+          PgStatActivitySource.new(connection)
+        elsif arguments.any?
+          ARGV.replace(arguments)
+          if !options[:input_format]
+            ext = ARGV.map { |v| File.extname(v) }.uniq
+            options[:input_format] = ext.first[1..-1] if ext.size == 1
+          end
+          LogSource.new(ARGF, options[:input_format])
+        elsif options[:stdin]
+          LogSource.new(STDIN, options[:input_format])
+        else
+          raise Dexter::Abort, "Specify a source of queries: --pg-stat-statements, --pg-stat-activity, --stdin, or a path"
         end
-        Processor.new(ARGF, **options).perform
-      elsif options[:stdin]
-        Processor.new(STDIN, **options).perform
-      else
-        raise Dexter::Abort, "Specify a source of queries: --pg-stat-statements, --pg-stat-activity, --stdin, or a path"
-      end
+
+      Processor.new(source, connection, **options).perform
     end
 
     def parse_args(args)

@@ -12,10 +12,15 @@ module Dexter
         else
           StderrLogParser.new(logfile)
         end
+      @stdin = logfile == STDIN
     end
 
     def perform(collector)
       @log_parser.perform(collector)
+    end
+
+    def stdin?
+      @stdin
     end
   end
 end

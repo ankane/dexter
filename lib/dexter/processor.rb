@@ -2,23 +2,10 @@ module Dexter
   class Processor
     include Logging
 
-    def initialize(source, interval: nil, min_time: nil, min_calls: nil, **options)
+    def initialize(source, connection, interval: nil, min_time: nil, min_calls: nil, **options)
       @source = source
-
       @collector = Collector.new(min_time: min_time, min_calls: min_calls)
-      connection = Connection.new(**options)
       @indexer = Indexer.new(connection: connection, **options)
-
-      @source_processor =
-        if @source == :pg_stat_activity
-          PgStatActivitySource.new(connection)
-        elsif @source == :pg_stat_statements
-          PgStatStatementsSource.new(connection)
-        elsif @source == :statement
-          StatementSource.new(options[:statement])
-        else
-          LogSource.new(source, options[:input_format])
-        end
 
       @starting_interval = 3
       @interval = interval
@@ -26,11 +13,11 @@ module Dexter
       @mutex = Mutex.new
       @last_checked_at = {}
 
-      log "Started" if ![:pg_stat_statements, :statement].include?(@source)
+      log "Started" if !@source.is_a?(PgStatStatementsSource) && !@source.is_a?(StatementSource)
     end
 
     def perform
-      if @source == STDIN
+      if @source.is_a?(LogSource) && @source.stdin?
         Thread.abort_on_exception = true
         Thread.new do
           sleep(@starting_interval)
@@ -46,7 +33,7 @@ module Dexter
       end
 
       begin
-        @source_processor.perform(@collector)
+        @source.perform(@collector)
       rescue Errno::ENOENT => e
         raise Dexter::Abort, "ERROR: #{e.message}"
       end
@@ -73,7 +60,7 @@ module Dexter
         end
       end
 
-      log "Processing #{queries.size} new query fingerprints" if @source != :statement
+      log "Processing #{queries.size} new query fingerprints" unless @source.is_a?(StatementSource)
       @indexer.process_queries(queries) if queries.any?
     end
   end

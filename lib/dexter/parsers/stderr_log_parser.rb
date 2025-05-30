@@ -4,14 +4,10 @@ module Dexter
     DETAIL_LINE = "DETAIL:  ".freeze
 
     def perform(collector)
-      process_stderr(collector, @logfile.each_line)
-    end
-
-    def process_stderr(collector, rows)
       active_line = nil
       duration = nil
 
-      rows.each do |line|
+      @logfile.each_line do |line|
         if active_line
           if line.include?(DETAIL_LINE)
             add_parameters(active_line, line.chomp.split(DETAIL_LINE)[1])

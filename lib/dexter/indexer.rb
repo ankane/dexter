@@ -365,7 +365,7 @@ module Dexter
 
             query_indexes.each do |query_index|
               reset_hypothetical_indexes
-              create_hypothetical_index(query_index[:table], query_index[:columns].map { |v| {column: v} })
+              create_hypothetical_index(query_index[:table], query_index[:columns])
               plan3 = plan(query.statement)
               cost3 = plan3["Total Cost"]
 

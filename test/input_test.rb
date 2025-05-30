@@ -39,6 +39,8 @@ class InputTest < Minitest::Test
 
   def assert_index_file(file)
     file = File.expand_path("support/#{file}", __dir__)
-    assert_dexter_output "Index found: public.posts (id)", file
+    output = dexter_run(file)
+    assert_match "Index found: public.posts (id)", output
+    assert_match "Processing 1 new query fingerprints", output
   end
 end

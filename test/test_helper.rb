@@ -3,7 +3,7 @@ Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
 
-$url = ENV["DEXTER_URL"] || "postgres:///dexter_test"
+$url = "postgres:///dexter_test"
 $conn = PG::Connection.new($url)
 $conn.exec("SET client_min_messages = warning")
 $conn.exec(File.read(File.expand_path("support/schema.sql", __dir__)))

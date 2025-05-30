@@ -24,8 +24,8 @@ class ConnectionTest < Minitest::Test
 
   private
 
-  def assert_connection(*flags)
-    dexter = Dexter::Client.new(flags + ["-s", "SELECT 1"])
+  def assert_connection(*args)
+    dexter = Dexter::Client.new(args + ["-s", "SELECT 1"])
     stdout, _ = capture_io { dexter.perform }
     puts stdout if ENV["VERBOSE"]
     assert_match "No new indexes found", stdout

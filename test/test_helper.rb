@@ -9,18 +9,18 @@ $conn.exec("SET client_min_messages = warning")
 $conn.exec(File.read(File.expand_path("support/schema.sql", __dir__)))
 
 class Minitest::Test
-  def assert_index(statement, index, *options)
-    assert_dexter_output "Index found: #{index}", "-s", statement, *options
+  def assert_index(statement, index, *args)
+    assert_dexter_output "Index found: #{index}", "-s", statement, *args
   end
 
-  def assert_no_index(statement, *options, reason: nil)
-    output = dexter_run("-s", statement, *options)
+  def assert_no_index(statement, *args, reason: nil)
+    output = dexter_run("-s", statement, *args)
     assert_match "No new indexes found", output
     assert_match reason, output if reason
   end
 
-  def dexter_run(*options)
-    dexter = Dexter::Client.new([$url] + options + ["--log-level", "debug2"])
+  def dexter_run(*args)
+    dexter = Dexter::Client.new([$url] + args + ["--log-level", "debug2"])
     ex = nil
     stdout, _ = capture_io do
       begin
@@ -34,13 +34,13 @@ class Minitest::Test
     stdout
   end
 
-  def assert_dexter_output(expected, *options)
-    assert_match expected, dexter_run(*options)
+  def assert_dexter_output(expected, *args)
+    assert_match expected, dexter_run(*args)
   end
 
-  def assert_dexter_error(expected, *options)
+  def assert_dexter_error(expected, *args)
     error = assert_raises do
-      dexter_run(*options)
+      dexter_run(*args)
     end
     assert_match expected, error.message
   end

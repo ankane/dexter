@@ -6,6 +6,7 @@ module Dexter
       end
     end
 
+    # could group, sum, and filter min_time/min_calls in SQL, but keep simple for now
     def stat_statements
       sql = <<~SQL
         SELECT

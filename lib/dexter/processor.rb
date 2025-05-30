@@ -2,10 +2,10 @@ module Dexter
   class Processor
     include Logging
 
-    def initialize(source, connection, interval: nil, min_time: nil, min_calls: nil, **options)
+    def initialize(source, collector, indexer, interval:)
       @source = source
-      @collector = Collector.new(min_time: min_time, min_calls: min_calls)
-      @indexer = Indexer.new(connection: connection, **options)
+      @collector = collector
+      @indexer = indexer
 
       @starting_interval = 3
       @interval = interval

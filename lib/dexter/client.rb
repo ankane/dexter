@@ -44,7 +44,11 @@ module Dexter
           raise Dexter::Abort, "Specify a source of queries: --pg-stat-statements, --pg-stat-activity, --stdin, or a path"
         end
 
-      Processor.new(source, connection, **options).perform
+      collector = Collector.new(**options.slice(:min_time, :min_calls))
+
+      indexer = Indexer.new(connection: connection, **options)
+
+      Processor.new(source, collector, indexer, **options.slice(:interval)).perform
     end
 
     def parse_args(args)

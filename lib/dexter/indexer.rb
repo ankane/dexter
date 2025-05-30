@@ -63,7 +63,7 @@ module Dexter
         # create hypothetical indexes and explain queries
         # process in batches to prevent "hypopg: not more oid available" error
         # https://hypopg.readthedocs.io/en/rel1_stable/usage.html#configuration
-        candidate_queries.each_slice(500) do |batch|
+        candidate_queries.each_slice(100) do |batch|
           create_hypothetical_indexes(batch)
         end
       end

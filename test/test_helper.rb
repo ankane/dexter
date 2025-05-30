@@ -76,7 +76,7 @@ class Minitest::Test
   end
 
   def server_version
-    execute("SHOW server_version_num").first["server_version_num"].to_i / 10000
+    @server_version ||= execute("SHOW server_version_num").first["server_version_num"].to_i / 10000
   end
 
   def execute(statement)

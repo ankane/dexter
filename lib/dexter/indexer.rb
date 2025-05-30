@@ -38,7 +38,7 @@ module Dexter
 
       tables = determine_tables(candidate_queries)
       candidate_queries.each do |query|
-        query.candidate_tables = query.tables.select { |t| tables.include?(t) }
+        query.candidate_tables = query.tables.select { |t| tables.include?(t) }.sort
       end
       candidate_queries.select! { |q| q.candidate_tables.any? }
 

@@ -33,7 +33,7 @@ module Dexter
     end
 
     def perform
-      if [STDIN].include?(@logfile)
+      if @logfile == STDIN
         Thread.abort_on_exception = true
         Thread.new do
           sleep(@starting_interval)

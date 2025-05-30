@@ -10,8 +10,6 @@ module Dexter
       @include_tables = Array(options[:include].split(",")) if options[:include]
       @log_sql = options[:log_sql]
       @log_explain = options[:log_explain]
-      @min_time = options[:min_time] || 0
-      @min_calls = options[:min_calls] || 0
       @analyze = options[:analyze]
       @min_cost_savings_pct = options[:min_cost_savings_pct].to_i
       @options = options
@@ -24,12 +22,6 @@ module Dexter
       check_extension
 
       execute("SET lock_timeout = '5s'")
-    end
-
-    def process_stat_statements
-      queries = stat_statements.map { |q| Query.new(q) }.sort_by(&:fingerprint).group_by(&:fingerprint).map { |_, v| v.first }
-      log "Processing #{queries.size} new query fingerprints"
-      process_queries(queries)
     end
 
     def process_queries(queries)
@@ -684,24 +676,6 @@ module Dexter
       end
 
       view_tables
-    end
-
-    def stat_statements
-      sql = <<~SQL
-        SELECT
-          DISTINCT query
-        FROM
-          pg_stat_statements
-        INNER JOIN
-          pg_database ON pg_database.oid = pg_stat_statements.dbid
-        WHERE
-          datname = current_database()
-          AND (total_plan_time + total_exec_time) >= \$1
-          AND calls >= \$2
-        ORDER BY
-          1
-      SQL
-      execute(sql, params: [@min_time * 60000, @min_calls.to_i]).map { |q| q["query"] }
     end
 
     def with_advisory_lock

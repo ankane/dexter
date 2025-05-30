@@ -235,12 +235,10 @@ module Dexter
       candidates = {}
 
       # filter tables for performance
-      tables = Set.new(queries.flat_map(&:tables))
+      # use all columns in tables from views
+      tables = Set.new(queries.flat_map(&:candidate_tables))
       tables_from_views = Set.new(queries.flat_map(&:tables_from_views))
       possible_columns = Set.new(queries.flat_map(&:columns))
-
-      # create hypothetical indexes
-      # use all columns in tables from views
       columns_by_table = columns(tables).select { |c| possible_columns.include?(c[:column]) || tables_from_views.include?(c[:table]) }.group_by { |c| c[:table] }
 
       # create single column indexes

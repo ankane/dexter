@@ -13,8 +13,9 @@ module Dexter
       @analyze = options[:analyze]
       @min_cost_savings_pct = options[:min_cost_savings_pct].to_i
       @options = options
+      @server_version_num = self.server_version_num
 
-      if server_version_num < 130000
+      if @server_version_num < 130000
         raise Dexter::Abort, "This version of Dexter requires Postgres 13+"
       end
 
@@ -23,9 +24,8 @@ module Dexter
       execute("SET lock_timeout = '5s'")
     end
 
+    # TODO recheck server version?
     def process_queries(queries)
-      reset_hypothetical_indexes
-
       tables = Set.new(database_tables + materialized_views)
       no_schema_tables = self.no_schema_tables(tables)
       view_tables = self.view_tables(no_schema_tables)
@@ -47,6 +47,7 @@ module Dexter
         analyze_tables(tables) if @analyze || @log_level == "debug2"
 
         # get initial costs for queries
+        reset_hypothetical_indexes
         calculate_plan(candidate_queries)
         candidate_queries.select! { |q| q.initial_cost && q.high_cost? }
 
@@ -230,8 +231,6 @@ module Dexter
 
     def create_hypothetical_indexes(queries)
       candidates = {}
-
-      reset_hypothetical_indexes
 
       # filter tables for performance
       tables = Set.new(queries.flat_map(&:tables))
@@ -543,7 +542,7 @@ module Dexter
       # try to EXPLAIN normalized queries
       # https://dev.to/yugabyte/explain-from-pgstatstatements-normalized-queries-how-to-always-get-the-generic-plan-in--5cfi
       normalized = query.include?("$1")
-      generic_plan = normalized && server_version_num >= 160000
+      generic_plan = normalized && @server_version_num >= 160000
       explain_normalized = normalized && !generic_plan
       if explain_normalized
         prepared_name = "dexter_prepared"

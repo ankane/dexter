@@ -1,5 +1,10 @@
 module Dexter
-  class PgStatActivityParser < LogParser
+  class PgStatActivityParser
+    def initialize(indexer, collector)
+      @indexer = indexer
+      @collector = collector
+    end
+
     def perform
       previous_queries = {}
 
@@ -11,7 +16,7 @@ module Dexter
           if row["state"] == "active"
             active_queries[row["id"]] = row
           else
-            process_entry(row["query"], row["duration_ms"].to_f)
+            @collector.add(row["query"], row["duration_ms"].to_f)
             processed_queries[row["id"]] = true
           end
         end
@@ -19,7 +24,7 @@ module Dexter
         # store queries after they complete
         previous_queries.each do |id, row|
           if !active_queries[id] && !processed_queries[id]
-            process_entry(row["query"], row["duration_ms"].to_f)
+            @collector.add(row["query"], row["duration_ms"].to_f)
           end
         end
 
@@ -44,7 +49,7 @@ module Dexter
         ORDER BY
           1
       SQL
-      @logfile.send(:execute, sql)
+      @indexer.send(:execute, sql)
     end
   end
 end

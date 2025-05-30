@@ -1,8 +1,13 @@
 module Dexter
-  class PgStatStatementsParser < LogParser
+  class PgStatStatementsParser
+    def initialize(indexer, collector)
+      @indexer = indexer
+      @collector = collector
+    end
+
     def perform
       stat_statements.each do |row|
-        process_entry(row["query"], row["duration_ms"].to_f, row["calls"].to_i)
+        @collector.add(row["query"], row["duration_ms"].to_f, row["calls"].to_i)
       end
     end
 
@@ -22,7 +27,7 @@ module Dexter
         ORDER BY
           1
       SQL
-      @logfile.send(:execute, sql)
+      @indexer.send(:execute, sql)
     end
   end
 end

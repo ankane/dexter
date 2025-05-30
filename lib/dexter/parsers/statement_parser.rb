@@ -1,7 +1,12 @@
 module Dexter
-  class StatementParser < LogParser
+  class StatementParser
+    def initialize(statement, collector)
+      @statement = statement
+      @collector = collector
+    end
+
     def perform
-      process_entry(@logfile, 0, 0, true)
+      @collector.add(@statement, 0, 0, true)
     end
   end
 end

@@ -2,27 +2,27 @@ module Dexter
   class Processor
     include Logging
 
-    def initialize(logfile, interval: nil, min_time: nil, min_calls: nil, **options)
-      @logfile = logfile
+    def initialize(source, interval: nil, min_time: nil, min_calls: nil, **options)
+      @source = source
 
       @collector = Collector.new(min_time: min_time, min_calls: min_calls)
       @indexer = Indexer.new(**options)
 
-      @log_parser =
-        if @logfile == :pg_stat_activity
+      @source_processor =
+        if @source == :pg_stat_activity
           PgStatActivityParser.new(@indexer, @collector)
-        elsif @logfile == :pg_stat_statements
+        elsif @source == :pg_stat_statements
           PgStatStatementsParser.new(@indexer, @collector)
-        elsif @logfile == :statement
+        elsif @source == :statement
           StatementParser.new(options[:statement], @collector)
         elsif options[:input_format] == "csv"
-          CsvLogParser.new(logfile, @collector)
+          CsvLogParser.new(source, @collector)
         elsif options[:input_format] == "json"
-          JsonLogParser.new(logfile, @collector)
+          JsonLogParser.new(source, @collector)
         elsif options[:input_format] == "sql"
-          SqlLogParser.new(logfile, @collector)
+          SqlLogParser.new(source, @collector)
         else
-          StderrLogParser.new(logfile, @collector)
+          StderrLogParser.new(source, @collector)
         end
 
       @starting_interval = 3
@@ -31,11 +31,11 @@ module Dexter
       @mutex = Mutex.new
       @last_checked_at = {}
 
-      log "Started" if ![:pg_stat_statements, :statement].include?(@logfile)
+      log "Started" if ![:pg_stat_statements, :statement].include?(@source)
     end
 
     def perform
-      if @logfile == STDIN
+      if @source == STDIN
         Thread.abort_on_exception = true
         Thread.new do
           sleep(@starting_interval)
@@ -51,7 +51,7 @@ module Dexter
       end
 
       begin
-        @log_parser.perform
+        @source_processor.perform
       rescue Errno::ENOENT => e
         raise Dexter::Abort, "ERROR: #{e.message}"
       end
@@ -78,7 +78,7 @@ module Dexter
         end
       end
 
-      log "Processing #{queries.size} new query fingerprints" if @logfile != :statement
+      log "Processing #{queries.size} new query fingerprints" if @source != :statement
       @indexer.process_queries(queries) if queries.any?
     end
   end

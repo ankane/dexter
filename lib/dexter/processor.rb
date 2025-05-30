@@ -2,10 +2,10 @@ module Dexter
   class Processor
     include Logging
 
-    def initialize(logfile, interval: nil, **options)
+    def initialize(logfile, interval: nil, min_time: nil, min_calls: nil, **options)
       @logfile = logfile
 
-      @collector = Collector.new(min_time: options[:min_time], min_calls: options[:min_calls])
+      @collector = Collector.new(min_time: min_time, min_calls: min_calls)
       @indexer = Indexer.new(**options)
 
       @log_parser =

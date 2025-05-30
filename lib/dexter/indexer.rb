@@ -153,9 +153,7 @@ module Dexter
       tables
     end
 
-    def analyze_tables(tables)
-      tables = tables.to_a.sort
-
+    def analyze_stats(tables)
       query = <<~SQL
         SELECT
           schemaname || '.' || relname AS table,
@@ -166,10 +164,14 @@ module Dexter
         WHERE
           schemaname || '.' || relname IN (#{tables.size.times.map { |i| "$#{i + 1}" }.join(", ")})
       SQL
-      analyze_stats = execute(query, params: tables.to_a)
+      execute(query, params: tables.to_a)
+    end
+
+    def analyze_tables(tables)
+      tables = tables.to_a.sort
 
       last_analyzed = {}
-      analyze_stats.each do |stats|
+      analyze_stats(tables).each do |stats|
         last_analyzed[stats["table"]] = Time.parse(stats["last_analyze"]) if stats["last_analyze"]
       end
 

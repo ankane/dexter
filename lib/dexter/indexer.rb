@@ -327,7 +327,7 @@ module Dexter
         end
       end
 
-      savings_ratio = (1 - @min_cost_savings_pct / 100.0)
+      savings_ratio = 1 - @min_cost_savings_pct / 100.0
 
       queries.each do |query|
         if query.fully_analyzed?

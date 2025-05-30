@@ -1,13 +1,12 @@
 module Dexter
   class PgStatStatementsSource
-    def initialize(connection, collector)
+    def initialize(connection)
       @connection = connection
-      @collector = collector
     end
 
-    def perform
+    def perform(collector)
       stat_statements.each do |row|
-        @collector.add(row["query"], row["duration_ms"].to_f, row["calls"].to_i)
+        collector.add(row["query"], row["duration_ms"].to_f, row["calls"].to_i)
       end
     end
 

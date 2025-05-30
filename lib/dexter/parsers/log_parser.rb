@@ -1,19 +1,12 @@
 module Dexter
   class LogParser
-    include Logging
-
     REGEX = /duration: (\d+\.\d+) ms  (statement|execute [^:]+): (.+)/
 
-    def initialize(logfile, collector)
+    def initialize(logfile)
       @logfile = logfile
-      @collector = collector
     end
 
     private
-
-    def process_entry(query, duration, calls = 1, keep_all = false)
-      @collector.add(query, duration, calls, keep_all)
-    end
 
     def add_parameters(active_line, details)
       if details.start_with?("parameters: ")

@@ -1,11 +1,10 @@
 module Dexter
   class PgStatActivitySource
-    def initialize(connection, collector)
+    def initialize(connection)
       @connection = connection
-      @collector = collector
     end
 
-    def perform
+    def perform(collector)
       previous_queries = {}
 
       10.times do
@@ -16,7 +15,7 @@ module Dexter
           if row["state"] == "active"
             active_queries[row["id"]] = row
           else
-            @collector.add(row["query"], row["duration_ms"].to_f)
+            collector.add(row["query"], row["duration_ms"].to_f)
             processed_queries[row["id"]] = true
           end
         end
@@ -24,7 +23,7 @@ module Dexter
         # store queries after they complete
         previous_queries.each do |id, row|
           if !active_queries[id] && !processed_queries[id]
-            @collector.add(row["query"], row["duration_ms"].to_f)
+            collector.add(row["query"], row["duration_ms"].to_f)
           end
         end
 

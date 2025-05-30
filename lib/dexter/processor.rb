@@ -11,13 +11,13 @@ module Dexter
 
       @source_processor =
         if @source == :pg_stat_activity
-          PgStatActivitySource.new(connection, @collector)
+          PgStatActivitySource.new(connection)
         elsif @source == :pg_stat_statements
-          PgStatStatementsSource.new(connection, @collector)
+          PgStatStatementsSource.new(connection)
         elsif @source == :statement
-          StatementSource.new(options[:statement], @collector)
+          StatementSource.new(options[:statement])
         else
-          LogSource.new(source, options[:input_format], @collector)
+          LogSource.new(source, options[:input_format])
         end
 
       @starting_interval = 3
@@ -46,7 +46,7 @@ module Dexter
       end
 
       begin
-        @source_processor.perform
+        @source_processor.perform(@collector)
       rescue Errno::ENOENT => e
         raise Dexter::Abort, "ERROR: #{e.message}"
       end

@@ -19,7 +19,7 @@ require_relative "dexter/query"
 require_relative "dexter/version"
 
 # parsers
-require_relative "dexter/log_parser"
+require_relative "dexter/parsers/log_parser"
 require_relative "dexter/parsers/csv_log_parser"
 require_relative "dexter/parsers/json_log_parser"
 require_relative "dexter/parsers/pg_stat_activity_parser"

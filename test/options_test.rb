@@ -7,8 +7,11 @@ class OptionsTest < Minitest::Test
     refute_match "ANALYZE", dexter_run(*args)
 
     output = dexter_run(*args, "--analyze")
-    assert_match %{Running analyze: ANALYZE "public"."posts"}, output
-    assert_match %{[sql] ANALYZE "public"."posts"}, output
+    # last analyze time not reset for Postgres < 15
+    if server_version >= 15
+      assert_match %{Running analyze: ANALYZE "public"."posts"}, output
+      assert_match %{[sql] ANALYZE "public"."posts"}, output
+    end
 
     refute_match "ANALYZE", dexter_run(*args, "--analyze")
   end

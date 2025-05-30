@@ -2,7 +2,6 @@ require "bundler/setup"
 Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
-require "dexter"
 
 $url = ENV["DEXTER_URL"] || "postgres:///dexter_test"
 $conn = PG::Connection.new($url)

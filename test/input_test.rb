@@ -37,7 +37,7 @@ class InputTest < Minitest::Test
   private
 
   def assert_index_file(file)
-    file = File.expand_path("../support/#{file}", __FILE__)
+    file = File.expand_path("support/#{file}", __dir__)
     assert_dexter_output "Index found: public.posts (id)", [file]
   end
 end

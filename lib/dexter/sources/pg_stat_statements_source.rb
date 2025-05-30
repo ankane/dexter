@@ -15,7 +15,7 @@ module Dexter
       sql = <<~SQL
         SELECT
           query,
-          (total_plan_time + total_exec_time) AS duration_ms,
+          total_plan_time + total_exec_time AS duration_ms,
           calls
         FROM
           pg_stat_statements

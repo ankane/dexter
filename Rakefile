@@ -28,7 +28,7 @@ namespace :bench do
     require "benchmark/ips"
     require "dexter"
 
-    indexer = Dexter::Indexer.new({})
+    indexer = Dexter::Indexer.new
     query = Dexter::Query.new("SELECT * FROM posts WHERE user_id = 1 ORDER BY blog_id LIMIT 1000")
     Benchmark.ips do |x|
       x.report("find_columns") do

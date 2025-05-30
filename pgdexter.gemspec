@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 3"
 
   spec.add_dependency "csv"
-  spec.add_dependency "pg", ">= 0.18.2"
+  spec.add_dependency "pg", ">= 1"
   spec.add_dependency "pg_query", "~> 6"
   spec.add_dependency "slop", ">= 4.10.1"
 end

@@ -580,14 +580,14 @@ module Dexter
       columns_by_table.each do |table, cols|
         # no reason to use btree index for json columns
         cols.reject { |c| ["json", "jsonb"].include?(c[:type]) }.permutation(n) do |col_set|
-          index_name = create_hypothetical_index(table, col_set)
+          index_name = create_hypothetical_index(table, col_set.map { |c| c[:column] })
           index_mapping[index_name] = col_set
         end
       end
     end
 
     def create_hypothetical_index(table, columns)
-      execute("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{columns.map { |c| quote_ident(c[:column]) }.join(", ")})')").first["indexname"]
+      execute("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{columns.map { |c| quote_ident(c) }.join(", ")})')").first["indexname"]
     end
 
     def database_tables

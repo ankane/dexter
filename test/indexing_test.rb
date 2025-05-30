@@ -8,28 +8,28 @@ class IndexingTest < Minitest::Test
   end
 
   def test_tablespace
-    assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--create --tablespace pg_default"
+    assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--create", "--tablespace", "pg_default"
   ensure
     execute("DROP INDEX posts_id_idx")
   end
 
   def test_exclude
-    assert_no_index "SELECT * FROM posts WHERE id = 1", "--exclude posts", reason: "No candidate tables for indexes"
+    assert_no_index "SELECT * FROM posts WHERE id = 1", "--exclude", "posts", reason: "No candidate tables for indexes"
   end
 
   def test_exclude_other
-    assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--exclude other"
+    assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--exclude", "other"
   end
 
   def test_include
-    assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--include posts"
+    assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--include", "posts"
   end
 
   def test_include_other
-    assert_no_index "SELECT * FROM posts WHERE id = 1", "--include other", reason: "No candidate tables for indexes"
+    assert_no_index "SELECT * FROM posts WHERE id = 1", "--include", "other", reason: "No candidate tables for indexes"
   end
 
   def test_min_cost_savings
-    assert_no_index "SELECT * FROM posts WHERE id = 1", "--min-cost-savings-pct 100", reason: "Need 100% cost savings to suggest index"
+    assert_no_index "SELECT * FROM posts WHERE id = 1", "--min-cost-savings-pct", "100", reason: "Need 100% cost savings to suggest index"
   end
 end

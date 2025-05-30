@@ -19,6 +19,7 @@ class InputTest < Minitest::Test
 
   def test_pg_stat_activity
     execute "SELECT * FROM posts WHERE id = 1"
+    # TODO speed up test
     assert_dexter_output "Index found: public.posts (id)", "--pg-stat-activity"
   end
 

@@ -18,20 +18,20 @@ class InputTest < Minitest::Test
   end
 
   def test_pg_stat_activity
-    execute("SELECT * FROM posts WHERE id = 1")
+    execute "SELECT * FROM posts WHERE id = 1"
     assert_dexter_output "Index found: public.posts (id)", "--pg-stat-activity"
   end
 
   def test_pg_stat_statements
-    execute("CREATE EXTENSION IF NOT EXISTS pg_stat_statements")
-    execute("SELECT pg_stat_statements_reset()")
-    execute("SELECT * FROM posts WHERE id = 1")
+    execute "CREATE EXTENSION IF NOT EXISTS pg_stat_statements"
+    execute "SELECT pg_stat_statements_reset()"
+    execute "SELECT * FROM posts WHERE id = 1"
     assert_dexter_output "Index found: public.posts (id)", "--pg-stat-statements"
     assert_dexter_output "Index found: public.posts (id)", "--pg-stat-statements", "--min-calls", "1"
   end
 
   def test_no_source
-    assert_dexter_error("Specify a source of queries")
+    assert_dexter_error "Specify a source of queries"
   end
 
   private

@@ -4,13 +4,13 @@ class IndexingTest < Minitest::Test
   def test_create
     assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--create"
   ensure
-    execute("DROP INDEX posts_id_idx")
+    execute "DROP INDEX IF EXISTS posts_id_idx"
   end
 
   def test_tablespace
     assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--create", "--tablespace", "pg_default"
   ensure
-    execute("DROP INDEX posts_id_idx")
+    execute "DROP INDEX IF EXISTS posts_id_idx"
   end
 
   def test_exclude

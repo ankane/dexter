@@ -22,11 +22,14 @@ require_relative "dexter/version"
 require_relative "dexter/parsers/log_parser"
 require_relative "dexter/parsers/csv_log_parser"
 require_relative "dexter/parsers/json_log_parser"
-require_relative "dexter/parsers/pg_stat_activity_parser"
-require_relative "dexter/parsers/pg_stat_statements_parser"
 require_relative "dexter/parsers/sql_log_parser"
-require_relative "dexter/parsers/statement_parser"
 require_relative "dexter/parsers/stderr_log_parser"
+
+# sources
+require_relative "dexter/sources/log_source"
+require_relative "dexter/sources/pg_stat_activity_source"
+require_relative "dexter/sources/pg_stat_statements_source"
+require_relative "dexter/sources/statement_source"
 
 module Dexter
   class Abort < StandardError; end

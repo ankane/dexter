@@ -1,5 +1,5 @@
 module Dexter
-  class PgStatStatementsParser
+  class PgStatStatementsSource
     def initialize(indexer, collector)
       @indexer = indexer
       @collector = collector

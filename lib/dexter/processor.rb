@@ -10,19 +10,13 @@ module Dexter
 
       @source_processor =
         if @source == :pg_stat_activity
-          PgStatActivityParser.new(@indexer, @collector)
+          PgStatActivitySource.new(@indexer, @collector)
         elsif @source == :pg_stat_statements
-          PgStatStatementsParser.new(@indexer, @collector)
+          PgStatStatementsSource.new(@indexer, @collector)
         elsif @source == :statement
-          StatementParser.new(options[:statement], @collector)
-        elsif options[:input_format] == "csv"
-          CsvLogParser.new(source, @collector)
-        elsif options[:input_format] == "json"
-          JsonLogParser.new(source, @collector)
-        elsif options[:input_format] == "sql"
-          SqlLogParser.new(source, @collector)
+          StatementSource.new(options[:statement], @collector)
         else
-          StderrLogParser.new(source, @collector)
+          LogSource.new(source, options[:input_format], @collector)
         end
 
       @starting_interval = 3

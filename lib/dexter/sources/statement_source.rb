@@ -1,5 +1,5 @@
 module Dexter
-  class StatementParser
+  class StatementSource
     def initialize(statement, collector)
       @statement = statement
       @collector = collector

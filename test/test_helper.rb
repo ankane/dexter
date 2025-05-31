@@ -19,8 +19,8 @@ class Minitest::Test
     assert_match reason, output if reason
   end
 
-  def run_command(*args, add_url: true)
-    args.unshift($url) if add_url
+  def run_command(*args, add_conninfo: true)
+    args.unshift($url) if add_conninfo
     client = Dexter::Client.new(args)
     ex = nil
     stdout, _ = capture_io do

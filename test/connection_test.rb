@@ -20,7 +20,7 @@ class ConnectionTest < Minitest::Test
   private
 
   def assert_connection(*args)
-    output = run_command(*args, "-s", "SELECT 1", add_url: false)
+    output = run_command(*args, "-s", "SELECT 1", add_conninfo: false)
     assert_match "No new indexes found", output
   end
 end

@@ -45,7 +45,7 @@ module Dexter
         candidate_queries.select! { |q| q.initial_cost && q.high_cost? }
 
         # find columns
-        set_query_columns(candidate_queries)
+        ColumnResolver.new(@connection, candidate_queries, log_level: @log_level).perform
         candidate_queries.select! { |q| q.columns.any? }
 
         # sort to improve batching
@@ -166,29 +166,6 @@ module Dexter
       end
     end
 
-    def set_query_columns(candidate_queries)
-      candidate_queries.each do |query|
-        log "Finding columns: #{query.statement}" if @log_level == "debug3"
-        columns = Set.new
-        begin
-          find_columns(query.tree).each do |col|
-            last_col = col["fields"].last
-            if last_col["String"]
-              columns << last_col["String"]["sval"]
-            end
-          end
-        rescue JSON::NestingError
-          if @log_level.start_with?("debug")
-            log colorize("ERROR: Cannot get columns", :red)
-          end
-        end
-
-        # TODO resolve possible tables
-        # TODO calculate all possible indexes for query
-        query.columns = columns.to_a
-      end
-    end
-
     def create_hypothetical_indexes(queries)
       index_mapping = {}
 
@@ -216,16 +193,11 @@ module Dexter
       end
     end
 
-    def find_columns(plan)
-      plan = JSON.parse(plan.to_json, max_nesting: 1000)
-      find_by_key(plan, "ColumnRef")
-    end
-
     def find_indexes(plan)
-      find_by_key(plan, "Index Name")
+      self.class.find_by_key(plan, "Index Name")
     end
 
-    def find_by_key(plan, key)
+    def self.find_by_key(plan, key)
       result = []
       queue = [plan]
       while queue.any?

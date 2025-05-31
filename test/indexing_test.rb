@@ -2,15 +2,15 @@ require_relative "test_helper"
 
 class IndexingTest < Minitest::Test
   def test_create
-    # TODO improve test
-    assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--create"
+    expected = %{Creating index: CREATE INDEX CONCURRENTLY ON "public"."posts" ("id")}
+    assert_output expected, "-s", "SELECT * FROM posts WHERE id = 1", "--create"
   ensure
     execute "DROP INDEX posts_id_idx"
   end
 
   def test_tablespace
-    # TODO improve test
-    assert_index "SELECT * FROM posts WHERE id = 1", "public.posts (id)", "--create", "--tablespace", "pg_default"
+    expected = %{Creating index: CREATE INDEX CONCURRENTLY ON "public"."posts" ("id") TABLESPACE "pg_default"}
+    assert_output expected, "-s", "SELECT * FROM posts WHERE id = 1", "--create", "--tablespace", "pg_default"
   ensure
     execute "DROP INDEX posts_id_idx"
   end

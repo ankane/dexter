@@ -15,9 +15,9 @@ require_relative "dexter/client"
 require_relative "dexter/collector"
 require_relative "dexter/connection"
 require_relative "dexter/indexer"
-require_relative "dexter/object_resolver"
 require_relative "dexter/processor"
 require_relative "dexter/query"
+require_relative "dexter/table_resolver"
 require_relative "dexter/version"
 
 # parsers

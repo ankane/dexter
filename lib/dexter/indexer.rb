@@ -26,7 +26,7 @@ module Dexter
 
     # TODO recheck server version?
     def process_queries(queries)
-      ObjectResolver.new(@connection, queries, log_level: @log_level).perform
+      TableResolver.new(@connection, queries, log_level: @log_level).perform
       candidate_queries = queries.reject(&:missing_tables)
 
       tables = determine_tables(candidate_queries)

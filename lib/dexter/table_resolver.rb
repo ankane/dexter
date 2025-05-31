@@ -1,5 +1,5 @@
 module Dexter
-  class ObjectResolver
+  class TableResolver
     include Logging
 
     attr_reader :queries

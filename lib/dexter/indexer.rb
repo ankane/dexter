@@ -22,6 +22,10 @@ module Dexter
       check_extension
 
       execute("SET lock_timeout = '5s'")
+
+      if @options[:enable_hypopg_use_real_oids]
+        execute("SET hypopg.use_real_oids=on")
+      end
     end
 
     # TODO recheck server version?

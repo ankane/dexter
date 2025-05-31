@@ -6,8 +6,8 @@ module Dexter
     attr_reader :arguments, :options
 
     def self.start
-      Dexter::Client.new(ARGV).perform
-    rescue Dexter::Abort => e
+      Client.new(ARGV).perform
+    rescue Error => e
       abort colorize(e.message.strip, :red)
     end
 
@@ -41,7 +41,7 @@ module Dexter
         elsif options[:stdin]
           LogSource.new(STDIN, options[:input_format])
         else
-          raise Dexter::Abort, "Specify a source of queries: --pg-stat-statements, --pg-stat-activity, --stdin, or a path"
+          raise Error, "Specify a source of queries: --pg-stat-statements, --pg-stat-activity, --stdin, or a path"
         end
 
       collector = Collector.new(**options.slice(:min_time, :min_calls))
@@ -114,12 +114,12 @@ module Dexter
       # TODO don't use global var
       $log_level = options[:log_level].to_s.downcase
       unless ["error", "info", "debug", "debug2", "debug3"].include?($log_level)
-        raise Dexter::Abort, "Unknown log level"
+        raise Error, "Unknown log level"
       end
 
       [arguments, options]
     rescue Slop::Error => e
-      raise Dexter::Abort, e.message
+      raise Error, e.message
     end
   end
 end

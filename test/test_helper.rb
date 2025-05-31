@@ -39,7 +39,7 @@ class Minitest::Test
   end
 
   def assert_dexter_error(expected, *args)
-    error = assert_raises do
+    error = assert_raises(Dexter::Error) do
       dexter_run(*args)
     end
     assert_match expected, error.message

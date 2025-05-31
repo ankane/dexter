@@ -35,7 +35,7 @@ module Dexter
       begin
         @source.perform(@collector)
       rescue Errno::ENOENT => e
-        raise Dexter::Abort, "ERROR: #{e.message}"
+        raise Error, "ERROR: #{e.message}"
       end
 
       process_queries

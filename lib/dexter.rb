@@ -35,5 +35,5 @@ require_relative "dexter/sources/pg_stat_statements_source"
 require_relative "dexter/sources/statement_source"
 
 module Dexter
-  class Abort < StandardError; end
+  class Error < StandardError; end
 end

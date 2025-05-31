@@ -17,7 +17,7 @@ module Dexter
         end
       end
     rescue CSV::MalformedCSVError => e
-      raise Dexter::Abort, "ERROR: #{e.message}"
+      raise Error, "ERROR: #{e.message}"
     end
   end
 end

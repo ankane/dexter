@@ -13,7 +13,7 @@ module Dexter
 
     def setup(enable_hypopg)
       if server_version_num < 130000
-        raise Dexter::Abort, "This version of Dexter requires Postgres 13+"
+        raise Error, "This version of Dexter requires Postgres 13+"
       end
 
       check_extension(enable_hypopg)
@@ -51,14 +51,14 @@ module Dexter
       extension = execute("SELECT installed_version FROM pg_available_extensions WHERE name = 'hypopg'").first
 
       if extension.nil?
-        raise Dexter::Abort, "Install HypoPG first: https://github.com/ankane/dexter#installation"
+        raise Error, "Install HypoPG first: https://github.com/ankane/dexter#installation"
       end
 
       if extension["installed_version"].nil?
         if enable_hypopg
           execute("CREATE EXTENSION hypopg")
         else
-          raise Dexter::Abort, "Run `CREATE EXTENSION hypopg` or pass --enable-hypopg"
+          raise Error, "Run `CREATE EXTENSION hypopg` or pass --enable-hypopg"
         end
       end
     end
@@ -82,7 +82,7 @@ module Dexter
         PG::Connection.new(config)
       end
     rescue PG::ConnectionBad => e
-      raise Dexter::Abort, e.message
+      raise Error, e.message
     end
 
     def squish(str)

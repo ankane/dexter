@@ -15,7 +15,7 @@ module Dexter
         end
       end
     rescue JSON::ParserError => e
-      raise Dexter::Abort, "ERROR: #{e.message}"
+      raise Error, "ERROR: #{e.message}"
     end
   end
 end

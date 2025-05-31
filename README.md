@@ -91,7 +91,7 @@ Dexter can collect queries from a number of sources.
 
 - [Query stats](#query-stats)
 - [Live queries](#live-queries)
-- [Log files](#log-file)
+- [Log files](#log-files)
 - [SQL files](#sql-files)
 
 ### Query Stats

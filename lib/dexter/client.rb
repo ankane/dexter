@@ -19,8 +19,8 @@ module Dexter
       STDOUT.sync = true
       STDERR.sync = true
 
-      # note: connection is lazy
       connection = Connection.new(**options.slice(:dbname, :host, :port, :username, :log_sql))
+      connection.setup(options[:enable_hypopg])
 
       source =
         if options[:statement]

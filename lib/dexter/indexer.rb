@@ -13,15 +13,7 @@ module Dexter
       @analyze = options[:analyze]
       @min_cost_savings_pct = options[:min_cost_savings_pct].to_i
       @options = options
-      @server_version_num = self.server_version_num
-
-      if @server_version_num < 130000
-        raise Dexter::Abort, "This version of Dexter requires Postgres 13+"
-      end
-
-      check_extension
-
-      execute("SET lock_timeout = '5s'")
+      @server_version_num = @connection.server_version_num
     end
 
     # TODO recheck server version?
@@ -73,22 +65,6 @@ module Dexter
     end
 
     private
-
-    def check_extension
-      extension = execute("SELECT installed_version FROM pg_available_extensions WHERE name = 'hypopg'").first
-
-      if extension.nil?
-        raise Dexter::Abort, "Install HypoPG first: https://github.com/ankane/dexter#installation"
-      end
-
-      if extension["installed_version"].nil?
-        if @options[:enable_hypopg]
-          execute("CREATE EXTENSION hypopg")
-        else
-          raise Dexter::Abort, "Run `CREATE EXTENSION hypopg` or pass --enable-hypopg"
-        end
-      end
-    end
 
     def reset_hypothetical_indexes
       execute("SELECT hypopg_reset()")
@@ -525,10 +501,6 @@ module Dexter
 
     def create_hypothetical_index(table, columns)
       execute("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{columns.map { |c| quote_ident(c) }.join(", ")})')").first["indexname"]
-    end
-
-    def server_version_num
-      execute("SHOW server_version_num").first["server_version_num"].to_i
     end
 
     def with_advisory_lock

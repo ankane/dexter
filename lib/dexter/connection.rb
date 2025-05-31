@@ -11,6 +11,16 @@ module Dexter
       @mutex = Mutex.new
     end
 
+    def setup(enable_hypopg)
+      if server_version_num < 130000
+        raise Dexter::Abort, "This version of Dexter requires Postgres 13+"
+      end
+
+      check_extension(enable_hypopg)
+
+      execute("SET lock_timeout = '5s'")
+    end
+
     def execute(query, pretty: true, params: [], use_exec: false)
       # use exec_params instead of exec when possible for security
       #
@@ -31,7 +41,27 @@ module Dexter
       end
     end
 
+    def server_version_num
+      @server_version_num ||= execute("SHOW server_version_num").first["server_version_num"].to_i
+    end
+
     private
+
+    def check_extension(enable_hypopg)
+      extension = execute("SELECT installed_version FROM pg_available_extensions WHERE name = 'hypopg'").first
+
+      if extension.nil?
+        raise Dexter::Abort, "Install HypoPG first: https://github.com/ankane/dexter#installation"
+      end
+
+      if extension["installed_version"].nil?
+        if enable_hypopg
+          execute("CREATE EXTENSION hypopg")
+        else
+          raise Dexter::Abort, "Run `CREATE EXTENSION hypopg` or pass --enable-hypopg"
+        end
+      end
+    end
 
     def conn
       @conn ||= begin

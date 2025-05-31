@@ -60,8 +60,14 @@ module Dexter
       # see if new indexes were used and meet bar
       new_indexes = determine_indexes(queries, tables)
 
-      # display and create new indexes
-      show_and_create_indexes(new_indexes, queries)
+      # display new indexes
+      show_new_indexes(new_indexes)
+
+      # display debug info
+      show_debug_info(new_indexes, queries) if @log_level.start_with?("debug")
+
+      # create new indexes
+      create_indexes(new_indexes) if @create && new_indexes.any?
     end
 
     private
@@ -365,7 +371,7 @@ module Dexter
       end
     end
 
-    def show_and_create_indexes(new_indexes, queries)
+    def show_new_indexes(new_indexes)
       # print summary
       if new_indexes.any?
         new_indexes.each do |index|
@@ -374,77 +380,73 @@ module Dexter
       else
         log "No new indexes found"
       end
+    end
 
-      # debug info
-      if @log_level.start_with?("debug")
-        index_queries = new_indexes.flat_map { |i| i[:queries].sort_by(&:fingerprint) }
-        if @log_level == "debug2"
-          fingerprints = Set.new(index_queries.map(&:fingerprint))
-          index_queries.concat(queries.reject { |q| fingerprints.include?(q.fingerprint) }.sort_by(&:fingerprint))
-        end
-        index_queries.each do |query|
-          log "-" * 80
-          log "Query #{query.fingerprint}"
-          log "Total time: #{(query.total_time / 60000.0).round(1)} min, avg time: #{(query.total_time / query.calls.to_f).round} ms, calls: #{query.calls}" if query.calls > 0
-
-          if query.fingerprint == "unknown"
-            log "Could not parse query"
-          elsif query.tables.empty?
-            log "No tables"
-          elsif query.missing_tables
-            log "Tables not present in current database"
-          elsif query.candidate_tables.empty?
-            log "No candidate tables for indexes"
-          elsif query.initial_cost && !query.high_cost?
-            log "Low initial cost: #{query.initial_cost}"
-          elsif query.candidate_columns.empty?
-            log "No candidate columns for indexes"
-          elsif query.fully_analyzed?
-            query_indexes = query.indexes || []
-            log "Start: #{query.costs[0]}"
-            log "Pass1: #{query.costs[1]} : #{log_indexes(query.pass1_indexes || [])}"
-            log "Pass2: #{query.costs[2]} : #{log_indexes(query.pass2_indexes || [])}"
-            if query.costs[3]
-              log "Pass3: #{query.costs[3]} : #{log_indexes(query.pass3_indexes || [])}"
-            end
-            log "Final: #{query.new_cost} : #{log_indexes(query.suggest_index ? query_indexes : [])}"
-            if (query.pass1_indexes.any? || query.pass2_indexes.any?) && !query.suggest_index
-              log "Need #{@min_cost_savings_pct}% cost savings to suggest index"
-            end
-          else
-            log "Could not run explain"
-          end
-          log
-          log query.statement
-          log
-        end
+    def show_debug_info(new_indexes, queries)
+      index_queries = new_indexes.flat_map { |i| i[:queries].sort_by(&:fingerprint) }
+      if @log_level == "debug2"
+        fingerprints = Set.new(index_queries.map(&:fingerprint))
+        index_queries.concat(queries.reject { |q| fingerprints.include?(q.fingerprint) }.sort_by(&:fingerprint))
       end
+      index_queries.each do |query|
+        log "-" * 80
+        log "Query #{query.fingerprint}"
+        log "Total time: #{(query.total_time / 60000.0).round(1)} min, avg time: #{(query.total_time / query.calls.to_f).round} ms, calls: #{query.calls}" if query.calls > 0
 
-      # create
-      if @create && new_indexes.any?
-        # 1. create lock
-        # 2. refresh existing index list
-        # 3. create indexes that still don't exist
-        # 4. release lock
-        with_advisory_lock do
-          new_indexes.each do |index|
-            unless index_exists?(index)
-              statement = String.new("CREATE INDEX CONCURRENTLY ON #{quote_ident(index[:table])} (#{index[:columns].map { |c| quote_ident(c) }.join(", ")})")
-              statement << " TABLESPACE #{quote_ident(@tablespace)}" if @tablespace
-              log "Creating index: #{statement}"
-              started_at = monotonic_time
-              begin
-                execute(statement)
-                log "Index created: #{((monotonic_time - started_at) * 1000).to_i} ms"
-              rescue PG::LockNotAvailable
-                log "Could not acquire lock: #{index[:table]}"
-              end
+        if query.fingerprint == "unknown"
+          log "Could not parse query"
+        elsif query.tables.empty?
+          log "No tables"
+        elsif query.missing_tables
+          log "Tables not present in current database"
+        elsif query.candidate_tables.empty?
+          log "No candidate tables for indexes"
+        elsif query.initial_cost && !query.high_cost?
+          log "Low initial cost: #{query.initial_cost}"
+        elsif query.candidate_columns.empty?
+          log "No candidate columns for indexes"
+        elsif query.fully_analyzed?
+          query_indexes = query.indexes || []
+          log "Start: #{query.costs[0]}"
+          log "Pass1: #{query.costs[1]} : #{log_indexes(query.pass1_indexes || [])}"
+          log "Pass2: #{query.costs[2]} : #{log_indexes(query.pass2_indexes || [])}"
+          if query.costs[3]
+            log "Pass3: #{query.costs[3]} : #{log_indexes(query.pass3_indexes || [])}"
+          end
+          log "Final: #{query.new_cost} : #{log_indexes(query.suggest_index ? query_indexes : [])}"
+          if (query.pass1_indexes.any? || query.pass2_indexes.any?) && !query.suggest_index
+            log "Need #{@min_cost_savings_pct}% cost savings to suggest index"
+          end
+        else
+          log "Could not run explain"
+        end
+        log
+        log query.statement
+        log
+      end
+    end
+
+    # 1. create lock
+    # 2. refresh existing index list
+    # 3. create indexes that still don't exist
+    # 4. release lock
+    def create_indexes(new_indexes)
+      with_advisory_lock do
+        new_indexes.each do |index|
+          unless index_exists?(index)
+            statement = String.new("CREATE INDEX CONCURRENTLY ON #{quote_ident(index[:table])} (#{index[:columns].map { |c| quote_ident(c) }.join(", ")})")
+            statement << " TABLESPACE #{quote_ident(@tablespace)}" if @tablespace
+            log "Creating index: #{statement}"
+            started_at = monotonic_time
+            begin
+              execute(statement)
+              log "Index created: #{((monotonic_time - started_at) * 1000).to_i} ms"
+            rescue PG::LockNotAvailable
+              log "Could not acquire lock: #{index[:table]}"
             end
           end
         end
       end
-
-      new_indexes
     end
 
     def monotonic_time

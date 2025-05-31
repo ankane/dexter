@@ -47,4 +47,8 @@ class IndexingTest < Minitest::Test
 
     refute_match "ANALYZE", dexter_run(*args, "--analyze")
   end
+
+  def test_log_level_invalid
+    assert_dexter_error "Unknown log level", "-s", "SELECT 1", "--log-level", "bad"
+  end
 end

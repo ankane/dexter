@@ -113,7 +113,9 @@ module Dexter
 
       # TODO don't use global var
       $log_level = options[:log_level].to_s.downcase
-      raise Dexter::Abort, "Unknown log level" unless ["error", "info", "debug", "debug2", "debug3"].include?($log_level)
+      unless ["error", "info", "debug", "debug2", "debug3"].include?($log_level)
+        raise Dexter::Abort, "Unknown log level"
+      end
 
       [arguments, options]
     rescue Slop::Error => e

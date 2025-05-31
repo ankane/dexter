@@ -20,11 +20,11 @@ class Minitest::Test
   end
 
   def run_command(*args)
-    dexter = Dexter::Client.new([$url] + args)
+    client = Dexter::Client.new([$url] + args)
     ex = nil
     stdout, _ = capture_io do
       begin
-        dexter.perform
+        client.perform
       rescue => e
         ex = e
       end

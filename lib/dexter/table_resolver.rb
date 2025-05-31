@@ -17,18 +17,28 @@ module Dexter
 
       queries.each do |query|
         # add schema to table if needed
-        query.tables = query.tables.map { |t| no_schema_tables[t] || t }
+        query_tables = self.tables(query).map { |t| no_schema_tables[t] || t }
 
         # substitute view tables
-        new_tables = query.tables.flat_map { |t| view_tables[t] || [t] }.uniq
-        query.tables_from_views = new_tables - query.tables
-        query.tables = new_tables
+        query.tables = query_tables.flat_map { |t| view_tables[t] || [t] }.uniq
+        query.tables_from_views = query.tables - query_tables
 
         query.missing_tables = !query.tables.all? { |t| tables.include?(t) }
       end
     end
 
     private
+
+    def tables(query)
+      parse = query.send(:parse)
+      parse ? parse.tables : []
+    rescue => e
+      # possible pg_query bug
+      $stderr.puts "Error extracting tables. Please report to https://github.com/ankane/dexter/issues"
+      $stderr.puts "#{e.class.name}: #{e.message}"
+      $stderr.puts query.statement
+      []
+    end
 
     def no_schema_tables(tables)
       search_path_index = Hash[search_path.map.with_index.to_a]

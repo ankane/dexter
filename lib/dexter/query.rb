@@ -1,8 +1,7 @@
 module Dexter
   class Query
     attr_reader :statement, :fingerprint, :plans
-    attr_writer :tables
-    attr_accessor :missing_tables, :new_cost, :total_time, :calls, :indexes, :suggest_index, :pass1_indexes, :pass2_indexes, :pass3_indexes, :candidate_tables, :tables_from_views, :index_mapping, :columns, :candidate_columns
+    attr_accessor :tables, :missing_tables, :new_cost, :total_time, :calls, :indexes, :suggest_index, :pass1_indexes, :pass2_indexes, :pass3_indexes, :candidate_tables, :tables_from_views, :index_mapping, :columns, :candidate_columns
 
     def initialize(statement, fingerprint = nil)
       @statement = statement
@@ -12,18 +11,6 @@ module Dexter
       @candidate_tables = []
       @columns = []
       @candidate_columns = []
-    end
-
-    def tables
-      @tables ||= begin
-        parse ? parse.tables : []
-      rescue => e
-        # possible pg_query bug
-        $stderr.puts "Error extracting tables. Please report to https://github.com/ankane/dexter/issues"
-        $stderr.puts "#{e.class.name}: #{e.message}"
-        $stderr.puts statement
-        []
-      end
     end
 
     def tree

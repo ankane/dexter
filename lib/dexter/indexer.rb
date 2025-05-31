@@ -170,18 +170,42 @@ module Dexter
       end
     end
 
+    def create_single_column_indexes(queries, index_mapping)
+      candidate_indexes = queries.flat_map(&:candidate_columns).uniq
+      candidate_indexes.sort_by! { |c| [c[:table], c[:column]] }
+      candidate_indexes.each do |column|
+        columns = [column]
+        index_name = create_hypothetical_index(columns[0][:table], columns.map { |c| c[:column] })
+        index_mapping[index_name] = columns
+      end
+    end
+
+    # TODO for multicolumn indexes, use ordering
+    def create_multicolumn_indexes(queries, index_mapping)
+      candidate_indexes = Set.new
+      queries.each do |query|
+        columns_by_table = query.candidate_columns.group_by { |c| c[:table] }
+        columns_by_table.each do |table, columns|
+          candidate_indexes.merge(columns.permutation(2).to_a)
+        end
+      end
+      candidate_indexes.each do |columns|
+        index_name = create_hypothetical_index(columns[0][:table], columns.map { |c| c[:column] })
+        index_mapping[index_name] = columns
+      end
+    end
+
     def create_hypothetical_indexes(queries)
       index_mapping = {}
-      columns_by_table = queries.flat_map(&:candidate_columns).uniq.group_by { |c| c[:table] }
 
       # create single column indexes
-      create_hypothetical_indexes_helper(columns_by_table, 1, index_mapping)
+      create_single_column_indexes(queries, index_mapping)
 
       # get next round of costs
       calculate_plan(queries)
 
       # create multicolumn indexes
-      create_hypothetical_indexes_helper(columns_by_table, 2, index_mapping)
+      create_multicolumn_indexes(queries, index_mapping)
 
       # get next round of costs
       calculate_plan(queries)
@@ -501,16 +525,6 @@ module Dexter
       if explain_normalized
         execute("ROLLBACK") if transaction
         execute("DEALLOCATE #{prepared_name}") if prepared
-      end
-    end
-
-    # TODO for multicolumn indexes, use ordering
-    def create_hypothetical_indexes_helper(columns_by_table, n, index_mapping)
-      columns_by_table.each do |table, cols|
-        cols.permutation(n) do |col_set|
-          index_name = create_hypothetical_index(table, col_set.map { |c| c[:column] })
-          index_mapping[index_name] = col_set
-        end
       end
     end
 

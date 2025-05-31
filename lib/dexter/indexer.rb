@@ -171,13 +171,8 @@ module Dexter
     end
 
     def create_single_column_indexes(queries, index_mapping)
-      candidate_indexes = queries.flat_map(&:candidate_columns).uniq
-      candidate_indexes.sort_by! { |c| [c[:table], c[:column]] }
-      candidate_indexes.each do |column|
-        columns = [column]
-        index_name = create_hypothetical_index(columns[0][:table], columns.map { |c| c[:column] })
-        index_mapping[index_name] = columns
-      end
+      candidate_indexes = queries.flat_map(&:candidate_columns).uniq.map { |c| [c] }
+      create_candidate_indexes(candidate_indexes, index_mapping)
     end
 
     # TODO for multicolumn indexes, use ordering
@@ -189,6 +184,10 @@ module Dexter
           candidate_indexes.merge(columns.permutation(2).to_a)
         end
       end
+      create_candidate_indexes(candidate_indexes, index_mapping)
+    end
+
+    def create_candidate_indexes(candidate_indexes, index_mapping)
       candidate_indexes.each do |columns|
         index_name = create_hypothetical_index(columns[0][:table], columns.map { |c| c[:column] })
         index_mapping[index_name] = columns

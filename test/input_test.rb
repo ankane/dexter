@@ -37,9 +37,12 @@ class InputTest < Minitest::Test
 
   private
 
+  def support_path(file)
+    File.expand_path("support/#{file}", __dir__)
+  end
+
   def assert_index_file(file)
-    file = File.expand_path("support/#{file}", __dir__)
-    output = run_command(file)
+    output = run_command(support_path(file))
     assert_match "Index found: public.posts (id)", output
     assert_match "Processing 1 new query fingerprints", output
   end

@@ -13,8 +13,15 @@ module Dexter
       @candidate_columns = []
     end
 
+    def parser_result
+      unless defined?(@parser_result)
+        @parser_result = PgQuery.parse(statement) rescue nil
+      end
+      @parser_result
+    end
+
     def tree
-      parse.tree
+      parser_result.tree
     end
 
     def fully_analyzed?
@@ -31,15 +38,6 @@ module Dexter
 
     def high_cost?
       initial_cost && initial_cost >= 100
-    end
-
-    private
-
-    def parse
-      unless defined?(@parse)
-        @parse = PgQuery.parse(statement) rescue nil
-      end
-      @parse
     end
   end
 end

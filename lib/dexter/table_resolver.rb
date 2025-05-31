@@ -30,8 +30,7 @@ module Dexter
     private
 
     def tables(query)
-      parse = query.send(:parse)
-      parse ? parse.tables : []
+      query.parser_result&.tables || []
     rescue => e
       # possible pg_query bug
       $stderr.puts "Error extracting tables. Please report to https://github.com/ankane/dexter/issues"

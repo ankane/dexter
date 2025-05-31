@@ -93,8 +93,8 @@ module Dexter
       result.map { |r| r["table_name"] }
     end
 
-    def database_view_tables
-      result = execute <<~SQL
+    def views
+      execute <<~SQL
         SELECT
           schemaname || '.' || viewname AS table_name,
           definition
@@ -103,9 +103,11 @@ module Dexter
         WHERE
           schemaname NOT IN ('information_schema', 'pg_catalog')
       SQL
+    end
 
+    def database_view_tables
       view_tables = {}
-      result.each do |row|
+      views.each do |row|
         begin
           view_tables[row["table_name"]] = PgQuery.parse(row["definition"]).tables
         rescue PgQuery::ParseError
@@ -114,7 +116,6 @@ module Dexter
           end
         end
       end
-
       view_tables
     end
   end

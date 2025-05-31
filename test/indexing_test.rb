@@ -32,4 +32,19 @@ class IndexingTest < Minitest::Test
   def test_min_cost_savings
     assert_no_index "SELECT * FROM posts WHERE id = 1", "--min-cost-savings-pct", "100", reason: "Need 100% cost savings to suggest index"
   end
+
+  def test_analyze
+    # last analyze time not reset consistently
+    skip if server_version < 15
+
+    execute "SELECT pg_stat_reset()"
+    args = ["-s", "SELECT * FROM posts WHERE id = 1", "--log-sql"]
+    refute_match "ANALYZE", dexter_run(*args)
+
+    output = dexter_run(*args, "--analyze")
+    assert_match %{Running analyze: ANALYZE "public"."posts"}, output
+    assert_match %{[sql] ANALYZE "public"."posts"}, output
+
+    refute_match "ANALYZE", dexter_run(*args, "--analyze")
+  end
 end

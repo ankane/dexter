@@ -32,15 +32,14 @@ module Dexter
 
         possible_columns = []
         columns.each do |column|
-          (query.candidate_tables - query.tables_from_views).each do |table|
+          query.candidate_tables.each do |table|
             resolved = columns_by_table.dig(table, column)
             possible_columns << resolved if resolved
           end
-
-          # use all columns in tables from views (not ideal)
-          query.tables_from_views.each do |table|
-            possible_columns.concat(columns_by_table[table].values)
-          end
+        end
+        # use all columns in tables from views (not ideal)
+        (query.tables_from_views & query.candidate_tables).each do |table|
+          possible_columns.concat(columns_by_table[table].values)
         end
         query.columns = possible_columns.uniq
       end

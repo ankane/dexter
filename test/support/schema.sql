@@ -17,6 +17,13 @@ CREATE VIEW posts_view AS SELECT id AS view_id FROM posts;
 CREATE MATERIALIZED VIEW posts_materialized AS SELECT * FROM posts;
 ANALYZE posts;
 
+DROP TABLE IF EXISTS blogs;
+CREATE TABLE blogs (
+  id int PRIMARY KEY
+);
+INSERT INTO blogs (id) SELECT n FROM generate_series(1, 1000) n;
+ANALYZE blogs;
+
 DROP SCHEMA IF EXISTS "Bar" CASCADE;
 CREATE SCHEMA "Bar";
 CREATE TABLE "Bar"."Foo"("Id" int);

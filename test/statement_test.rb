@@ -21,6 +21,10 @@ class StatementTest < Minitest::Test
     assert_index "SELECT * FROM posts WHERE user_id = 1 ORDER BY blog_id LIMIT 1000", "public.posts (user_id, blog_id)"
   end
 
+  def test_join
+    assert_index "SELECT * FROM posts INNER JOIN blogs ON blogs.id = posts.blog_id WHERE blogs.id = 1", "public.posts (blog_id)"
+  end
+
   def test_update
     assert_index "UPDATE posts SET user_id = 2 WHERE user_id = 1", "public.posts (user_id)"
   end

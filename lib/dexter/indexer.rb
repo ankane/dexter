@@ -46,7 +46,11 @@ module Dexter
 
         # find columns
         ColumnResolver.new(@connection, candidate_queries, log_level: @log_level).perform
-        candidate_queries.select! { |q| q.columns.any? }
+        candidate_queries.each do |query|
+          # no reason to use btree index for json columns
+          query.candidate_columns = query.columns.reject { |c| ["json", "jsonb"].include?(c[:type]) }
+        end
+        candidate_queries.select! { |q| q.candidate_columns.any? }
 
         # sort to improve batching
         # TODO improve
@@ -168,7 +172,7 @@ module Dexter
 
     def create_hypothetical_indexes(queries)
       index_mapping = {}
-      columns_by_table = queries.flat_map(&:columns).uniq.group_by { |c| c[:table] }
+      columns_by_table = queries.flat_map(&:candidate_columns).uniq.group_by { |c| c[:table] }
 
       # create single column indexes
       create_hypothetical_indexes_helper(columns_by_table, 1, index_mapping)
@@ -398,7 +402,7 @@ module Dexter
             log "No candidate tables for indexes"
           elsif query.initial_cost && !query.high_cost?
             log "Low initial cost: #{query.initial_cost}"
-          elsif query.columns.empty?
+          elsif query.candidate_columns.empty?
             log "No candidate columns for indexes"
           elsif query.fully_analyzed?
             query_indexes = query.indexes || []
@@ -503,8 +507,7 @@ module Dexter
     # TODO for multicolumn indexes, use ordering
     def create_hypothetical_indexes_helper(columns_by_table, n, index_mapping)
       columns_by_table.each do |table, cols|
-        # no reason to use btree index for json columns
-        cols.reject { |c| ["json", "jsonb"].include?(c[:type]) }.permutation(n) do |col_set|
+        cols.permutation(n) do |col_set|
           index_name = create_hypothetical_index(table, col_set.map { |c| c[:column] })
           index_mapping[index_name] = col_set
         end

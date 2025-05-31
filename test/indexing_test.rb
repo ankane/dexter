@@ -5,14 +5,14 @@ class IndexingTest < Minitest::Test
     expected = %{Creating index: CREATE INDEX CONCURRENTLY ON "public"."posts" ("id")}
     assert_output expected, "-s", "SELECT * FROM posts WHERE id = 1", "--create"
   ensure
-    execute "DROP INDEX posts_id_idx"
+    execute "DROP INDEX IF EXISTS posts_id_idx"
   end
 
   def test_tablespace
     expected = %{Creating index: CREATE INDEX CONCURRENTLY ON "public"."posts" ("id") TABLESPACE "pg_default"}
     assert_output expected, "-s", "SELECT * FROM posts WHERE id = 1", "--create", "--tablespace", "pg_default"
   ensure
-    execute "DROP INDEX posts_id_idx"
+    execute "DROP INDEX IF EXISTS posts_id_idx"
   end
 
   def test_exclude

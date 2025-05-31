@@ -53,9 +53,10 @@ module Dexter
 
     def parse_args(args)
       opts = Slop.parse(args) do |o|
-        o.banner = %(Usage:
-    dexter [options])
-        o.separator ""
+        o.banner = <<~BANNER
+          Usage:
+              dexter [options]
+        BANNER
 
         o.separator "Input options:"
         o.string "--input-format", "input format"

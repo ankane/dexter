@@ -9,8 +9,16 @@ class InputTest < Minitest::Test
     assert_index_file "queries.csv"
   end
 
+  def test_csv_invalid
+    assert_error "ERROR: Illegal quoting", support_path("queries.json"), "--input-format", "csv"
+  end
+
   def test_json
     assert_index_file "queries.json"
+  end
+
+  def test_json_invalid
+    assert_error "ERROR: unexpected token", support_path("queries.log"), "--input-format", "json"
   end
 
   def test_sql

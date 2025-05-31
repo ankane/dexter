@@ -16,6 +16,8 @@ module Dexter
       end
     rescue JSON::ParserError => e
       raise Error, "ERROR: #{e.message}"
+    ensure
+      @logfile.close
     end
   end
 end

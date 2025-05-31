@@ -18,6 +18,8 @@ module Dexter
       end
     rescue CSV::MalformedCSVError => e
       raise Error, "ERROR: #{e.message}"
+    ensure
+      @logfile.close
     end
   end
 end

@@ -372,7 +372,6 @@ module Dexter
     end
 
     def show_new_indexes(new_indexes)
-      # print summary
       if new_indexes.any?
         new_indexes.each do |index|
           log colorize("Index found: #{index[:table]} (#{index[:columns].join(", ")})", :green)

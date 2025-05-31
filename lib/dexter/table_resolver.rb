@@ -2,8 +2,6 @@ module Dexter
   class TableResolver
     include Logging
 
-    attr_reader :queries
-
     def initialize(connection, queries, log_level:)
       @connection = connection
       @queries = queries
@@ -15,7 +13,7 @@ module Dexter
       no_schema_tables = self.no_schema_tables(tables)
       view_tables = self.view_tables(no_schema_tables)
 
-      queries.each do |query|
+      @queries.each do |query|
         # add schema to table if needed
         query_tables = self.tables(query).map { |t| no_schema_tables[t] || t }
 

@@ -14,12 +14,12 @@ class Minitest::Test
   end
 
   def assert_no_index(statement, *args, reason: nil)
-    output = dexter_run("-s", statement, "--log-level", "debug2", *args)
+    output = run_command("-s", statement, "--log-level", "debug2", *args)
     assert_match "No new indexes found", output
     assert_match reason, output if reason
   end
 
-  def dexter_run(*args)
+  def run_command(*args)
     dexter = Dexter::Client.new([$url] + args)
     ex = nil
     stdout, _ = capture_io do
@@ -35,12 +35,12 @@ class Minitest::Test
   end
 
   def assert_output(expected, *args)
-    assert_match expected, dexter_run(*args)
+    assert_match expected, run_command(*args)
   end
 
   def assert_error(expected, *args)
     error = assert_raises(Dexter::Error) do
-      dexter_run(*args)
+      run_command(*args)
     end
     assert_match expected, error.message
   end

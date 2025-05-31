@@ -39,13 +39,13 @@ class IndexingTest < Minitest::Test
 
     execute "SELECT pg_stat_reset()"
     args = ["-s", "SELECT * FROM posts WHERE id = 1", "--log-sql"]
-    refute_match "ANALYZE", dexter_run(*args)
+    refute_match "ANALYZE", run_command(*args)
 
-    output = dexter_run(*args, "--analyze")
+    output = run_command(*args, "--analyze")
     assert_match %{Running analyze: ANALYZE "public"."posts"}, output
     assert_match %{[sql] ANALYZE "public"."posts"}, output
 
-    refute_match "ANALYZE", dexter_run(*args, "--analyze")
+    refute_match "ANALYZE", run_command(*args, "--analyze")
   end
 
   def test_log_level_invalid

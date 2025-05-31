@@ -10,7 +10,7 @@ $conn.exec(File.read(File.expand_path("support/schema.sql", __dir__)))
 
 class Minitest::Test
   def assert_index(statement, index, *args)
-    assert_dexter_output "Index found: #{index}", "-s", statement, "--log-level", "debug2", *args
+    assert_output "Index found: #{index}", "-s", statement, "--log-level", "debug2", *args
   end
 
   def assert_no_index(statement, *args, reason: nil)
@@ -34,11 +34,11 @@ class Minitest::Test
     stdout
   end
 
-  def assert_dexter_output(expected, *args)
+  def assert_output(expected, *args)
     assert_match expected, dexter_run(*args)
   end
 
-  def assert_dexter_error(expected, *args)
+  def assert_error(expected, *args)
     error = assert_raises(Dexter::Error) do
       dexter_run(*args)
     end

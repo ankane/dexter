@@ -49,6 +49,6 @@ class IndexingTest < Minitest::Test
   end
 
   def test_log_level_invalid
-    assert_dexter_error "Unknown log level", "-s", "SELECT 1", "--log-level", "bad"
+    assert_error "Unknown log level", "-s", "SELECT 1", "--log-level", "bad"
   end
 end

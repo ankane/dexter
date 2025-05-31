@@ -1,11 +1,13 @@
 module Dexter
   class Query
-    attr_reader :statement, :fingerprint, :plans
-    attr_accessor :tables, :missing_tables, :new_cost, :total_time, :calls, :indexes, :suggest_index, :pass1_indexes, :pass2_indexes, :pass3_indexes, :candidate_tables, :tables_from_views, :index_mapping, :columns, :candidate_columns
+    attr_reader :statement, :fingerprint, :total_time, :calls, :plans
+    attr_accessor :tables, :missing_tables, :new_cost, :indexes, :suggest_index, :pass1_indexes, :pass2_indexes, :pass3_indexes, :candidate_tables, :tables_from_views, :index_mapping, :columns, :candidate_columns
 
-    def initialize(statement, fingerprint = nil)
+    def initialize(statement, fingerprint = nil, total_time: nil, calls: nil)
       @statement = statement
       @fingerprint = fingerprint
+      @total_time = total_time
+      @calls = calls
       @plans = []
       @tables_from_views = []
       @candidate_tables = []

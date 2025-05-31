@@ -198,16 +198,12 @@ module Dexter
     def create_hypothetical_indexes(queries)
       index_mapping = {}
 
-      # create single column indexes
+      # check single column indexes
       create_single_column_indexes(queries, index_mapping)
-
-      # get next round of costs
       calculate_plan(queries)
 
-      # create multicolumn indexes
+      # check multicolumn indexes
       create_multicolumn_indexes(queries, index_mapping)
-
-      # get next round of costs
       calculate_plan(queries)
 
       # save index mapping for analysis

@@ -43,6 +43,10 @@ class InputTest < Minitest::Test
     assert_error "Specify a source of queries"
   end
 
+  def test_input_format_invalid
+    assert_error "Unknown input format", support_path("queries.json"), "--input-format", "bad"
+  end
+
   private
 
   def support_path(file)

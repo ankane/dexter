@@ -117,6 +117,10 @@ module Dexter
         raise Error, "Unknown log level"
       end
 
+      unless [nil, "csv", "json", "sql"].include?(options[:input_format])
+        raise Error, "Unknown input format"
+      end
+
       [arguments, options]
     rescue Slop::Error => e
       raise Error, e.message

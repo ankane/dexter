@@ -9,6 +9,11 @@ module Dexter
     end
 
     def perform
+      tables = Set.new(@queries.flat_map(&:candidate_tables))
+      columns = tables.any? ? self.columns(tables) : []
+      columns_by_table = columns.group_by { |c| c[:table] }.transform_values { |v| v.to_h { |c| [c[:column], c] } }
+      columns_by_table.default = {}
+
       @queries.each do |query|
         log "Finding columns: #{query.statement}" if @log_level == "debug3"
         columns = Set.new
@@ -25,9 +30,19 @@ module Dexter
           end
         end
 
-        # TODO resolve possible tables
-        # TODO calculate all possible indexes for query
-        query.columns = columns.to_a
+        possible_columns = []
+        columns.each do |column|
+          (query.candidate_tables - query.tables_from_views).each do |table|
+            resolved = columns_by_table.dig(table, column)
+            possible_columns << resolved if resolved
+          end
+
+          # use all columns in tables from views (not ideal)
+          query.tables_from_views.each do |table|
+            possible_columns.concat(columns_by_table[table].values)
+          end
+        end
+        query.columns = possible_columns.uniq
       end
     end
 
@@ -36,6 +51,25 @@ module Dexter
     def find_columns(plan)
       plan = JSON.parse(plan.to_json, max_nesting: 1000)
       Indexer.find_by_key(plan, "ColumnRef")
+    end
+
+    def columns(tables)
+      query = <<~SQL
+        SELECT
+          s.nspname || '.' || t.relname AS table_name,
+          a.attname AS column_name,
+          pg_catalog.format_type(a.atttypid, a.atttypmod) AS data_type
+        FROM pg_attribute a
+          JOIN pg_class t on a.attrelid = t.oid
+          JOIN pg_namespace s on t.relnamespace = s.oid
+        WHERE a.attnum > 0
+          AND NOT a.attisdropped
+          AND s.nspname || '.' || t.relname IN (#{tables.size.times.map { |i| "$#{i + 1}" }.join(", ")})
+        ORDER BY
+          1, 2
+      SQL
+      columns = @connection.execute(query, params: tables.to_a)
+      columns.map { |v| {table: v["table_name"], column: v["column_name"], type: v["data_type"]} }
     end
   end
 end

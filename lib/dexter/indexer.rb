@@ -168,13 +168,7 @@ module Dexter
 
     def create_hypothetical_indexes(queries)
       index_mapping = {}
-
-      # filter tables for performance
-      # use all columns in tables from views
-      tables = Set.new(queries.flat_map(&:candidate_tables))
-      tables_from_views = Set.new(queries.flat_map(&:tables_from_views))
-      possible_columns = Set.new(queries.flat_map(&:columns))
-      columns_by_table = columns(tables).select { |c| possible_columns.include?(c[:column]) || tables_from_views.include?(c[:table]) }.group_by { |c| c[:table] }
+      columns_by_table = queries.flat_map(&:columns).uniq.group_by { |c| c[:table] }
 
       # create single column indexes
       create_hypothetical_indexes_helper(columns_by_table, 1, index_mapping)
@@ -188,6 +182,7 @@ module Dexter
       # get next round of costs
       calculate_plan(queries)
 
+      # save index mapping for analysis
       queries.each do |query|
         query.index_mapping = index_mapping
       end
@@ -553,25 +548,6 @@ module Dexter
 
     def index_exists?(index)
       indexes([index[:table]]).find { |i| i["columns"] == index[:columns] }
-    end
-
-    def columns(tables)
-      query = <<~SQL
-        SELECT
-          s.nspname || '.' || t.relname AS table_name,
-          a.attname AS column_name,
-          pg_catalog.format_type(a.atttypid, a.atttypmod) AS data_type
-        FROM pg_attribute a
-          JOIN pg_class t on a.attrelid = t.oid
-          JOIN pg_namespace s on t.relnamespace = s.oid
-        WHERE a.attnum > 0
-          AND NOT a.attisdropped
-          AND s.nspname || '.' || t.relname IN (#{tables.size.times.map { |i| "$#{i + 1}" }.join(", ")})
-        ORDER BY
-          1, 2
-      SQL
-      columns = execute(query, params: tables.to_a)
-      columns.map { |v| {table: v["table_name"], column: v["column_name"], type: v["data_type"]} }
     end
 
     def indexes(tables)

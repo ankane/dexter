@@ -10,7 +10,7 @@ $conn.exec(File.read(File.expand_path("support/schema.sql", __dir__)))
 
 class Minitest::Test
   def assert_index(statement, index, *args)
-    assert_dexter_output "Index found: #{index}", "-s", statement, *args
+    assert_dexter_output "Index found: #{index}", "-s", statement, "--log-level", "debug2", *args
   end
 
   def assert_no_index(statement, *args, reason: nil)

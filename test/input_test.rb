@@ -1,19 +1,19 @@
 require_relative "test_helper"
 
 class InputTest < Minitest::Test
-  def test_input_format_stderr
+  def test_stderr
     assert_index_file "queries.log"
   end
 
-  def test_input_format_csv
+  def test_csv
     assert_index_file "queries.csv"
   end
 
-  def test_input_format_json
+  def test_json
     assert_index_file "queries.json"
   end
 
-  def test_input_format_sql
+  def test_sql
     assert_index_file "queries.sql"
   end
 

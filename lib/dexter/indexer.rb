@@ -19,13 +19,18 @@ module Dexter
     # TODO recheck server version?
     def process_queries(queries)
       TableResolver.new(@connection, queries, log_level: @log_level).perform
+      ColumnResolver.new(@connection, queries, log_level: @log_level).perform
       candidate_queries = queries.reject(&:missing_tables)
 
       tables = determine_tables(candidate_queries)
       candidate_queries.each do |query|
         query.candidate_tables = query.tables.select { |t| tables.include?(t) }.sort
+        query.candidate_columns = query.columns.select { |c| tables.include?(c[:table]) }
+
+        # no reason to use btree index for json columns
+        query.candidate_columns.reject! { |c| ["json", "jsonb"].include?(c[:type]) }
       end
-      candidate_queries.select! { |q| q.candidate_tables.any? }
+      candidate_queries.select! { |q| q.candidate_columns.any? }
 
       if tables.any?
         # analyze tables if needed
@@ -35,14 +40,6 @@ module Dexter
         reset_hypothetical_indexes
         calculate_plan(candidate_queries)
         candidate_queries.select! { |q| q.initial_cost && q.high_cost? }
-
-        # find columns
-        ColumnResolver.new(@connection, candidate_queries, log_level: @log_level).perform
-        candidate_queries.each do |query|
-          # no reason to use btree index for json columns
-          query.candidate_columns = query.columns.reject { |c| ["json", "jsonb"].include?(c[:type]) }
-        end
-        candidate_queries.select! { |q| q.candidate_columns.any? }
 
         # sort to improve batching
         # TODO improve

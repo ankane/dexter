@@ -9,13 +9,15 @@ module Dexter
     end
 
     def perform
-      tables = Set.new(@queries.flat_map(&:candidate_tables))
+      tables = Set.new(@queries.flat_map(&:tables))
       columns = tables.any? ? self.columns(tables) : []
       columns_by_table = columns.group_by { |c| c[:table] }.transform_values { |v| v.to_h { |c| [c[:column], c] } }
       columns_by_table.default = {}
 
       @queries.each do |query|
         log "Finding columns: #{query.statement}" if @log_level == "debug3"
+        next unless query.parser_result
+
         columns = Set.new
         begin
           find_columns(query.tree).each do |col|
@@ -32,13 +34,13 @@ module Dexter
 
         possible_columns = []
         columns.each do |column|
-          query.candidate_tables.each do |table|
+          query.tables.each do |table|
             resolved = columns_by_table.dig(table, column)
             possible_columns << resolved if resolved
           end
         end
         # use all columns in tables from views (not ideal)
-        (query.tables_from_views & query.candidate_tables).each do |table|
+        query.tables_from_views.each do |table|
           possible_columns.concat(columns_by_table[table].values)
         end
         query.columns = possible_columns.uniq

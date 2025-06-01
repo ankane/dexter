@@ -1,10 +1,6 @@
 require_relative "test_helper"
 
 class BatchingTest < Minitest::Test
-  def setup
-    super
-  end
-
   def test_batching
     skip unless ENV["TEST_BATCHING"]
 

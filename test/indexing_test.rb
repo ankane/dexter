@@ -1,6 +1,18 @@
 require_relative "test_helper"
 
 class IndexingTest < Minitest::Test
+  def test_enable_hypopg
+    execute "DROP EXTENSION hypopg"
+
+    expected = "Run `CREATE EXTENSION hypopg` or pass --enable-hypopg"
+    assert_error expected, "-s", "SELECT 1"
+
+    expected = "[sql] CREATE EXTENSION hypopg"
+    assert_output expected, "-s", "SELECT 1", "--enable-hypopg", "--log-sql"
+  ensure
+    execute "CREATE EXTENSION IF NOT EXISTS hypopg"
+  end
+
   def test_create
     expected = %{Creating index: CREATE INDEX CONCURRENTLY ON "public"."posts" ("id")}
     assert_output expected, "-s", "SELECT * FROM posts WHERE id = 1", "--create"

@@ -41,6 +41,13 @@ class BatchingTest < Minitest::Test
     assert_match "Index found", output
   end
 
+  def test_column_resolution
+    statement = "SELECT id, blog_id FROM posts"
+    output = run_command("-s", statement, "--log-level", "debug2")
+    # TODO fix (should be 0)
+    assert_match "4 hypothetical indexes", output
+  end
+
   private
 
   def create_table(nc)

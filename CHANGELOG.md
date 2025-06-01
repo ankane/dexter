@@ -1,4 +1,4 @@
-## 0.6.0 (unreleased)
+## 0.6.0 (2025-06-01)
 
 - Added Linux packages for Ubuntu 24.04 and Debian 12
 - Fixed error with hypothetical index limit

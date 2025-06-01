@@ -9,6 +9,7 @@ CREATE TABLE posts (
   json json,
   jsonb jsonb,
   hstore hstore,
+  point point,
   indexed int
 );
 INSERT INTO posts (id, blog_id, user_id, indexed) SELECT n, n % 1000, n % 10, n FROM generate_series(1, 100000) n;

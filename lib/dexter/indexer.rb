@@ -41,7 +41,8 @@ module Dexter
         ColumnResolver.new(@connection, candidate_queries, log_level: @log_level).perform
         candidate_queries.each do |query|
           # no reason to use btree index for json columns
-          query.candidate_columns = query.columns.reject { |c| ["json", "jsonb"].include?(c[:type]) }.sort_by { |c| [c[:table], c[:column]] }
+          # TODO check type supports btree
+          query.candidate_columns = query.columns.reject { |c| ["json", "jsonb", "point"].include?(c[:type]) }.sort_by { |c| [c[:table], c[:column]] }
         end
         candidate_queries.select! { |q| q.candidate_columns.any? }
 
@@ -183,8 +184,12 @@ module Dexter
 
     def create_candidate_indexes(candidate_indexes, index_mapping)
       candidate_indexes.each do |columns|
-        index_name = create_hypothetical_index(columns[0][:table], columns.map { |c| c[:column] })
-        index_mapping[index_name] = columns
+        begin
+          index_name = create_hypothetical_index(columns[0][:table], columns.map { |c| c[:column] })
+          index_mapping[index_name] = columns
+        rescue PG::UndefinedObject
+          # data type x has no default operator class for access method "btree"
+        end
       end
     rescue PG::InternalError
       # hypopg: not more oid available

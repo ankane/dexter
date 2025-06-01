@@ -1,3 +1,7 @@
+## 0.6.1 (unreleased)
+
+- Fixed error with column types without `btree` support
+
 ## 0.6.0 (2025-06-01)
 
 - Added Linux packages for Ubuntu 24.04 and Debian 12

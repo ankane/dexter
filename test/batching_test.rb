@@ -1,7 +1,7 @@
 require_relative "test_helper"
 
 class BatchingTest < Minitest::Test
-  def test_batching
+  def test_many_queries
     skip unless ENV["TEST_BATCHING"]
 
     nc = 100

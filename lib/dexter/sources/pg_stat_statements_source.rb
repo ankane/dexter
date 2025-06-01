@@ -27,6 +27,8 @@ module Dexter
           1
       SQL
       @connection.execute(sql)
+    rescue PG::UndefinedTable => e
+      raise Error, e.message
     end
   end
 end

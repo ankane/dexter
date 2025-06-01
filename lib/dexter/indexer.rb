@@ -183,6 +183,9 @@ module Dexter
         index_name = create_hypothetical_index(columns[0][:table], columns.map { |c| c[:column] })
         index_mapping[index_name] = columns
       end
+    rescue PG::InternalError => e
+      # hypopg: not more oid available
+      log colorize("WARNING: Limiting index candidates", :yellow) if @log_level == "debug2"
     end
 
     def create_hypothetical_indexes(queries)
@@ -512,9 +515,6 @@ module Dexter
 
     def create_hypothetical_index(table, columns)
       execute("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{columns.map { |c| quote_ident(c) }.join(", ")})')").first["indexname"]
-    rescue PG::InternalError => e
-      # hypopg: not more oid available
-      raise Error, e.message
     end
 
     def with_advisory_lock

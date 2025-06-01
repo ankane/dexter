@@ -35,8 +35,9 @@ class BatchingTest < Minitest::Test
     create_table(nc)
 
     statement =  "SELECT * FROM t WHERE #{nc.times.map { |i| "c%02d = 1" % i }.join(" AND ")}"
-    # TODO fix
-    assert_error "hypopg: not more oid available", "-s", statement
+    output = run_command("-s", statement, "--log-level", "debug2")
+    assert_match "WARNING: Limiting index candidates", output
+    assert_match "Index found", output
   end
 
   private

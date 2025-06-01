@@ -62,11 +62,17 @@ class IndexingTest < Minitest::Test
     execute "CREATE TABLE t (#{nc.times.map { |i| "c%02d int" % i }.join(", ")})"
     execute "INSERT INTO t SELECT #{nc.times.map { "n" }.join(", ")} FROM generate_series(1, 2000) n"
 
-    tempfile = Tempfile.new
+    queries = []
     nc.times do |i|
       (i + 1).upto(nc - 1) do |j|
-        tempfile << "SELECT * FROM t WHERE c%02d = 1 AND c%02d = 2;\n" % [i, j]
+        queries << "SELECT * FROM t WHERE c%02d = 0 AND c%02d = 1" % [i, j]
       end
+    end
+    queries.shuffle!
+
+    tempfile = Tempfile.new
+    queries.each do |query|
+      tempfile << "#{query};\n"
     end
     tempfile.flush
 

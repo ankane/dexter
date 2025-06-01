@@ -27,7 +27,8 @@ class BatchingTest < Minitest::Test
 
     output = run_command(tempfile.path, "--input-format", "sql", "--log-level", "debug2")
     assert_equal nc, output.scan(/Index found/).size
-    assert_match "Batches: 50", output
+    assert_match "Batch 50", output
+    refute_match "Batch 51", output
   end
 
   def test_many_columns

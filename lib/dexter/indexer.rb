@@ -154,11 +154,9 @@ module Dexter
       candidate_queries.sort_by! { |q| q.candidate_columns.map { |c| [c[:table], c[:column]] } }
 
       candidate_queries.each_slice(100) do |batch|
-        create_hypothetical_indexes(batch)
+        create_hypothetical_indexes(batch, batch_count)
         batch_count += 1
       end
-
-      log "Batches: #{batch_count}" if @log_level == "debug2"
     end
 
     def create_single_column_indexes(queries, index_mapping)
@@ -183,12 +181,12 @@ module Dexter
         index_name = create_hypothetical_index(columns[0][:table], columns.map { |c| c[:column] })
         index_mapping[index_name] = columns
       end
-    rescue PG::InternalError => e
+    rescue PG::InternalError
       # hypopg: not more oid available
       log colorize("WARNING: Limiting index candidates", :yellow) if @log_level == "debug2"
     end
 
-    def create_hypothetical_indexes(queries)
+    def create_hypothetical_indexes(queries, batch_number)
       index_mapping = {}
       reset_hypothetical_indexes
 
@@ -204,6 +202,9 @@ module Dexter
       queries.each do |query|
         query.index_mapping = index_mapping
       end
+
+      # TODO different log level?
+      log "Batch #{batch_number + 1}: #{index_mapping.size} hypothetical indexes" if @log_level == "debug2"
     end
 
     def find_indexes(plan)

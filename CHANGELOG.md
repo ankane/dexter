@@ -1,5 +1,6 @@
 ## 0.6.0 (unreleased)
 
+- Fixed `hypopg: not more oid available` error
 - Dropped support for Linux package for Ubuntu 20.04
 - Dropped support for Ruby < 3
 - Dropped support for Postgres < 13

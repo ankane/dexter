@@ -1,6 +1,6 @@
 FROM ruby:3-alpine
 
-MAINTAINER Andrew Kane <andrew@ankane.org>
+LABEL org.opencontainers.image.authors="Andrew Kane <andrew@ankane.org>"
 
 RUN apk add --update build-base libpq-dev && \
     gem install google-protobuf --platform ruby && \

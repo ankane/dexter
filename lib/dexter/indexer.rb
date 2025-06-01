@@ -144,37 +144,41 @@ module Dexter
       end
     end
 
-    # TODO limit batches to certain number of hypothetical indexes
     # process in batches to prevent "hypopg: not more oid available" error
     # https://hypopg.readthedocs.io/en/rel1_stable/usage.html#configuration
     def batch_hypothetical_indexes(candidate_queries)
       batch_count = 0
+      batch = []
+      single_column_indexes = Set.new
+      multicolumn_indexes = Set.new
 
       # sort to improve batching
       # TODO improve
       candidate_queries.sort_by! { |q| q.candidate_columns.map { |c| [c[:table], c[:column]] } }
 
-      candidate_queries.each_slice(100) do |batch|
-        create_hypothetical_indexes(batch, batch_count)
-        batch_count += 1
-      end
-    end
+      candidate_queries.each do |query|
+        batch << query
 
-    def create_single_column_indexes(queries, index_mapping)
-      candidate_indexes = queries.flat_map(&:candidate_columns).uniq.map { |c| [c] }
-      create_candidate_indexes(candidate_indexes, index_mapping)
-    end
+        single_column_indexes.merge(query.candidate_columns)
 
-    # TODO for multicolumn indexes, use ordering
-    def create_multicolumn_indexes(queries, index_mapping)
-      candidate_indexes = Set.new
-      queries.each do |query|
+        # TODO for multicolumn indexes, use ordering
         columns_by_table = query.candidate_columns.group_by { |c| c[:table] }
-        columns_by_table.each do |table, columns|
-          candidate_indexes.merge(columns.permutation(2).to_a)
+        columns_by_table.each do |_, columns|
+          multicolumn_indexes.merge(columns.permutation(2).to_a)
+        end
+
+        if single_column_indexes.size + multicolumn_indexes.size >= 500
+          create_hypothetical_indexes(batch, single_column_indexes, multicolumn_indexes, batch_count)
+          batch_count += 1
+          batch.clear
+          single_column_indexes.clear
+          multicolumn_indexes.clear
         end
       end
-      create_candidate_indexes(candidate_indexes, index_mapping)
+
+      if batch.any?
+        create_hypothetical_indexes(batch, single_column_indexes, multicolumn_indexes, batch_count)
+      end
     end
 
     def create_candidate_indexes(candidate_indexes, index_mapping)
@@ -187,16 +191,16 @@ module Dexter
       log colorize("WARNING: Limiting index candidates", :yellow) if @log_level == "debug2"
     end
 
-    def create_hypothetical_indexes(queries, batch_number)
+    def create_hypothetical_indexes(queries, single_column_indexes, multicolumn_indexes, batch_count)
       index_mapping = {}
       reset_hypothetical_indexes
 
       # check single column indexes
-      create_single_column_indexes(queries, index_mapping)
+      create_candidate_indexes(single_column_indexes.map { |c| [c] }, index_mapping)
       calculate_plan(queries)
 
       # check multicolumn indexes
-      create_multicolumn_indexes(queries, index_mapping)
+      create_candidate_indexes(multicolumn_indexes, index_mapping)
       calculate_plan(queries)
 
       # save index mapping for analysis
@@ -205,7 +209,7 @@ module Dexter
       end
 
       # TODO different log level?
-      log "Batch #{batch_number + 1}: #{index_mapping.size} hypothetical indexes" if @log_level == "debug2"
+      log "Batch #{batch_count + 1}: #{queries.size} queries, #{index_mapping.size} hypothetical indexes" if @log_level == "debug2"
     end
 
     def find_indexes(plan)

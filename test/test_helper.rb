@@ -3,6 +3,7 @@ Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
 
+$dexter_test = true
 $url = "postgres:///dexter_test"
 $conn = PG::Connection.new($url)
 $conn.exec("SET client_min_messages = warning")

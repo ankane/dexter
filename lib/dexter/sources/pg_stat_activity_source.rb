@@ -29,7 +29,7 @@ module Dexter
 
         previous_queries = active_queries
 
-        sleep(0.1)
+        sleep($dexter_test ? 0 : 0.1)
       end
     end
 

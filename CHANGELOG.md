@@ -1,5 +1,6 @@
 ## 0.6.0 (unreleased)
 
+- Added Linux packages for Ubuntu 24.04 and Debian 12
 - Fixed error with hypothetical index limit
 - Dropped support for Linux package for Ubuntu 20.04
 - Dropped support for Ruby < 3

@@ -13,7 +13,7 @@ sudo apt-get update
 sudo apt-get -y install dexter
 ```
 
-Supports Ubuntu 22.04 (Jammy)
+Supports Ubuntu 22.04 (Jammy) and 24.04 (Noble)
 
 ### Debian
 
@@ -26,7 +26,7 @@ sudo apt-get update
 sudo apt-get -y install dexter
 ```
 
-Supports Debian 11 (Bullseye)
+Supports Debian 11 (Bullseye) and 12 (Bookworm)
 
 ## Credits
 

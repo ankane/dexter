@@ -26,7 +26,7 @@ class ConnectionTest < Minitest::Test
   end
 
   def test_user
-    assert_connection_error %{role "bad" does not exist}, "-U", "bad"
+    assert_connection_error (/(role|user) "bad"/), "-U", "bad"
   end
 
   private

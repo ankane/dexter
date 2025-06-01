@@ -40,13 +40,13 @@ module Dexter
         ColumnResolver.new(@connection, candidate_queries, log_level: @log_level).perform
         candidate_queries.each do |query|
           # no reason to use btree index for json columns
-          query.candidate_columns = query.columns.reject { |c| ["json", "jsonb"].include?(c[:type]) }
+          query.candidate_columns = query.columns.reject { |c| ["json", "jsonb"].include?(c[:type]) }.sort_by { |c| [c[:table], c[:column]] }
         end
         candidate_queries.select! { |q| q.candidate_columns.any? }
 
         # sort to improve batching
         # TODO improve
-        candidate_queries.sort_by! { |q| q.candidate_tables }
+        candidate_queries.sort_by! { |q| q.candidate_columns.map { |c| [c[:table], c[:column]] } }
 
         # TODO limit batches to certain number of hypothetical indexes
         # create hypothetical indexes and explain queries

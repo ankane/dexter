@@ -58,18 +58,18 @@ class IndexingTest < Minitest::Test
     skip unless ENV["TEST_BATCHING"]
 
     execute "DROP TABLE IF EXISTS t"
-    execute "CREATE TABLE t (#{100.times.map { |i| "c#{i} int" }.join(", ")})"
+    execute "CREATE TABLE t (#{100.times.map { |i| "c%02d int" % i }.join(", ")})"
     execute "INSERT INTO t SELECT #{100.times.map { |n| n }.join(", ")} FROM generate_series(1, 2000) n"
 
     tempfile = Tempfile.new
     100.times do |i|
       (i + 1).upto(99) do |j|
-        tempfile << "SELECT * FROM t WHERE c#{i} = 1 AND c#{j} = 2;\n"
+        tempfile << "SELECT * FROM t WHERE c%02d = 1 AND c%02d = 2;\n" % [i, j]
       end
     end
     tempfile.flush
 
     # TODO fix
-    assert_error "hypopg: not more oid available", tempfile.path, "--input-format", "sql"
+    assert_error "hypopg: not more oid available", tempfile.path, "--input-format", "sql", "--log-sql"
   end
 end

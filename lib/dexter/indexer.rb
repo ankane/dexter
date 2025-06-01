@@ -11,6 +11,7 @@ module Dexter
       @include_tables = Array(options[:include].split(",")) if options[:include]
       @log_explain = options[:log_explain]
       @analyze = options[:analyze]
+      @min_cost = options[:min_cost].to_i
       @min_cost_savings_pct = options[:min_cost_savings_pct].to_i
       @options = options
       @server_version_num = @connection.server_version_num
@@ -34,7 +35,7 @@ module Dexter
         # get initial costs for queries
         reset_hypothetical_indexes
         calculate_plan(candidate_queries)
-        candidate_queries.select! { |q| q.initial_cost && q.high_cost? }
+        candidate_queries.select! { |q| q.initial_cost && q.initial_cost >= @min_cost }
 
         # find columns
         ColumnResolver.new(@connection, candidate_queries, log_level: @log_level).perform
@@ -416,7 +417,7 @@ module Dexter
           log "No candidate tables for indexes"
         elsif !query.initial_cost
           log "Could not run explain"
-        elsif !query.high_cost?
+        elsif query.initial_cost < @min_cost
           log "Low initial cost: #{query.initial_cost}"
         elsif query.candidate_columns.empty?
           log "No candidate columns for indexes"

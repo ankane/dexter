@@ -85,6 +85,7 @@ module Dexter
         o.boolean "--enable-hypopg", "enable the HypoPG extension", default: false
         o.array "--exclude", "prevent specific tables from being indexed"
         o.string "--include", "only include specific tables"
+        o.integer "--min-cost", default: 100, help: false
         o.integer "--min-cost-savings-pct", default: 50, help: false
         o.string "--tablespace", "tablespace to create indexes"
         o.separator ""

@@ -37,9 +37,5 @@ module Dexter
     def initial_cost
       costs[0]
     end
-
-    def high_cost?
-      initial_cost && initial_cost >= 100
-    end
   end
 end

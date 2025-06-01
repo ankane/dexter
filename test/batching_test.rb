@@ -43,16 +43,14 @@ class BatchingTest < Minitest::Test
 
   def test_column_resolution
     statement = "SELECT id, blog_id FROM posts"
-    output = run_command("-s", statement, "--log-level", "debug2")
     # TODO fix (should be 0)
-    assert_match "4 hypothetical indexes", output
+    assert_output "4 hypothetical indexes", "-s", statement, "--log-level", "debug2"
   end
 
   def test_column_resolution_view
     statement = "SELECT view_id FROM posts_view WHERE view_id = 1"
-    output = run_command("-s", statement, "--log-level", "debug2")
     # TODO fix (should be 1)
-    assert_match "25 hypothetical indexes", output
+    assert_output "25 hypothetical indexes", "-s", statement, "--log-level", "debug2"
   end
 
   private

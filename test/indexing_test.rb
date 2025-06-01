@@ -76,7 +76,8 @@ class IndexingTest < Minitest::Test
     end
     tempfile.flush
 
-    output = run_command(tempfile.path, "--input-format", "sql")
+    output = run_command(tempfile.path, "--input-format", "sql", "--log-level", "debug2")
     assert_equal nc, output.scan(/Index found/).size
+    assert_match "Batches: 50", output
   end
 end

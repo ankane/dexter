@@ -44,17 +44,8 @@ module Dexter
         end
         candidate_queries.select! { |q| q.candidate_columns.any? }
 
-        # sort to improve batching
-        # TODO improve
-        candidate_queries.sort_by! { |q| q.candidate_columns.map { |c| [c[:table], c[:column]] } }
-
-        # TODO limit batches to certain number of hypothetical indexes
         # create hypothetical indexes and explain queries
-        # process in batches to prevent "hypopg: not more oid available" error
-        # https://hypopg.readthedocs.io/en/rel1_stable/usage.html#configuration
-        candidate_queries.each_slice(100) do |batch|
-          create_hypothetical_indexes(batch)
-        end
+        batch_hypothetical_indexes(candidate_queries)
       end
 
       # see if new indexes were used and meet bar
@@ -150,6 +141,24 @@ module Dexter
         end
         puts if @log_explain
       end
+    end
+
+    # TODO limit batches to certain number of hypothetical indexes
+    # process in batches to prevent "hypopg: not more oid available" error
+    # https://hypopg.readthedocs.io/en/rel1_stable/usage.html#configuration
+    def batch_hypothetical_indexes(candidate_queries)
+      batch_count = 0
+
+      # sort to improve batching
+      # TODO improve
+      candidate_queries.sort_by! { |q| q.candidate_columns.map { |c| [c[:table], c[:column]] } }
+
+      candidate_queries.each_slice(100) do |batch|
+        create_hypothetical_indexes(batch)
+        batch_count += 1
+      end
+
+      log "Batches: #{batch_count}" if @log_level == "debug2"
     end
 
     def create_single_column_indexes(queries, index_mapping)

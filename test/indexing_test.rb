@@ -57,19 +57,20 @@ class IndexingTest < Minitest::Test
   def test_batching
     skip unless ENV["TEST_BATCHING"]
 
+    nc = 100
     execute "DROP TABLE IF EXISTS t"
-    execute "CREATE TABLE t (#{100.times.map { |i| "c%02d int" % i }.join(", ")})"
-    execute "INSERT INTO t SELECT #{100.times.map { |n| n }.join(", ")} FROM generate_series(1, 2000) n"
+    execute "CREATE TABLE t (#{nc.times.map { |i| "c%02d int" % i }.join(", ")})"
+    execute "INSERT INTO t SELECT #{nc.times.map { "n" }.join(", ")} FROM generate_series(1, 2000) n"
 
     tempfile = Tempfile.new
-    100.times do |i|
-      (i + 1).upto(99) do |j|
+    nc.times do |i|
+      (i + 1).upto(nc - 1) do |j|
         tempfile << "SELECT * FROM t WHERE c%02d = 1 AND c%02d = 2;\n" % [i, j]
       end
     end
     tempfile.flush
 
     output = run_command(tempfile.path, "--input-format", "sql")
-    assert_equal 100, output.scan(/Index found/).size
+    assert_equal nc, output.scan(/Index found/).size
   end
 end

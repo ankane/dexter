@@ -178,6 +178,7 @@ module Dexter
 
     def create_hypothetical_indexes(queries)
       index_mapping = {}
+      reset_hypothetical_indexes
 
       # check single column indexes
       create_single_column_indexes(queries, index_mapping)

@@ -69,7 +69,7 @@ class IndexingTest < Minitest::Test
     end
     tempfile.flush
 
-    # TODO fix
-    assert_error "hypopg: not more oid available", tempfile.path, "--input-format", "sql", "--log-sql"
+    output = run_command(tempfile.path, "--input-format", "sql")
+    assert_equal 100, output.scan(/Index found/).size
   end
 end

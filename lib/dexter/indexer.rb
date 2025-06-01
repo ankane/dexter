@@ -108,7 +108,7 @@ module Dexter
         WHERE
           schemaname || '.' || relname IN (#{tables.size.times.map { |i| "$#{i + 1}" }.join(", ")})
       SQL
-      execute(query, params: tables.to_a)
+      execute(query, params: tables)
     end
 
     def analyze_tables(tables)

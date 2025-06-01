@@ -27,7 +27,6 @@ class InputTest < Minitest::Test
 
   def test_pg_stat_activity
     execute "SELECT * FROM posts WHERE id = 1"
-    # TODO speed up test
     assert_output "Index found: public.posts (id)", "--pg-stat-activity"
   end
 
@@ -37,6 +36,11 @@ class InputTest < Minitest::Test
     execute "SELECT * FROM posts WHERE id = 1"
     assert_output "Index found: public.posts (id)", "--pg-stat-statements"
     assert_output "Index found: public.posts (id)", "--pg-stat-statements", "--min-calls", "1"
+  end
+
+  def test_pg_stat_statements_missing
+    execute "DROP EXTENSION IF EXISTS pg_stat_statements"
+    assert_error %{relation "pg_stat_statements" does not exist}, "--pg-stat-statements"
   end
 
   def test_no_source

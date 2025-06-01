@@ -42,7 +42,7 @@ module Dexter
         end
       end
 
-      queries.sort_by(&:fingerprint)
+      queries
     end
   end
 end

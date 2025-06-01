@@ -502,6 +502,9 @@ module Dexter
 
     def create_hypothetical_index(table, columns)
       execute("SELECT * FROM hypopg_create_index('CREATE INDEX ON #{quote_ident(table)} (#{columns.map { |c| quote_ident(c) }.join(", ")})')").first["indexname"]
+    rescue PG::InternalError => e
+      # hypopg: not more oid available
+      raise Error, e.message
     end
 
     def with_advisory_lock

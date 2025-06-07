@@ -112,7 +112,7 @@ module Dexter
 
       options[:dbname] = arguments.shift unless options[:dbname]
 
-      # TODO don't use global var
+      # TODO remove global variable
       $log_level = options[:log_level].to_s.downcase
       unless ["error", "info", "debug", "debug2", "debug3"].include?($log_level)
         raise Error, "Unknown log level"

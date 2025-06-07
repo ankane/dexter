@@ -8,7 +8,7 @@ module Dexter
     }
 
     def output
-      $stdout
+      $dexter_output || $stdout
     end
 
     def log(message = "")

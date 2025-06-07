@@ -2,6 +2,7 @@ require "bundler/setup"
 Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
+require "stringio"
 
 $dexter_test = true
 $url = "postgres:///dexter_test"
@@ -21,16 +22,16 @@ class Minitest::Test
   end
 
   def run_command(*args, add_conninfo: true)
+    $dexter_output = StringIO.new(+"")
     args.unshift($url) if add_conninfo
     client = Dexter::Client.new(args)
     ex = nil
-    stdout, _ = capture_io do
-      begin
-        client.perform
-      rescue => e
-        ex = e
-      end
+    begin
+      client.perform
+    rescue => e
+      ex = e
     end
+    stdout = $dexter_output.string
     puts stdout if ENV["VERBOSE"]
     raise ex if ex
     stdout

@@ -41,6 +41,10 @@ module Dexter
       end
     end
 
+    def quote_ident(value)
+      value.split(".").map { |v| conn.quote_ident(v) }.join(".")
+    end
+
     def server_version_num
       @server_version_num ||= execute("SHOW server_version_num").first["server_version_num"].to_i
     end

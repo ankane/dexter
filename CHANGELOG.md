@@ -1,4 +1,4 @@
-## 0.6.1 (unreleased)
+## 0.6.1 (2025-06-08)
 
 - Fixed error with column types without `btree` support
 

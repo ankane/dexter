@@ -30,6 +30,7 @@ module Dexter
 
       if tables.any?
         # analyze tables if needed
+        # TODO remove @log_level in 0.7.0
         analyze_tables(tables) if @analyze || @log_level == "debug2"
 
         # get initial costs for queries

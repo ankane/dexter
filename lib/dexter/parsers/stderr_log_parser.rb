@@ -1,6 +1,6 @@
 module Dexter
   class StderrLogParser < LogParser
-    LINE_SEPERATOR = ":  ".freeze
+    LINE_SEPARATOR = ":  ".freeze
     DETAIL_LINE = "DETAIL:  ".freeze
 
     def perform(collector)
@@ -11,7 +11,7 @@ module Dexter
         if active_line
           if line.include?(DETAIL_LINE)
             add_parameters(active_line, line.chomp.split(DETAIL_LINE)[1])
-          elsif line.include?(LINE_SEPERATOR)
+          elsif line.include?(LINE_SEPARATOR)
             collector.add(active_line, duration)
             active_line = nil
           else

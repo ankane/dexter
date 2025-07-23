@@ -1,5 +1,7 @@
 module Dexter
   class Query
+    include Logging
+
     attr_reader :statement, :fingerprint, :total_time, :calls, :plans
     attr_accessor :tables, :missing_tables, :new_cost, :indexes, :suggest_index, :pass1_indexes, :pass2_indexes, :pass3_indexes, :candidate_tables, :tables_from_views, :index_mapping, :columns, :candidate_columns
 

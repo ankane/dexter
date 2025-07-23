@@ -34,6 +34,7 @@ class InputTest < Minitest::Test
     execute "CREATE EXTENSION IF NOT EXISTS pg_stat_statements"
     execute "SELECT pg_stat_statements_reset()"
     execute "SELECT * FROM posts WHERE id = 1"
+    execute "REFRESH MATERIALIZED VIEW posts_materialized"
     assert_output "Index found: public.posts (id)", "--pg-stat-statements"
     assert_output "Index found: public.posts (id)", "--pg-stat-statements", "--min-calls", "1"
   end

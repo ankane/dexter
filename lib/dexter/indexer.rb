@@ -136,7 +136,8 @@ module Dexter
           puts
         end
         begin
-          query.plans << plan(query.statement)
+          plan = self.plan(query.statement)
+          query.plans << plan if plan && plan["Total Cost"]
         rescue PG::Error, JSON::NestingError => e
           if @log_explain
             log e.message

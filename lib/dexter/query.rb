@@ -31,7 +31,7 @@ module Dexter
     end
 
     def costs
-      plans.compact.map { |plan| plan["Total Cost"] }
+      plans.map { |plan| plan["Total Cost"] }
     end
 
     def initial_cost

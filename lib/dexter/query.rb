@@ -31,6 +31,9 @@ module Dexter
     end
 
     def costs
+      if plans.any?(&:nil?)
+        log colorize("Failed for query: #{statement}", :yellow)
+      end
       plans.compact.map { |plan| plan["Total Cost"] }
     end
 

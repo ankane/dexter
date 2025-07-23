@@ -1,3 +1,7 @@
+## 0.6.2 (unreleased)
+
+- Fixed error with utility statements
+
 ## 0.6.1 (2025-06-08)
 
 - Fixed error with column types without `btree` support

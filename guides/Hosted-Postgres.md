@@ -2,43 +2,24 @@
 
 Some hosted providers like Heroku do not support the HypoPG extension, which Dexter needs to run. Hopefully this will change with time. For now, we can spin up a separate database instance to run Dexter. It’s not super convenient, but can be useful to do from time to time.
 
-### Install Postgres and Ruby
+### Install Postgres, HypoPG, and Dexter
 
-Ubuntu 22.04
+Ubuntu
 
 ```sh
-sudo apt-get install -y curl ca-certificates gnupg
-curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg >/dev/null
-sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-sudo apt-get update
-sudo apt-get install -y postgresql-15 postgresql-server-dev-15
+sudo apt-get install -y postgresql-common
+sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+sudo apt-get install -y postgresql-17 postgresql-17-hypopg
+sudo service postgresql start
 sudo -u postgres createuser $(whoami) -s
-sudo apt-get install -y ruby3.0 ruby3.0-dev
+sudo apt-get install -y build-essential libpq-dev ruby ruby-dev
+sudo gem install pgdexter
 ```
 
 Mac
 
 ```sh
-brew install postgresql
-brew install ruby
-```
-
-### Install HypoPG and Dexter
-
-HypoPG
-
-```sh
-cd /tmp
-curl -L https://github.com/HypoPG/hypopg/archive/1.4.0.tar.gz | tar xz
-cd hypopg-1.4.0
-make
-make install # may need sudo
-```
-
-Dexter
-
-```sh
-gem install pgdexter # may need sudo
+brew install postgresql@17 hypopg dexter
 ```
 
 ### Download logs

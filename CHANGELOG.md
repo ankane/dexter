@@ -1,4 +1,4 @@
-## 0.6.2 (unreleased)
+## 0.6.2 (2025-07-27)
 
 - Fixed error with utility statements
 

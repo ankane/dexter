@@ -44,6 +44,12 @@ class InputTest < Minitest::Test
     assert_error %{relation "pg_stat_statements" does not exist}, "--pg-stat-statements"
   end
 
+  def test_multiple_statements
+    output = run_command("-s", "SELECT * FROM posts WHERE id = 1", "-s", "SELECT * FROM posts WHERE user_id = 1")
+    assert_match "Index found: public.posts (id)", output
+    assert_match "Index found: public.posts (user_id)", output
+  end
+
   def test_no_source
     assert_error "Specify a source of queries"
   end

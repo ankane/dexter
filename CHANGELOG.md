@@ -1,6 +1,7 @@
 ## 0.6.3 (unreleased)
 
 - Added `--non-concurrently` option
+- Added support for multiple `--statement` options
 
 ## 0.6.2 (2025-07-27)
 

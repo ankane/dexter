@@ -23,7 +23,7 @@ module Dexter
       connection.setup(options[:enable_hypopg])
 
       source =
-        if options[:statement]
+        if options[:statement].any?
           # TODO raise error for --interval, --min-calls, --min-time
           StatementSource.new(options[:statement])
         elsif options[:pg_stat_statements]
@@ -63,7 +63,7 @@ module Dexter
         o.boolean "--pg-stat-activity", "use pg_stat_activity", default: false
         o.boolean "--pg-stat-statements", "use pg_stat_statements", default: false, help: false
         o.boolean "--stdin", "use stdin", default: false
-        o.string "-s", "--statement", "process a single statement"
+        o.array "-s", "--statement", "process a single statement", delimiter: nil
         o.separator ""
 
         o.separator "Connection options:"

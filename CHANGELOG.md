@@ -1,4 +1,4 @@
-## 0.6.3 (unreleased)
+## 0.6.3 (2025-10-15)
 
 - Added `--non-concurrently` option
 - Added support for multiple `--statement` options

@@ -29,6 +29,8 @@ module Dexter
               log "Index created: #{((monotonic_time - started_at) * 1000).to_i} ms"
             rescue PG::LockNotAvailable
               log "Could not acquire lock: #{index[:table]}"
+            rescue PG::FeatureNotSupported => e
+              raise Error, e.message
             end
           end
         end

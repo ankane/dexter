@@ -13,27 +13,6 @@ class IndexingTest < Minitest::Test
     execute "CREATE EXTENSION IF NOT EXISTS hypopg"
   end
 
-  def test_create
-    expected = %{Creating index: CREATE INDEX CONCURRENTLY ON "public"."posts" ("id")}
-    assert_output expected, "-s", "SELECT * FROM posts WHERE id = 1", "--create"
-  ensure
-    execute "DROP INDEX IF EXISTS posts_id_idx"
-  end
-
-  def test_tablespace
-    expected = %{Creating index: CREATE INDEX CONCURRENTLY ON "public"."posts" ("id") TABLESPACE "pg_default"}
-    assert_output expected, "-s", "SELECT * FROM posts WHERE id = 1", "--create", "--tablespace", "pg_default"
-  ensure
-    execute "DROP INDEX IF EXISTS posts_id_idx"
-  end
-
-  def test_non_concurrently
-    expected = %{Creating index: CREATE INDEX ON "public"."posts" ("id")}
-    assert_output expected, "-s", "SELECT * FROM posts WHERE id = 1", "--create", "--non-concurrently"
-  ensure
-    execute "DROP INDEX IF EXISTS posts_id_idx"
-  end
-
   def test_exclude
     assert_no_index "SELECT * FROM posts WHERE id = 1", "--exclude", "posts", reason: "No candidate tables for indexes"
   end

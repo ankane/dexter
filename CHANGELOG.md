@@ -1,3 +1,7 @@
+## 0.6.3 (unreleased)
+
+- Added `--non-concurrently` option
+
 ## 0.6.2 (2025-07-27)
 
 - Fixed error with utility statements

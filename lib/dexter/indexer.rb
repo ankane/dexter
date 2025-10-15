@@ -61,7 +61,7 @@ module Dexter
       show_debug_info(new_indexes, queries) if @log_level.start_with?("debug")
 
       # create new indexes
-      IndexCreator.new(@connection, self, new_indexes, @tablespace).perform if @create && new_indexes.any?
+      IndexCreator.new(@connection, self, new_indexes, @tablespace, !@options[:non_concurrently]).perform if @create && new_indexes.any?
     end
 
     private

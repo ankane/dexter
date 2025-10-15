@@ -88,6 +88,7 @@ module Dexter
         o.integer "--min-cost", default: 100, help: false
         o.integer "--min-cost-savings-pct", default: 50, help: false
         o.string "--tablespace", "tablespace to create indexes"
+        o.boolean "--non-concurrently", "use non-concurrent index creation", default: false
         o.separator ""
 
         o.separator "Logging options:"

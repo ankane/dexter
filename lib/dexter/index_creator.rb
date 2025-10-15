@@ -2,11 +2,12 @@ module Dexter
   class IndexCreator
     include Logging
 
-    def initialize(connection, indexer, new_indexes, tablespace)
+    def initialize(connection, indexer, new_indexes, tablespace, concurrently)
       @connection = connection
       @indexer = indexer
       @new_indexes = new_indexes
       @tablespace = tablespace
+      @concurrently = concurrently
     end
 
     # 1. create lock
@@ -17,7 +18,9 @@ module Dexter
       with_advisory_lock do
         @new_indexes.each do |index|
           unless index_exists?(index)
-            statement = String.new("CREATE INDEX CONCURRENTLY ON #{@connection.quote_ident(index[:table])} (#{index[:columns].map { |c| @connection.quote_ident(c) }.join(", ")})")
+            statement = String.new("CREATE INDEX")
+            statement << " CONCURRENTLY" if @concurrently
+            statement << " ON #{@connection.quote_ident(index[:table])} (#{index[:columns].map { |c| @connection.quote_ident(c) }.join(", ")})"
             statement << " TABLESPACE #{@connection.quote_ident(@tablespace)}" if @tablespace
             log "Creating index: #{statement}"
             started_at = monotonic_time

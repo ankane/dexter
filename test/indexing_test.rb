@@ -27,6 +27,13 @@ class IndexingTest < Minitest::Test
     execute "DROP INDEX IF EXISTS posts_id_idx"
   end
 
+  def test_non_concurrently
+    expected = %{Creating index: CREATE INDEX ON "public"."posts" ("id")}
+    assert_output expected, "-s", "SELECT * FROM posts WHERE id = 1", "--create", "--non-concurrently"
+  ensure
+    execute "DROP INDEX IF EXISTS posts_id_idx"
+  end
+
   def test_exclude
     assert_no_index "SELECT * FROM posts WHERE id = 1", "--exclude", "posts", reason: "No candidate tables for indexes"
   end

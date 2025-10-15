@@ -49,6 +49,13 @@ class StatementTest < Minitest::Test
     assert_index "SELECT * FROM events WHERE blog_id = 1", "public.events (blog_id)"
   end
 
+  def test_partitioned_table_and_partition
+    output = run_command("-s", "SELECT * FROM events WHERE blog_id = 1", "-s", "SELECT * FROM events_0 WHERE blog_id = 1")
+    assert_match "Index found: public.events (blog_id)", output
+    # TODO fix
+    assert_match "Index found: public.events_0 (blog_id)", output
+  end
+
   def test_foreign_table
     assert_no_index "SELECT * FROM comments WHERE post_id = 1", reason: "Tables not present in current database"
   end

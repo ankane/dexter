@@ -45,6 +45,10 @@ class StatementTest < Minitest::Test
     assert_no_index "SELECT * FROM missing", reason: "Tables not present in current database"
   end
 
+  def test_partitioned_table
+    assert_index "SELECT * FROM events WHERE blog_id = 1", "public.events (blog_id)"
+  end
+
   def test_foreign_table
     assert_no_index "SELECT * FROM comments WHERE post_id = 1", reason: "Tables not present in current database"
   end

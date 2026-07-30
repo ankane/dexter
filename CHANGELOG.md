@@ -1,3 +1,7 @@
+## 0.7.0 (unreleased)
+
+- Dropped support for Linux packages
+
 ## 0.6.3 (2025-10-15)
 
 - Added `--non-concurrently` option

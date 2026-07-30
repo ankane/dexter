@@ -32,7 +32,7 @@ Then install the command line tool with:
 gem install pgdexter
 ```
 
-The command line tool is also available with [Docker](#docker), [Homebrew](#homebrew), or as a [Linux package](guides/Linux.md).
+The command line tool is also available with [Docker](#docker) or [Homebrew](#homebrew).
 
 ## How to Use
 

@@ -208,7 +208,7 @@ dexter --log-sql --log-level debug2
 
 The `hypopg` extension, which Dexter needs to run, is available on [these providers](https://github.com/ankane/dexter/issues/44).
 
-For other providers, see [this guide](guides/Hosted-Postgres.md). To request a new extension:
+To request a new extension on other providers:
 
 - Google Cloud SQL - vote or comment on [this page](https://issuetracker.google.com/issues/69250435)
 - DigitalOcean Managed Databases - vote or comment on [this page](https://ideas.digitalocean.com/managed-database/p/support-hypopg-for-postgres)
